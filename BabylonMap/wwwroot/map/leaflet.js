@@ -1,4 +1,4 @@
-﻿var data = {
+var data = {
     mapSize: 1500000,
     tileSize: 512,
     transformB: 403,
@@ -138,9 +138,7 @@ function addCustomMarker(lat, lng, node, timeleft) {
             <svg xmlns="http://www.w3.org/2000/svg" width="60" height="100" viewBox="0 0 60 100">
                 <!-- Rechteck für den Timer oben -->
                 <rect x="5" y="5" width="50" height="20" fill="black" stroke="white" stroke-width="2" rx="5"/>
-                <text id="timer-${node.id}" x="30" y="20" text-anchor="middle" font-size="14" fill="white">10</text>
-                
-               
+                <text id="timer-${node.id}" x="30" y="20" text-anchor="middle" font-size="14" fill="white"></text>
 
                 <!-- Dreieck als Marker -->
                 <polygon points="30,90 10,60 50,60" fill="#${node.rarity}" stroke="#${node.rarity}" stroke-width="2"/>
@@ -230,12 +228,12 @@ function startTimer(id, timeRemaining) {
     }
 
     const interval = setInterval(() => {
+        let formatted = formatTime(timeLeft);
         if (timeLeft <= 0) {
             clearInterval(interval);
             timerElement.textContent = "🔥"; // Timer abgelaufen
             console.log("startTimer: Timer abgelaufen für ID", id);
         } else {
-            let formatted = formatTime(timeLeft);
             timerElement.textContent = formatted;
             console.log(`startTimer: Update für ID ${id} – verbleibende Zeit: ${timeLeft} Sek.`);
             timeLeft--;

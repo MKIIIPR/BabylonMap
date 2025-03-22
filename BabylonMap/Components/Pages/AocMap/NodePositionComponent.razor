@@ -1,4 +1,4 @@
-﻿
+
 @using AshesMapBib.Models
 @using System.Threading
 @using BabylonMap.Components.AppStates
@@ -21,11 +21,11 @@
 
             <div style="display:flex;flex-direction: column;padding-left:5px;">
                 <div style="display:flex;flex-direction: column;">
-                    
-                <span>@(NodePosition.TimeRemainingString)</span>
                     <span style="font-size: smaller;">@(NodePosition.Node.Name)</span>
+                    <span style="font-size: smaller;">@(NodePosition.TimeRemainingString)</span>
+                    <span style="font-size: smaller;">@(NodePosition.ActualRespawnAt)</span>
                 </div>
-                <div style="width:150px;height:50px">
+                <div style="width:190px;height:50px">
                 <MudIconButton Icon="@Icons.Material.Filled.AdsClick"
                                Variant="Variant.Outlined"
                                Color="Color.Success"
@@ -43,11 +43,11 @@
                                Size="Size.Small"
                                OnClick="() => DeleteNode(NodePosition)" />
 
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                    Variant="Variant.Outlined"
-                                   Color="Color.Error"
+                                   Color="Color.Info"
                                    Size="Size.Small"
-                                   OnClick="() => DeleteNode(NodePosition)" />
+                                   OnClick="() => EditNode(NodePosition)" />
 
                 <MudToggleIconButton @bind-Toggled="NodePosition.AlertSet"
                                      Icon="@Icons.Material.Filled.AlarmOff"
@@ -128,6 +128,13 @@
     {
         spot.Ghost = true;
         await _mapData.UpdateNodePosition(spot);
+    }
+
+    private async Task EditNode(NodePositionView spot)
+    {
+        //todo: Edit Dialog!
+
+        //await _mapData.UpdateNodePosition(spot);
     }
 
     public void EnlargeImg()

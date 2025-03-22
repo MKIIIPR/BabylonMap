@@ -82,7 +82,7 @@
         // Gibt die verbleibende Zeit als formatierte Zeichenkette zurück
         public string TimeRemainingString => TimeRemaining.TotalSeconds > 0
             ? $"{TimeRemaining.Hours}h {TimeRemaining.Minutes}m {TimeRemaining.Seconds}s"
-            : "Bereit zur Ernte";
+            : $"Ernten! {TimeRemaining.Hours}h {TimeRemaining.Minutes}m {TimeRemaining.Seconds}s";
 
         // Gibt true zurück, wenn die Ressource noch nicht bereit ist
         public bool IsRespawning => TimeRemaining.TotalSeconds > 0;
