@@ -1,0 +1,166 @@
+﻿@using System.Net.Http.Json
+@using AshesMapBib.Components
+@using AshesMapBib.Models
+@using MudBlazor
+@inject HttpClient httpClient
+@inject ISnackbar Snackbar
+@inject ResourceApiClient<Node> _nodes
+
+<MudTable Items="@Nodes" Dense="true" Hover="true" ReadOnly="false" CanCancelEdit="@true" Filter="new Func<Node, bool>(FilterFunc)"
+@bind-SelectedItem="selectedNode" SortLabel="Sort By" CommitEditTooltip="Commit Edit"
+OnCommitEditClick="@(() => Snackbar.Add("Commit Edit Handler Invoked"))" RowEditPreview="BackupNode" RowEditCancel="ResetNodeToOriginalValues"
+RowEditCommit="@(ts =>  NodeHasBeenCommitted(ts))" IsEditRowSwitchingBlocked="@blockSwitch" ApplyButtonPosition="@applyButtonPosition" EditButtonPosition="@editButtonPosition" EditTrigger="@editTrigger">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Nodes</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <ColGroup>
+        @if (applyButtonPosition.DisplayApplyButtonAtStart() || (editButtonPosition.DisplayEditButtonAtStart() && editTrigger == TableEditTrigger.EditButton))
+        {
+            <col style="width:50px;" />
+        }
+        <col style="width:100px;" />
+        <col style="width:200px;" />
+        <col style="width:150px;" />
+        <col style="width:150px;" />
+        <col style="width:200px;" />
+        @if (applyButtonPosition.DisplayApplyButtonAtEnd() || (editButtonPosition.DisplayEditButtonAtEnd() && editTrigger == TableEditTrigger.EditButton))
+        {
+            <col style="width:50px;" />
+        }
+    </ColGroup>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<Node, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Node, object>(x => x.Name)">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Node, object>(x => x.Type)">Type</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Node, object>(x => x.RespawnTimer)">Respawn Timer</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<Node, object>(x => x.NodeImageUrl)">Image</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id"> <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="@Color.Secondary" OnClick="()=>DeleteNode(context)" />@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Type">@context.Type</MudTd>
+        <MudTd DataLabel="Respawn Timer">@context.RespawnTimer</MudTd>
+        <MudTd DataLabel="Image">
+            <MudAvatar Rounded="true" Color="Color.Secondary" Variant="Variant.Outlined">
+                <MudImage Src="@context.NodeImageUrl"></MudImage>
+            </MudAvatar>
+
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">
+
+            <MudTextField @bind-Value="context.Name" Required />
+        </MudTd>
+        <MudTd DataLabel="Type">
+            <MudTextField @bind-Value="context.Type" Required />
+        </MudTd>
+        <MudTd DataLabel="Respawn Timer">
+            <MudNumericField @bind-Value="context.RespawnTimer" Required Min="0" />
+        </MudTd>
+        <MudTd DataLabel="Image">
+
+            <FileUploader OnImageUploaded="@(image => context.NodeImageUrl = image)" />
+
+        </MudTd>
+        <MudTd>
+            <MudButton Variant="Variant.Filled">Default</MudButton>
+        </MudTd>
+    </RowEditingTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    <EditButtonContent Context="button">
+
+        <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
+    </EditButtonContent>
+</MudTable>
+
+
+
+@code {
+    private List<string> editEvents = new();
+
+
+    private bool blockSwitch = false;
+    private string searchString = "";
+    private Node selectedNode = null;
+    private Node nodeBeforeEdit;
+    private TableApplyButtonPosition applyButtonPosition = TableApplyButtonPosition.End;
+    private TableEditButtonPosition editButtonPosition = TableEditButtonPosition.End;
+    private TableEditTrigger editTrigger = TableEditTrigger.RowClick;
+    private IEnumerable<Node> Nodes => _map?.NodeList ?? Enumerable.Empty<Node>();
+    [CascadingParameter] public CascadingMapData _map { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        // Passe die URL entsprechend an, unter der deine Nodes abgerufen werden
+
+    }
+    public async Task DeleteNode(Node node){
+        await _nodes.DeleteAsync(((Node)node).Id, $"/node?id=eq.");
+        _map.NodeList.Remove(node);
+    }
+    public async Task AddNode(Node toAdd)
+    {
+        toAdd.Id = Guid.NewGuid().ToString();        
+        await _nodes.CreateAsync(toAdd, "/node");
+
+    }
+    private void ClearEventLog()
+    {
+        editEvents.Clear();
+    }
+
+    private void AddEditionEvent(string message)
+    {
+        editEvents.Add(message);
+        StateHasChanged();
+    }
+
+    private void BackupNode(object node)
+    {
+        nodeBeforeEdit = new Node
+            {
+                Id = ((Node)node).Id,
+                Name = ((Node)node).Name,
+                Type = ((Node)node).Type,
+                RespawnTimer = ((Node)node).RespawnTimer,
+                NodeImageUrl = ((Node)node).NodeImageUrl
+            };
+        AddEditionEvent($"RowEditPreview event: Backup of Node {((Node)node).Name} created");
+    }
+
+    private async Task NodeHasBeenCommitted(object node)
+    {
+
+        AddEditionEvent($"RowEditCommit event: Changes to Node {((Node)node).Name} committed");
+        await _nodes.UpdateAsync(((Node)node).Id, (Node)node, $"/node?id=eq.");
+    }
+
+    private void ResetNodeToOriginalValues(object node)
+    {
+        ((Node)node).Name = nodeBeforeEdit.Name;
+        ((Node)node).Type = nodeBeforeEdit.Type;
+        ((Node)node).RespawnTimer = nodeBeforeEdit.RespawnTimer;
+        ((Node)node).NodeImageUrl = nodeBeforeEdit.NodeImageUrl;
+        AddEditionEvent($"RowEditCancel event: Editing of Node {((Node)node).Name} canceled");
+    }
+
+    private bool FilterFunc(Node node)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (node.Id.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (node.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (node.Type.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (node.RespawnTimer.ToString().Contains(searchString))
+            return true;
+        return false;
+    }
+}

@@ -1,0 +1,135 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+<div class="image-container">
+    @foreach (var imageSource in imageSources)
+    {
+        <img src="@imageSource" style="max-width: 200px; height: auto;" />
+    }
+</div>
+
+<div @ref="fileDropContainer" class="file-drop-zone @HoverClass"
+     @ondragenter="OnDragEnter"
+     @ondragleave="OnDragLeave" @ondragover="OnDragEnter">
+    <!-- Benutzerdefiniertes Label -->
+    <label for="inputFile" class="custom-file-label">
+       klick or drag for upload
+    </label>
+
+    <!-- Das eigentliche InputFile wird versteckt -->
+    <InputFile id="inputFile" style="display: none;" @ref="inputFile" multiple OnChange="@OnChange" />
+</div>
+@* 
+<button @onclick="PasteImageFromClipboard">📋</button>
+ *@
+
+@code {
+    [Parameter] public EventCallback<string> OnImageUploaded { get; set; } // Übergabe des Bildes an das Parent
+    private const int maxAllowedSize = 8 * 1024 * 1024; // 8 MB
+    private List<string> imageSources = new List<string>();
+    private string HoverClass = string.Empty;
+    private ElementReference fileDropContainer;
+    InputFile? inputFile;
+    IJSObjectReference? _clipboardModule;
+
+    void OnDragEnter(DragEventArgs e) => HoverClass = "hover";
+    void OnDragLeave(DragEventArgs e) => HoverClass = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Importiere das Clipboard-Modul für das Einfügen von Bildern
+                _clipboardModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/clipboard.js");
+                Console.WriteLine("✅ Clipboard.js erfolgreich geladen.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Fehler beim Laden von clipboard.js: {ex.Message}");
+            }
+        }
+    }
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            try
+            {
+                using var stream = file.OpenReadStream(maxAllowedSize);
+                using var ms = new MemoryStream();
+                await stream.CopyToAsync(ms);
+                var base64Image = $"data:{file.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
+                imageSources.Add(base64Image);
+
+                // Bild an das Parent weitergeben
+                await OnImageUploaded.InvokeAsync(base64Image);
+                Console.WriteLine("✅ Bild erfolgreich hochgeladen.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Fehler beim Hochladen des Bildes: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task PasteImageFromClipboard()
+    {
+        if (_clipboardModule != null)
+        {
+            try
+            {
+                Console.WriteLine("📋 Versuche Bild aus Zwischenablage einzufügen...");
+                await _clipboardModule.InvokeVoidAsync("getClipboardImage", DotNetObjectReference.Create(this));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Fehler beim Einfügen des Bildes aus der Zwischenablage: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("⚠️ Clipboard-Modul nicht geladen!");
+        }
+    }
+
+    [JSInvokable]
+    public Task OnImagePasted(string base64Image)
+    {
+        try
+        {
+            var imageSrc = $"data:image/png;base64,{base64Image}";
+            imageSources.Add(imageSrc);
+
+            // Bild an das Parent weitergeben
+            OnImageUploaded.InvokeAsync(imageSrc);
+            StateHasChanged(); // UI aktualisieren
+            Console.WriteLine("✅ Bild aus Zwischenablage eingefügt!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Fehler beim Verarbeiten des eingefügten Bildes: {ex.Message}");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_clipboardModule is not null)
+        {
+            try
+            {
+                await _clipboardModule.DisposeAsync();
+                Console.WriteLine("✅ Clipboard-Modul erfolgreich entladen.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Fehler beim Entladen des Clipboard-Moduls: {ex.Message}");
+            }
+        }
+    }
+}

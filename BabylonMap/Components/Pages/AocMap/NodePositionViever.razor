@@ -1,0 +1,150 @@
+﻿
+@using AshesMapBib.Models
+@using System.Threading
+@using BabylonMap.Components.AppStates
+@using Microsoft.JSInterop
+@using MudBlazor
+@inject IJSRuntime JS
+
+<MudPaper Height="900px" Style="">
+    <!-- Button zum Entfernen der Marker -->
+   
+    <MudToggleIconButton @bind-Toggled="_open"
+                         Icon="@Icons.Material.Filled.KeyboardDoubleArrowLeft"
+                         Color="@Color.Success"
+                         ToggledIcon="@Icons.Material.Filled.KeyboardDoubleArrowRight"
+                         ToggledColor="@Color.Error"
+                          ></MudToggleIconButton>
+                          <span> @(_open ? "CloseFilter" : "OpenFilter")</span>
+
+    <MudDrawerContainer Class="mud-height-full" Style="overflow-y:auto">
+        <!-- MudDrawer mit Navigation und Filteroptionen -->
+        <MudDrawer @bind-Open="@_open" Fixed="true" Anchor="Anchor.End" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+            <MudPaper Width="250px" Class="d-inline-flex py-3" Elevation="0">
+
+                <MudNavMenu Class="mud-width-full">
+                    <!-- Divideren für visuelle Trennung -->
+                    <MudDivider Class="my-2" />
+                    <MudDivider Class="my-2" />
+                    <MudDivider Class="my-2" />
+                    <MudDivider Class="my-2" />
+                    <MudDivider Class="my-2" />
+
+                    <!-- Filter-Menu -->
+                    <MudNavGroup Title="Filter" Icon="@Icons.Material.Filled.Settings" Expanded="true">
+                        <!-- Filter für verschiedene Kategorien -->
+                        @foreach (var category in new[] { "wood", "metal", "flower", "gem", "stone" })
+                        {
+                            <MudNavGroup Title="@category" Icon="@Icons.Material.Filled.Settings" Expanded="false">
+                                <div style="margin-left:60px">
+                                    <MudChipSet @bind-SelectedValues="_mapData.selectedFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark>
+                                        @foreach (var node in _mapData.NodeList.Where(e => e.Type.Contains(category)))
+                                        {
+                                            <MudChip Value="@(node.Name)" />
+                                        }
+                                    </MudChipSet>
+                                </div>
+                            </MudNavGroup>
+                        }
+                    </MudNavGroup>
+                </MudNavMenu>
+            </MudPaper>
+        </MudDrawer>
+
+
+        <MudDivider></MudDivider>
+        <div style="">
+
+        
+        <!-- NodePosition Auswahl -->
+        @if (selectedNode != null)
+        {
+            <NodePositionComponent NodePosition="selectedNode" />
+        }         
+       
+      
+        @if (_mapData.FilteredPosList != null)
+        {
+
+        <MudRadioGroup T="NodePositionView" @bind-Value="selectedNode" Style="width:350px;display: flex;-direction: column;flex-wrap: nowrap;overflow-y:auto;height:850px">
+            @foreach (var spot in _mapData.FilteredPosList)
+            {
+                    <MudRadio Value="spot" Color="Color.Primary" Dense="true"  >
+                        <ChildContent>
+                            <NodePositionComponent NodePosition="spot" />
+                        </ChildContent>
+                        
+                    </MudRadio>
+            }
+            </MudRadioGroup>
+        }
+        </div>
+      
+    </MudDrawerContainer>
+</MudPaper>
+<style>
+    .mud-input-control>.mud-input-control-input-container {
+    position: relative;
+    display: flex
+;
+    flex-direction: column;
+}
+</style>
+@code {
+    // @CascadingParameter ermöglicht den Zugriff auf den globalen Zustand von _mapData
+    [CascadingParameter] public CascadingMapData _mapData { get; set; }
+
+    // Variablen und Timer-Setup
+    private NodePositionView selectedNode { get; set; }
+    private Timer _timer;
+    private bool _open = false; // Steuert, ob das Drawer geöffnet ist
+    public void UpdateSelectedNode(NodePositionView spot){
+        selectedNode = new();
+        selectedNode = spot;
+    }
+    // Entfernt alle Marker von der Karte
+    private async Task RemoveMarkers()
+    {
+        await JS.InvokeVoidAsync("removeCustomMarkers");
+    }
+
+    // Timer-Update-Funktion, die den Zustand bei aktivem Timer jede Sekunde aktualisiert
+    protected override void OnInitialized()
+    {
+        _timer = new Timer(UpdateTimer, null, 0, 1000);
+        base.OnInitialized();
+    }
+
+    private void UpdateTimer(object state)
+    {
+        if (_mapData.Timer)
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    // Callback-Methode, wenn der Drawer geöffnet/geschlossen werden soll
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+
+    // Wird aufgerufen, wenn ein Node ausgewählt wird
+    private void OnNodeSelected(NodePositionView node)
+    {
+        CenterOnMap(node);
+    }
+
+    // Zentriert die Karte auf den ausgewählten Node
+    private void CenterOnMap(NodePositionView node)
+    {
+        Console.WriteLine($"Center on map: {node.Node.Name}");
+    }
+
+    // Entsorgt den Timer, wenn die Komponente zerstört wird
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}
+

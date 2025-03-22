@@ -1,0 +1,32 @@
+[
+  {
+    "Id": "69392644-98e7-4022-a156-026c16973a9f",
+    "Name": null,
+    "Type": null,
+    "RespawnTimer": 0
+  },
+  {
+    "Id": "502f403d-0384-431f-9717-92fa9bfdc50a",
+    "Name": null,
+    "Type": null,
+    "RespawnTimer": 0
+  },
+  {
+    "Id": "c3e8b577-9e41-482c-994f-7715aa1e174f",
+    "Name": null,
+    "Type": null,
+    "RespawnTimer": 0
+  },
+  {
+    "Id": "7716d6be-e7da-4d60-a5f2-e12069e4ad4d",
+    "Name": null,
+    "Type": null,
+    "RespawnTimer": 0
+  },
+  {
+    "Id": "2f84ca7d-95cb-4d4e-aefc-5d7f395644dd",
+    "Name": "string",
+    "Type": "string",
+    "RespawnTimer": 0
+  }
+]

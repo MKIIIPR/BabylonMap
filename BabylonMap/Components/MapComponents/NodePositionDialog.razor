@@ -1,0 +1,157 @@
+﻿
+
+          
+@using AshesMapBib.Components
+@using AshesMapBib.Models
+@inject MapHandler MapHandler
+<MudDialog OnKeyDown="OnKeyDownAsync">
+    <TitleContent>
+        <MudText Typo="Typo.h6">Add Node</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudCard>
+            <MudCardContent>
+                <MudForm>
+                    <MudText Typo="Typo.h6">Neue Ressource hinzufügen</MudText>
+
+                    @*  <MudTextField Label="Latitude" @bind-Value="Lat" Variant="Variant.Outlined" Disabled="true" />
+                <MudTextField Label="Longitude" @bind-Value="Lng" Variant="Variant.Outlined" Disabled="true" /> 
+ *@
+
+                    <MudSelect @bind-Value="ToCreateNewPos.Node" Label="Select fast-food" HelperText="String" Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood" AdornmentColor="Color.Primary">
+
+                        @foreach (var resource in _mapData.NodeList.Where(e => e.Type == _mapData.ResType))
+                        {
+                            <MudSelectItem Value="@resource">@resource.Name</MudSelectItem>
+                        }
+
+                    </MudSelect>
+
+                    <MudChipSet T="string" @bind-SelectedValue="ToCreateNewPos.Rarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
+                        <MudChip Text="Hero" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")" Selected="true"></MudChip>
+                        <MudChip Text="Epic" Style="color:#000000; background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>
+                        <MudChip Text="Legi" Style="color:#000000; background-color:#ff5700" Value="@("ff5700")"></MudChip>
+                    </MudChipSet>
+                    <MudTextField Label="Erntezeit" @bind-Value="FormattedTime" HelperText="AktuelleUhrzeit" />
+
+
+                    <!-- Datei-Upload -->
+                    
+                    <MudNumericField @bind-Value="ToCreateNewPos.TimerMod"
+                                    Style="width:45%"
+                                     Label="Wert einstellen"
+                                     Min="0"
+                                     Max="100"
+                                     Step="1"
+                                     HelperText="Wert erhöhen oder verringern"
+                                     Variant="Variant.Outlined" />
+
+                    <MudTextField Label="Uhrzeit eingeben" @bind-Value="FormattedTime2" />
+                    <MudNumericField @bind-Value="ToCreateNewPos.TimerMod" Label="Enter an int" Variant="Variant.Outlined" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add minutes"
+                                   OnClick="() => {
+                    ToCreateNewPos.LastHarvest = ToCreateNewPos.LastHarvest.AddMinutes(ToCreateNewPos.TimerMod);
+                    ToCreateNewPos.TimerMod = 0;
+               }" />
+                    
+               <FileUploader OnImageUploaded="base64 => { ToCreateNewPos.Image = base64;  }" />
+
+                    @if (!string.IsNullOrEmpty(ToCreateNewPos.Image))
+                    {
+                        <img src="@ToCreateNewPos.Image" alt="Uploaded Image" style="max-width: 100%; height: auto;" />
+                    }
+                    <!-- Vorschau des hochgeladenen Bildes -->
+                    @if (!string.IsNullOrEmpty(ToCreateNewPos.Image))
+                    {
+                        <MudCardMedia Image="@($"data:image/png;base64,{ToCreateNewPos.Image}")" Height="150" />
+                    }
+                    @* 
+                    <MudButton OnClick="()=>{ _mapData.AddResourcePosition(ToCreateNewPos); _dialogSpawnVis =false;}" Color="Color.Primary" Variant="Variant.Filled">
+                        Speichern
+                    </MudButton> *@
+                </MudForm>
+            </MudCardContent>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Class="px-10">Save</MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel" Class="px-10">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [Inject]
+    private IDialogService DialogService { get; set; } // for MessageBox
+    public NodePositionView ToCreateNewPos { get; set; } = new();
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] public CascadingMapData _mapData { get; set; }
+    private string FormattedTime
+    {
+        get => ToCreateNewPos.LastHarvest.ToString("HH:mm"); // Gibt nur die Uhrzeit im Format HH:mm zurück
+        set
+        {
+            // Versuche, den Wert in eine Uhrzeit umzuwandeln und nur die Uhrzeit zu setzen
+            if (DateTime.TryParse(value, out DateTime time))
+            {
+                // Hier wird das Datum von LastHarvest beibehalten und nur die Uhrzeit geändert
+                ToCreateNewPos.LastHarvest = ToCreateNewPos.LastHarvest.Date.Add(time.TimeOfDay); // Das Datum bleibt gleich, nur die Uhrzeit wird geändert
+            }
+        }
+    }
+    private string FormattedTime2
+    {
+        get => ToCreateNewPos.LastHarvest.ToString("HH:mm"); // Gibt nur die Uhrzeit zurück
+        set
+        {
+            // Versuche, die Eingabe als Zeit zu parsen
+            if (TimeSpan.TryParse(value, out TimeSpan time))
+            {
+                // Erstelle ein neues DateTime mit dem aktuellen Datum und der eingegebenen Zeit
+                ToCreateNewPos.LastHarvest = DateTime.Today.Add(time); // Heute + eingegebene Zeit
+            }
+            else
+            {
+                // Optional: Fehlerbehandlung für ungültige Eingaben
+                Console.WriteLine("Ungültige Uhrzeit");
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        
+        base.OnInitialized();
+    }
+    protected override Task OnParametersSetAsync()
+    {
+        ToCreateNewPos = new();
+        ToCreateNewPos.LastHarvest = DateTime.Now;
+        return base.OnParametersSetAsync();
+    }
+    private string _returnValue;
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(ToCreateNewPos));
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args)
+    {
+        switch (args.Key)
+        {
+            case "Enter":
+            case "NumpadEnter":
+                if (string.IsNullOrEmpty(_returnValue))
+                {
+                    await DialogService.ShowMessageBox(
+                        "Sorry",
+                        @"You must either select a coffee and close with Enter or cancel with Escape!",
+                        yesText: "Got it",
+                        options: new DialogOptions() { CloseOnEscapeKey = true });
+                    return;
+                }
+                Submit();
+                break;
+        }
+    }
+
+}

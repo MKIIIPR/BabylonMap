@@ -1,0 +1,183 @@
+﻿@using System.Collections.Generic
+@using AshesMapBib.Models
+@inject IJSRuntime JS
+@inject ResourceApiClient<Node> _nodes
+@inject ResourceApiClient<NodePosition> _positions
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    // List von ResourcePositionen, die die Daten enthalten
+    public List<NodePositionView> NodePositionList { get; set; } = new List<NodePositionView>();
+    [Parameter] public RenderFragment ChildContent { get; set;  }
+    private bool _timer = true;
+    public bool Timer
+    {
+        get => _timer;
+        set
+        {
+            if (_timer != value)
+            {
+                _timer = value;
+
+                if (_timer)
+                {
+                    // Timer wurde gestartet
+                    StartedTimerAt = DateTime.Now;
+                    TimeStopHistory.Add(MBetweenStartStop);
+                }
+                else
+                {
+                    // Timer wurde gestoppt
+                    StoppedTimerAt = DateTime.Now;
+                }
+            }
+        }
+    }
+    public DateTime? StartedTimerAt { get; set; }
+    public DateTime? StoppedTimerAt { get; set; }
+    public List<int> TimeStopHistory { get; set; } = new();
+    private IReadOnlyCollection<string> _selectedFilter = new List<string>();
+
+    public IReadOnlyCollection<string> selectedFilter
+    {
+        get => _selectedFilter ?? new List<string>(); // Falls null, gib eine leere Liste zurück
+        set
+        {
+            _selectedFilter = value ?? new List<string>(); // Falls null, initialisiere mit einer leeren Liste
+
+            UpdateFilteredPosList();
+            JS.InvokeVoidAsync("removeCustomMarkers");
+            foreach (var newSpot in FilteredPosList)
+            {
+                JS.InvokeVoidAsync("addCustomMarker", newSpot.Lat, newSpot.Lng, newSpot, newSpot.TimeLeft);
+            }
+        }
+    }
+
+
+    public IEnumerable<NodePositionView> FilteredPosList { get; private set; }
+
+    private void UpdateFilteredPosList()
+    {
+        if (_selectedFilter != null && _selectedFilter.Any())
+        {
+            FilteredPosList = NodePositionList
+                .Where(node => _selectedFilter.Contains(node.Node.Name))
+                .ToList().OrderBy(e=>e.TimeLeft);
+        }
+        else
+        {
+            FilteredPosList = NodePositionList.OrderBy(e => e.TimeLeft);
+        }
+    }
+
+    // Die Timer-Eigenschaft, die den Start- und Stoppzeitpunkt setzt
+
+
+    // Berechnung der Zeitspanne zwischen Start und Stop (in Minuten)
+    public int MBetweenStartStop => (int)(StoppedTimerAt - StartedTimerAt).GetValueOrDefault().TotalSeconds;
+
+    public string ResType { get; set; } = "";
+    // Methode zum Hinzufügen einer neuen ResourcePosition
+    public async Task AddNode(Node toAdd)
+    {
+        toAdd.Id = Guid.NewGuid().ToString();
+        NodeList.Add(toAdd);
+        await _nodes.CreateAsync(toAdd, "/node");
+    }
+
+    public async Task AddResourcePosition(NodePositionView node)
+    {
+
+        NodePositionList.Add(node);
+
+        await JS.InvokeVoidAsync("addCustomMarker",node.Lat, node.Lng, node, node.TimeLeft);
+        if (selectedFilter == null || !selectedFilter.Contains(node.Node.Type))
+        {
+            var test = node.Node.Type.ToList();
+        }
+
+        var postNode = new NodePosition { Id=Guid.NewGuid().ToString(),Node=null, ResourceId=node.Node.Id, Description=node.Description, Lat=node.Lat, Lng=node.Lng, Rarity=node.Rarity, Image=node.Image, LastHarvest= node.LastHarvest,TimerMod=0 };
+        await _positions.CreateAsync(postNode, "/nodeposition");
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        NodeList = await GetAllNodes();
+        NodePositionList = await GetNodePositions();
+        NodePositionList = NodePositionList.Where(e => !e.Ghost).ToList();
+        UpdateFilteredPosList();
+        base.OnInitialized();
+    }
+    public async Task<List<NodePositionView>> GetNodePositions(){
+        var result = new List<NodePositionView>();
+        var fromClient = await _positions.GetAllAsync("/nodeposition?ghost=eq.false");
+        foreach(var spot in fromClient){
+            NodePositionView newSpot = new();
+
+            newSpot.Id = spot.Id;
+            newSpot.Node = NodeList.Where(e => e.Id == spot.ResourceId).FirstOrDefault();
+            newSpot.ResourceId = NodeList.Where(e => e.Id == spot.ResourceId).FirstOrDefault().Id;
+            newSpot.Description = spot.Description;
+            newSpot.Lat = spot.Lat;
+            newSpot.Lng = spot.Lng;
+            newSpot.Rarity = spot.Rarity;
+            newSpot.Image = spot.Image;
+            newSpot.LastHarvest = spot.LastHarvest;
+            newSpot.TimerMod = 0;
+            newSpot.Ghost = spot.Ghost;
+
+            result.Add(newSpot);
+            if(!newSpot.Ghost)
+            await JS.InvokeVoidAsync("addCustomMarker", newSpot.Lat, newSpot.Lng, newSpot, newSpot.TimeLeft);
+        }
+
+        return result;
+    }
+    public async Task SaveNode(NodePosition node)
+    { 
+
+    }
+    public async Task UpdateNodePosition(NodePositionView nodeView)
+    {
+
+        var nodeToRemove = NodePositionList.FirstOrDefault(e => e.Id == nodeView.Id);
+
+        var putNode = new NodePosition { Id = nodeView.Id ,Node = null, ResourceId = nodeView.Node.Id, Description = nodeView.Description, Lat = nodeView.Lat, Lng = nodeView.Lng, Rarity = nodeView.Rarity, Image = nodeView.Image, LastHarvest = nodeView.LastHarvest,Ghost=nodeView.Ghost, TimerMod = 0 };
+
+
+        await _positions.UpdateAsync(putNode.Id, putNode, $"/nodeposition?id=eq.");
+        if (nodeToRemove != null)
+        {
+            if (nodeView.Ghost)
+                NodePositionList.Remove(nodeToRemove);
+            await JS.InvokeVoidAsync("removeMarker", nodeToRemove.Id);
+            if(!nodeView.Ghost)
+                await JS.InvokeVoidAsync("addCustomMarker", nodeView.Lat, nodeView.Lng, nodeView, nodeView.TimeLeft);
+        }
+    }
+
+    public async Task DeleteNodePositionComplete(NodePosition position)
+    {
+        await _positions.DeleteAsync(position.Id, "/nodeposition?id=eq."); ;
+    }
+
+   
+ 
+    public List<Node> NodeList { get; set; } = new();
+    public async Task<List<Node>> GetAllNodes()
+    {
+        List<Node> blob = new();
+        blob = await _nodes.GetAllAsync("/node");
+        return blob;
+    }
+    public async Task CreateNode(Node node){
+        
+    }
+
+}
