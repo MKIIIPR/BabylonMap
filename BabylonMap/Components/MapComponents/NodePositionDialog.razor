@@ -1,7 +1,4 @@
-﻿
-
-          
-@using AshesMapBib.Components
+﻿@using AshesMapBib.Components
 @using AshesMapBib.Models
 @inject MapHandler MapHandler
 <MudDialog OnKeyDown="OnKeyDownAsync">
@@ -28,7 +25,8 @@
                     </MudSelect>
 
                     <MudChipSet T="string" @bind-SelectedValue="ToCreateNewPos.Rarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
-                        <MudChip Text="Hero" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")" Selected="true"></MudChip>
+                        <MudChip Text="Rare" Style="color:#000000; background-color:#0000ff" Value="@("2c35be")" Selected="true"></MudChip>
+                        <MudChip Text="Hero" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")"></MudChip>
                         <MudChip Text="Epic" Style="color:#000000; background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>
                         <MudChip Text="Legi" Style="color:#000000; background-color:#ff5700" Value="@("ff5700")"></MudChip>
                     </MudChipSet>
@@ -36,25 +34,25 @@
 
 
                     <!-- Datei-Upload -->
-                    
+
                     <MudNumericField @bind-Value="ToCreateNewPos.TimerMod"
-                                    Style="width:45%"
-                                     Label="Wert einstellen"
-                                     Min="0"
-                                     Max="100"
-                                     Step="1"
-                                     HelperText="Wert erhöhen oder verringern"
-                                     Variant="Variant.Outlined" />
+                    Style="width:45%"
+                    Label="Wert einstellen"
+                    Min="0"
+                    Max="100"
+                    Step="1"
+                    HelperText="Wert erhöhen oder verringern"
+                    Variant="Variant.Outlined" />
 
                     <MudTextField Label="Uhrzeit eingeben" @bind-Value="FormattedTime2" />
                     <MudNumericField @bind-Value="ToCreateNewPos.TimerMod" Label="Enter an int" Variant="Variant.Outlined" />
                     <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add minutes"
-                                   OnClick="() => {
+                    OnClick="() => {
                     ToCreateNewPos.LastHarvest = ToCreateNewPos.LastHarvest.AddMinutes(ToCreateNewPos.TimerMod);
                     ToCreateNewPos.TimerMod = 0;
                }" />
-                    
-               <FileUploader OnImageUploaded="base64 => { ToCreateNewPos.Image = base64;  }" />
+
+                    <FileUploader OnImageUploaded="base64 => { ToCreateNewPos.Image = base64;  }" />
 
                     @if (!string.IsNullOrEmpty(ToCreateNewPos.Image))
                     {
@@ -119,12 +117,13 @@
 
     protected override void OnInitialized()
     {
-        
+
         base.OnInitialized();
     }
     protected override Task OnParametersSetAsync()
     {
         ToCreateNewPos = new();
+        ToCreateNewPos.Node = _mapData.NodeList.Where(e => e.Type == _mapData.ResType).FirstOrDefault();
         ToCreateNewPos.LastHarvest = DateTime.Now;
         return base.OnParametersSetAsync();
     }
