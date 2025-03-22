@@ -44,10 +44,10 @@ function initMap() {
 
 
     // Attribution hinzufügen
-    L.control.attribution({ prefix: false })
-        .addAttribution('<a href="https://deine-seite.com">Deine Spielkarte</a>')
-        .addTo(map);
-    console.log("initMap: Attribution hinzugefügt.");
+    //L.control.attribution({ prefix: false })
+    //    .addAttribution('<a href="https://deine-seite.com">Deine Spielkarte</a>')
+    //    .addTo(map);
+    //console.log("initMap: Attribution hinzugefügt.");
 
     
     // Event-Listener für das Kontextmenü (Rechtsklick)
