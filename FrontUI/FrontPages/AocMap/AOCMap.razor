@@ -20,20 +20,24 @@
 
                 <MudNavMenu Class="mud-width-full">
                     <!-- Divideren für visuelle Trennung -->
+@*                     <MudDivider Class="my-2" />
                     <MudDivider Class="my-2" />
                     <MudDivider Class="my-2" />
                     <MudDivider Class="my-2" />
-                    <MudDivider Class="my-2" />
-                    <MudDivider Class="my-2" />
+                    <MudDivider Class="my-2" /> *@
 
                     <!-- Filter-Menu -->
                     <MudNavGroup Title="Filter" Icon="@Icons.Material.Filled.Settings" Expanded="true">
                         <!-- Filter für verschiedene Kategorien -->
-                        @foreach (var category in new[] { "wood", "metal", "flower", "gem", "stone" })
+                        @foreach (var category in new[] { "wood", "metal", "flower", "gem", "stone", "named" })
                         {
                             <MudNavGroup Title="@category" Icon="@Icons.Material.Filled.Settings" Expanded="false">
                                 <div style="margin-left:60px">
                                     <MudChipSet @bind-SelectedValues="_mapData.selectedFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark>
+                                        <MudChip Value="@(@category)" >
+                                                @("All " + category)
+                                        </MudChip>
+
                                         @foreach (var node in _mapData.NodeList.Where(e => e.Type.Contains(category)))
                                         {
                                             <MudChip Value="@(node.Name)" />
@@ -54,7 +58,7 @@
     </MudDrawerContainer>
    
 </MudPaper>
-<MudPaper Style="height:93.7vh;width:350px">
+<MudPaper Style="height:93.7vh;width:450px">
     
         <NodePositionViever></NodePositionViever>
     
