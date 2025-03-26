@@ -1,0 +1,725 @@
+﻿$kutschup: --sc-secondary;
+$accent-color: #355cc9;
+// colors
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$ketchup-mayo-opa: #f5d54670;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+$deepblue: #00001b;
+// add component style here
+
+// template style
+$duration: 400ms;
+$shift: 200ms;
+$start: 800ms;
+$sc-border: 2px solid $ketchup-mayo;
+$background: lighten(#00001b, 1%) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+$div-bg: linear-gradient(0deg, rgba($ketchup-mayo, .1) 0%, rgba($onyx, 0) 100%);
+$div-bg-2: linear-gradient(0deg, rgba($ketchup-mayo, .3) 20%, rgba($onyx, 1) 100%);
+
+.root {
+    --mud-palette-text-primary: #4ae25f !important;
+    --mud-elevation-1: 0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12) !important;
+    color: $ketchup-mayo;
+    --mud-elevation-2: 0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12) !important;
+    --mud-elevation-3: 0px 3px 3px -2px rgba(245, 213, 70, 0.2), 0px 3px 4px 0px rgba(245, 213, 70, 0.14), 0px 1px 8px 0px rgba(245, 213, 70, 0.12) !important;
+}
+.mud-list {
+    background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+    background-color: #00001b;
+    border-left: 1px solid $ketchup-mayo;
+    border-right: 1px solid $ketchup-mayo;
+    border-bottom: 1px solid $ketchup-mayo;
+    border-radius: 4px;
+}
+.mud-list-item-clickable:hover {
+    background: linear-gradient(180deg, rgba(245,213,70,0.3) 0%, rgba(0,0,27,0) 30%, rgba(11,10,29,0) 70%, rgba(245,213,70,0.295999649859944) 100%);
+}
+.d-Hover {
+    .mud-elevation-1 {
+        background: $div-bg-2;
+        box-shadow: 0px 2px 1px -1px rgb(242 249 0 / 20%),0px 1px 1px 0px rgb(0 255 184 / 14%),0px 1px 3px 0px rgb(0 208 255 / 39%);
+        
+    }
+}
+.d-Hover {
+    transition: 200ms all ease-out;
+    filter: drop-shadow(0 0 0.15rem $ketchup-mayo);
+
+
+    .mud-input-control {
+        margin-top: 0px;
+    }
+
+    .mud-input.mud-input-underline {
+        &::before {
+            width: 0%;
+        }
+
+        &::after {
+            left: 0;
+            right: 0;
+            width: 80%;
+            bottom: 3.5px;
+            content: "";
+            position: absolute;
+            transform: scaleX(0);
+            transition: transform 200ms cubic-bezier(0, 0, .2, 1) 0ms;
+            border-bottom: 2px solid #4ae25f;
+            pointer-events: none;
+        }
+    }
+
+    &:hover {
+        transform: translateY(-0.25em);
+        filter: drop-shadow(5px 1px 3.15px $ketchup-mayo-opa);
+
+        .sc-rcontent-imgCrnR {
+            position: relative;
+            left:-18.25px;
+            top:3px;
+        }
+
+        .sc-rcontent-imgCrnL {
+            position: relative;
+            left:18.2px;
+            top:-3px;
+        }
+    }
+
+    &:focus-within {
+        transform: translateY(-0.25em);
+        filter: drop-shadow(1px 1px 2.15px $ketchup-mayo-opa);
+
+        .sc-rcontent-imgCrnR {
+            position: relative;
+            top: 3.5px;
+            left: 3px;
+        }
+
+        .sc-rcontent-imgCrnL {
+            position: relative;
+            top: -3.5px;
+            left: -4px;
+        }
+    }
+
+    .mud-input-control {
+        > .mud-input-control-input-container {
+            > .mud-input-label-inputcontrol {
+                color: #4ae25f;
+                padding: 0;
+                top: -2px;
+                left: 5px;
+                letter-spacing: 0.00938em;
+                z-index: 0;
+                pointer-events: none;
+            }
+        }
+    }
+
+    .mud-input-label-animated {
+        transition: color 200ms cubic-bezier(0, 0, 0.3, 1.05) 0ms, transform 200ms cubic-bezier(0, 0, .2, 1) 0ms;
+    }
+
+    .mud-input-label-inputcontrol {
+        top: 0;
+        left: 0;
+        position: absolute;
+        transform: translate(0, 24px) scale(1);
+    }
+
+    .mud-shrink ~ .mud-input-label.mud-input-label-inputcontrol,
+    .mud-input:focus-within ~ .mud-input-label.mud-input-label-inputcontrol {
+        transform: translate(15px, 3.5px) scale(.75);
+        transform-origin: top left;
+    }
+
+    .mud-input:focus-within ~ .mud-input-label.mud-input-label-inputcontrol {
+        color: $ketchup-mayo-opa;
+    }
+
+    .mud-input > input.mud-input-root, div.mud-input-slot.mud-input-root {
+        width: 85%;
+        left: 6px;
+        top: -2Px;
+    }
+
+    .sc-rcontent-imgCrnL {
+        transition: 200ms all ease-out;
+        position: relative;
+        max-height: 100%;
+        top: -1px;
+        transform: translatex(15%);
+    }
+
+    .sc-rcontent-imgCrnR {
+        transition: 200ms all ease-out;
+        position: relative;
+        max-height: 100%;
+        top: 1px;
+        transform: translatex(-16%);
+    }
+
+    .masked-div {
+        position: relative;
+        background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+        background-color: #00001b;
+        height: 100%;
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: inherit;
+            background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+            background-color: #00001b;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+        }
+
+        &::before {
+            transform: translatex(-50%);
+            -webkit-mask-image: url('/app1/img/mainlayout/infofield/blend-tl.svg');
+            mask-image: url('/app1/img/mainlayout/infofield/blend-tl.svg');
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+        }
+
+        &::after {
+            transform: translatex(50%);
+            -webkit-mask-image: url('/app1/img/mainlayout/infofield/blend-br.svg');
+            mask-image: url('/app1/img/mainlayout/infofield/blend-br.svg');
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+        }
+    }
+}
+.p-rel{position:relative;}
+.C-Hover {
+    transition: 200ms all ease-out;
+    filter: drop-shadow(0 0 0.15rem $ketchup-mayo);
+
+
+    .mud-input-control {
+        margin-top: 0px;
+    }
+
+    .mud-input.mud-input-underline {
+        &::before {
+            width: 0%;
+        }
+
+        &::after {
+            left: 0;
+            right: 0;
+            width: 80%;
+            bottom: 3.5px;
+            content: "";
+            position: absolute;
+            transform: scaleX(0);
+            transition: transform 200ms cubic-bezier(0, 0, .2, 1) 0ms;
+            border-bottom: 2px solid #4ae25f;
+            pointer-events: none;
+        }
+    }
+
+    &:hover {
+        transform: translateY(-0.25em);
+        filter: drop-shadow(1px 1px 2.15px $ketchup-mayo-opa);
+
+        .sc-rcontent-imgCrnR {
+            position: relative;
+            top: 3.5px;
+            left: 3px;
+        }
+
+        .sc-rcontent-imgCrnL {
+            position: relative;
+            top: -3.5px;
+            left: -4px;
+        }
+    }
+
+    &:focus-within {
+        transform: translateY(-0.25em);
+        filter: drop-shadow(1px 1px 2.15px $ketchup-mayo-opa);
+
+        .sc-rcontent-imgCrnR {
+            position: relative;
+            top: 3.5px;
+            left: 3px;
+        }
+
+        .sc-rcontent-imgCrnL {
+            position: relative;
+            top: -3.5px;
+            left: -4px;
+        }
+    }
+
+    .mud-input-control {
+        > .mud-input-control-input-container {
+            > .mud-input-label-inputcontrol {
+                color: #4ae25f;
+                padding: 0;
+                top: -2px;
+                left: 5px;
+                letter-spacing: 0.00938em;
+                z-index: 0;
+                pointer-events: none;
+            }
+        }
+    }
+
+    .mud-input-label-animated {
+        transition: color 200ms cubic-bezier(0, 0, 0.3, 1.05) 0ms, transform 200ms cubic-bezier(0, 0, .2, 1) 0ms;
+    }
+
+    .mud-input-label-inputcontrol {
+        top: 0;
+        left: 0;
+        position: absolute;
+        transform: translate(0, 24px) scale(1);
+    }
+
+    .mud-shrink ~ .mud-input-label.mud-input-label-inputcontrol,
+    .mud-input:focus-within ~ .mud-input-label.mud-input-label-inputcontrol {
+        transform: translate(15px, 3.5px) scale(.75);
+        transform-origin: top left;
+    }
+
+    .mud-input:focus-within ~ .mud-input-label.mud-input-label-inputcontrol {
+        color: $ketchup-mayo-opa;
+    }
+
+    .mud-input > input.mud-input-root, div.mud-input-slot.mud-input-root {
+        width: 85%;
+        left: 6px;
+        top: -2Px;
+    }
+}
+.sc-rcontent-imgCrnL {
+    transition: 200ms all ease-out;
+    position: relative;
+    max-height:100%;
+    top: -1px;
+    left: 19px;
+}
+
+.sc-rcontent-imgCrnR {
+    transition: 200ms all ease-out;
+    position: relative;
+    max-height:100%;
+    top: 1px;
+    left: -19px;
+}
+
+.sc-rcontent-content {
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+    }
+
+.sc-rcontent-content-inner {
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        height: 40px;
+    }
+
+.sc-rcontent-wrap {
+    display: flex;
+    position: relative;
+    justify-content: space-around;
+    margin: 0 auto;
+    height:100%;
+}
+
+.sc-rcontent-frame {
+        height: 40px;
+        position: relative;
+    }
+
+.sc-rcontent-frame-inner {
+        height: 40px;
+        position: relative;
+    }
+
+.masked-div {
+    position: relative;
+    background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+    background-color: #00001b;
+    
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: inherit;
+        background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+        background-color: #00001b;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+    }
+
+    &::before {
+        transform: translatex(-50%);
+        -webkit-mask-image: url('/app1/img/mainlayout/infofield/blend-tl.svg');
+        mask-image: url('/app1/img/mainlayout/infofield/blend-tl.svg');
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+    }
+
+    &::after {
+        transform: translatex(50%);
+        -webkit-mask-image: url('/app1/img/mainlayout/infofield/blend-br.svg');
+        mask-image: url('/app1/img/mainlayout/infofield/blend-br.svg');
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+    }
+}
+
+
+
+.ShadowBorder {
+    filter: drop-shadow(-0.5px 0.5px 0px $ketchup-mayo);
+}
+
+.ShadowBorder2 {
+    filter: drop-shadow(0.5px -0.5px 0px $ketchup-mayo);
+}
+
+
+.masked-div-inner {
+        position: relative;
+        width: 300px;
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+            background-color: #00001bff;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+        }
+
+        &::before {
+            left: -44px;
+            -webkit-mask-image: url('/app1/img/mainlayout/infofield/blend-tl.svg');
+            mask-image: url('/app1/img/mainlayout/infofield/blend-tl.svg');
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+        }
+
+        &::after {
+            right: -40px;
+            -webkit-mask-image: url('/app1/img/mainlayout/infofield/blend-br.svg');
+            mask-image: url('/app1/img/mainlayout/infofield/blend-br.svg');
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+        }
+    }
+.masked-div-inner-thin {
+    position: relative;
+    width: 300px;
+
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+        background-color: #00001bff;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+    }
+
+    &::before {
+        left: -44px;
+        -webkit-mask-image: url('/app1/img/mainlayout/infofield/blend-tl.svg');
+        mask-image: url('/app1/img/mainlayout/infofield/blend-tl.svg');
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+    }
+
+    &::after {
+        right: -40px;
+        -webkit-mask-image: url('/app1/img/mainlayout/infofield/blend-br.svg');
+        mask-image: url('/app1/img/mainlayout/infofield/blend-br.svg');
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+    }
+}
+
+.sc-rcontent-line {
+    position: relative;
+    height: 1px; /* Höhe der Border anpassen */
+    background-color: white;
+
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    &::before {
+        border-top: 1px solid white;
+        height: 40px;
+        right: 20%;
+        /* Abstand zur vorherigen Elemente anpassen */
+    }
+
+    &::after {
+        border-bottom: 1px solid white;
+        height: 40px;
+        top: 0px; /* Abstand zur nächsten Elemente anpassen */
+    }
+}
+
+.drop3 {
+        background: rgb(255 255 255 / 0%);
+        display: flex;
+        margin: 0 auto;
+        box-shadow: 0 1px 3px $ketchup-mayo-opa inset, 0 1px 2px rgba(0, 0, 0, 0.24);
+        transition: all 300ms;
+
+        &:hover {
+            transform: translateY(1px);
+            box-shadow: 0 3px 7px $ketchup-mayo-opa inset, 0 5px 5px rgba(0, 0, 0, 0.22);
+        }
+    }
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    text-align: center !important; /* Zentriert den Text horizontal */
+    color:#00001b;
+    font-variant: small-caps;
+    margin-bottom: 0px;
+}
+sh1{text-align:center; font-variant: small-caps;color: $ketchup-mayo; font-size:24px} 
+sh2{text-align:center; font-variant: small-caps;color: $ketchup-mayo; font-size:20px} 
+sh3{text-align:center; font-variant: small-caps;color: $ketchup-mayo; font-size:16px} 
+sh4{text-align:center; font-variant: small-caps;color: $ketchup-mayo; font-size:12px} 
+sh5{text-align:center; font-variant: small-caps;color: $ketchup-mayo; font-size:10px}
+.sh1 {
+    text-align: center;
+    font-variant: small-caps;
+    color: $ketchup-mayo;
+    font-size: 24px
+}
+
+.sh2 {
+    text-align: center;
+    font-variant: small-caps;
+    color: $ketchup-mayo;
+    font-size: 20px
+}
+
+.sh3 {
+    text-align: center;
+    font-variant: small-caps;
+    color: $ketchup-mayo;
+    font-size: 16px
+}
+
+.sh4 {
+    text-align: start;
+    font-variant: small-caps;
+    color: $ketchup-mayo;
+    font-size: 12px
+}
+
+.sh5 {
+    text-align: center;
+    font-variant: small-caps;
+    color: $ketchup-mayo;
+    font-size: 10px
+}
+
+.glow {
+    filter: drop-shadow(0 0 0 rgba(0, 30, 200, 0.8));
+    transition: filter 600ms;
+    position: relative;
+
+    &:hover {
+        filter: drop-shadow(-0.01rem 0.1rem 0.5rem rgba(244, 212, 70, 0.5)) drop-shadow(-0.01rem 0.2rem 0.5rem rgba(244, 212, 70, 0.6));
+    }
+}
+
+.port-of-ports-wrap {
+    display: grid;
+    grid-template-rows: 1fr; // Erlaubt das Erstellen einer Zeile
+    grid-template-columns: 1fr; // Erlaubt das Erstellen einer Spalte
+    position: relative; // Wichtig für die Positionierung von Kindern
+    width: 100%;
+    aspect-ratio: 4 / 3; // Setzt das Seitenverhältnis auf 4:3
+    max-width: 500px; // Maximale Breite setzen
+    margin: auto; // Zentriert das Element
+
+    z-index: 1;
+    background-color: #f4d446;
+    mask: url("pwa/img/mainlayout/ports_of_port.svg") no-repeat center;
+    -webkit-mask: url("pwa/img/mainlayout/ports_of_port.svg") no-repeat center; /* Für WebKit-Browser */
+    mask-size: contain;
+    -webkit-mask-size: contain;
+
+
+    .btn-hover {
+        transition: transform 0.3s ease; // Animation für den Hover-Effekt
+        display: flex;
+        align-items: center; /* Zentriert Inhalte vertikal */
+        justify-content: center;
+
+        &:hover {
+            transform: translateY(-4px); // Verschiebt die Ports nach oben
+        }
+    }
+    // Stil für die ausgewählten Ports
+    .on_port_select {
+        background-color: rgba(244, 212, 70, 0.6); // Beispiel für die Hintergrundfarbe
+        transform: translateY(-12px); // Verschiebt die Ports nach oben
+    }
+    // Wenn das Input-Element ausgewählt ist
+    input[type="radio"]:checked + label {
+        background-color: rgba(244, 212, 70, 0.6); // Beispiel für die Hintergrundfarbe
+        transform: translateY(-6px); // Verschiebt das Label nach oben
+        .parent-element {
+            filter: drop-shadow(-0.01rem 0.1rem 0.5rem rgba(244, 212, 70, 0.5)) drop-shadow(-0.01rem 0.2rem 0.5rem rgba(244, 212, 70, 0.6));
+        }
+    }
+    // Wenn das Label über dem Radio-Input im Hover ist
+    label:hover,
+    input[type="radio"]:checked + label:hover {
+        background-color: rgba(0, 212, 70, 0.8); // Beispiel für Hover-Hintergrundfarbe bei Auswahl
+    }
+
+    .ports-container {
+        position: absolute; // Positioniert die Container relativ zur Parent-Div
+        top: 0;
+        left: 0;
+        width: 100%; // Volle Breite des Parent-Elements
+        height: 100%; // Volle Höhe des Parent-Elements
+        display: flex;
+        flex-wrap: wrap; // Damit die Ports in mehreren Reihen angezeigt werden können
+        justify-content: center; // Zentriert die Ports
+        align-items: center; // Zentriert die Ports vertikal
+    }
+}
+
+.port_format {
+    background-color: #00000b;
+    width: 32%; // Breite der Ports
+    height: 32%; // Höhe der Ports
+    position: absolute; // Positioniert sie relativ zu ihrem Container
+}
+
+.port_center_1stLayer_position {
+    width: 46.2%;
+    height: 100%;
+}
+// Relative Positionierung für die Ports
+.port_1_1stLayer_position {
+    left: 47.5%;
+    top: 66.8%;
+}
+
+.port_2_1stLayer_position {
+    left: 20.4%;
+    top: 66.8%;
+}
+
+.port_3_1stLayer_position {
+    left: 6.3%;
+    top: 32%;
+    height: 36%;
+    width: 29% !important;
+}
+
+.port_6_1stLayer_position {
+    left: 20.6%;
+    top: 1.2%;
+}
+
+.port_5_1stLayer_position {
+    left: 47.3%;
+    top: 1.2%;
+}
+
+.port_4_1stLayer_position {
+    height: 36%;
+    width: 29% !important;
+    left: 64.7%;
+    top: 32%;
+}
+
+// Masken für die Ports
+.port_mask_center,
+.port_mask_1,
+.port_mask_2,
+.port_mask_3,
+.port_mask_4,
+.port_mask_5,
+.port_mask_6 {
+    mask-size: contain;
+    -webkit-mask-size: contain;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+}
+
+// Definieren Sie die spezifischen Masken hier
+.port_mask_center {
+    mask: url("pwa/img/mainlayout/port_center.svg") no-repeat center;
+    -webkit-mask: url("pwa/img/mainlayout/port_center.svg") no-repeat center; /* Für WebKit-Browser */
+}
+
+.port_mask_1 {
+    mask: url("pwa/img/mainlayout/port_1.svg") no-repeat center;
+    -webkit-mask: url("pwa/img/mainlayout/port_1.svg") no-repeat center; /* Für WebKit-Browser */
+}
+
+.port_mask_2 {
+    mask: url("pwa/img/mainlayout/port_2.svg") no-repeat center;
+    -webkit-mask: url("pwa/img/mainlayout/port_2.svg") no-repeat center; /* Für WebKit-Browser */
+}
+
+.port_mask_3 {
+    mask: url("pwa/img/mainlayout/port_3.svg") no-repeat center;
+    -webkit-mask: url("pwa/img/mainlayout/port_3.svg") no-repeat center;
+}
+
+.port_mask_4 {
+    mask: url("pwa/img/mainlayout/port_4.svg") no-repeat center;
+    -webkit-mask: url("pwa/img/mainlayout/port_4.svg") no-repeat center; /* Für WebKit-Browser */
+}
+
+.port_mask_5 {
+    mask: url("pwa/img/mainlayout/port_5.svg") no-repeat center;
+    -webkit-mask: url("pwa/img/mainlayout/port_5.svg") no-repeat center; /* Für WebKit-Browser */
+}
+
+.port_mask_6 {
+    mask: url("pwa/img/mainlayout/port_6.svg") no-repeat center;
+    -webkit-mask: url("pwa/img/mainlayout/port_6.svg") no-repeat center;
+}
+
+.port_center {
+    mask: url('pwa/img/mainlayout/port_center.svg') no-repeat center;
+    -webkit-mask: url('pwa/img/mainlayout/port_center.svg') no-repeat center; /* Für WebKit-Browser */
+    mask-size: contain;
+    -webkit-mask-size: contain;
+}
+

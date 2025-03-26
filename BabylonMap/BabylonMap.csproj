@@ -61,6 +61,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
@@ -69,88 +70,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="wwwroot\map\2\2\" />
-      <Folder Include="wwwroot\map\2\3\" />
-      <Folder Include="wwwroot\map\2\4\" />
-      <Folder Include="wwwroot\map\2\5\" />
-      <Folder Include="wwwroot\map\3\10\" />
-      <Folder Include="wwwroot\map\3\4\" />
-      <Folder Include="wwwroot\map\3\5\" />
-      <Folder Include="wwwroot\map\3\6\" />
-      <Folder Include="wwwroot\map\3\7\" />
-      <Folder Include="wwwroot\map\3\8\" />
-      <Folder Include="wwwroot\map\3\9\" />
-      <Folder Include="wwwroot\map\4\10\" />
-      <Folder Include="wwwroot\map\4\11\" />
-      <Folder Include="wwwroot\map\4\12\" />
-      <Folder Include="wwwroot\map\4\13\" />
-      <Folder Include="wwwroot\map\4\14\" />
-      <Folder Include="wwwroot\map\4\15\" />
-      <Folder Include="wwwroot\map\4\16\" />
-      <Folder Include="wwwroot\map\4\17\" />
-      <Folder Include="wwwroot\map\4\18\" />
-      <Folder Include="wwwroot\map\4\19\" />
-      <Folder Include="wwwroot\map\4\20\" />
-      <Folder Include="wwwroot\map\4\8\" />
-      <Folder Include="wwwroot\map\4\9\" />
-      <Folder Include="wwwroot\map\5\16\" />
-      <Folder Include="wwwroot\map\5\17\" />
-      <Folder Include="wwwroot\map\5\18\" />
-      <Folder Include="wwwroot\map\5\19\" />
-      <Folder Include="wwwroot\map\5\20\" />
-      <Folder Include="wwwroot\map\5\21\" />
-      <Folder Include="wwwroot\map\5\22\" />
-      <Folder Include="wwwroot\map\5\23\" />
-      <Folder Include="wwwroot\map\5\24\" />
-      <Folder Include="wwwroot\map\5\25\" />
-      <Folder Include="wwwroot\map\5\26\" />
-      <Folder Include="wwwroot\map\5\27\" />
-      <Folder Include="wwwroot\map\5\28\" />
-      <Folder Include="wwwroot\map\5\29\" />
-      <Folder Include="wwwroot\map\5\30\" />
-      <Folder Include="wwwroot\map\5\31\" />
-      <Folder Include="wwwroot\map\5\32\" />
-      <Folder Include="wwwroot\map\5\33\" />
-      <Folder Include="wwwroot\map\5\34\" />
-      <Folder Include="wwwroot\map\5\35\" />
-      <Folder Include="wwwroot\map\5\36\" />
-      <Folder Include="wwwroot\map\5\37\" />
-      <Folder Include="wwwroot\map\5\38\" />
-      <Folder Include="wwwroot\map\5\39\" />
-      <Folder Include="wwwroot\map\5\40\" />
-      <Folder Include="wwwroot\map\6\32\" />
-      <Folder Include="wwwroot\map\6\33\" />
-      <Folder Include="wwwroot\map\6\34\" />
-      <Folder Include="wwwroot\map\6\35\" />
-      <Folder Include="wwwroot\map\6\36\" />
-      <Folder Include="wwwroot\map\6\37\" />
-      <Folder Include="wwwroot\map\6\38\" />
-      <Folder Include="wwwroot\map\6\39\" />
-      <Folder Include="wwwroot\map\6\40\" />
-      <Folder Include="wwwroot\map\6\41\" />
-      <Folder Include="wwwroot\map\6\42\" />
-      <Folder Include="wwwroot\map\6\43\" />
-      <Folder Include="wwwroot\map\6\44\" />
-      <Folder Include="wwwroot\map\6\45\" />
-      <Folder Include="wwwroot\map\6\46\" />
-      <Folder Include="wwwroot\map\6\47\" />
-      <Folder Include="wwwroot\map\6\48\" />
-      <Folder Include="wwwroot\map\6\49\" />
-      <Folder Include="wwwroot\map\6\50\" />
-      <Folder Include="wwwroot\map\6\51\" />
-      <Folder Include="wwwroot\map\6\52\" />
-      <Folder Include="wwwroot\map\6\53\" />
-      <Folder Include="wwwroot\map\6\54\" />
-      <Folder Include="wwwroot\map\6\55\" />
-      <Folder Include="wwwroot\map\6\56\" />
-      <Folder Include="wwwroot\map\6\57\" />
-      <Folder Include="wwwroot\map\6\58\" />
-      <Folder Include="wwwroot\map\6\59\" />
-      <Folder Include="wwwroot\map\6\60\" />
+      <Folder Include="Components\AppStates\" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\AshesMapBib\AshesMapBib.csproj" />
+      <ProjectReference Include="..\FrontUI\FrontUI.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,176 @@
+﻿
+$kutschup: --sc-secondary;
+$accent-color: #355cc9;
+// colors
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$ketchup-mayo-opa: #f5d54690;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+$deepblue: #00001b;
+// add component style here
+
+// template style
+$duration: 400ms;
+$shift: 200ms;
+$start: 800ms;
+$sc-border: 2px solid $ketchup-mayo;
+$background: lighten($onyx, 5%) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+$div-bg: linear-gradient(0deg, rgba($ketchup-mayo, .1) 0%, rgba($onyx, 0) 100%);
+$div-bg-2: linear-gradient(0deg, rgba($ketchup-mayo, .2) 20%, rgba($onyx, 1) 100%);
+
+
+
+h1 {
+    font-size: 12px;
+}
+
+h2 {
+    font-size: 11px;
+}
+
+h3 {
+    font-size: 11px;
+}
+
+h4 {
+    font-size: 10px
+}
+
+h5 {
+    font-size: 8px
+}
+h6{
+    font-size:8px;
+    align-self:center
+}
+
+p {
+    font-size: 11px;
+    margin: 1px 1px 1px 1px;
+    line-height: 16px;
+    color: gainsboro;
+}
+
+a {
+    color: dodgerblue;
+    text-decoration: none;
+   
+}
+
+a:hover {
+    color: tomato;
+}
+
+
+
+/* ------------------- */
+/* PEN STYLES      -- */
+/* ----------------- */
+
+/* MAKE IT CUTE ----- */
+.tabs {
+    position: relative;
+    display: flex;
+    height: 100%;
+    border-radius: 0px 0px 0px 0px;
+    overflow: hidden;
+    border-width: 0px;
+    border-radius: 3px;
+    background: $background;
+    
+}
+
+.absolute-bg {
+    background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+    background-color: #00001bff;
+}
+.absolute-bg-op {
+    background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+    background-color: #00001b99;
+}
+
+.tabby-tab {
+    flex: 1;
+
+
+    [type=radio]:checked ~ label {
+        background: #f5d546;
+        z-index: 2;
+    }
+
+ 
+}   
+.tabby-tab [type=radio] {
+        display: none;
+    }
+
+[type=radio]:checked ~ label ~ .tabby-content {
+    z-index: 1;
+    /* show/hide */
+    opacity: 1;
+    transform: scale(1);
+}
+.tabby-tab label {
+    display: block;
+    box-sizing: border-box;
+    height: 16px;
+    padding: 2px;
+    text-align: center;
+    font-size: 11px;
+    color: $onyx;
+    background: $ketchup-mayo-opa;
+    cursor: pointer;
+    transition: background 0.1s ease;
+}
+
+.tabby-tab label:hover {
+    background: $ketchup-mayo;
+}
+.tabby-content-poly {
+    clip-path: polygon(6% 0%,0% 8%, 0% 90%, 7% 100%, 98% 100%, 100% 96%, 100% 0%);
+}
+.tabby-content {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    top: 20px;
+    border-radius: 0 0 0px 0px;
+    transition: opacity 0.1s ease, transform 0.1s ease;
+    padding-bottom: 4px;
+    padding-right: 4px;
+    padding-left: 4px;
+    transform-origin: top left;
+    padding-top: 2px;
+    opacity: 0;
+     transform: scale(0.1); 
+    transform-origin: top left;
+
+
+
+    .tabby-conten-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        padding-bottom: 3px;
+        padding-top: 2px;
+        border-bottom-width: 0px;
+        text-align: center;
+    }
+}
+
+.tabby-content img {
+    float: left;
+    margin-right: 5px;
+    border-radius: 0px;
+}
+
+
+/* MAKE IT WORK ----- */
+
+
+
+/* BREAKPOINTS ----- */

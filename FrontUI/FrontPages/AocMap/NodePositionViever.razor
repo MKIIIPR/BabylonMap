@@ -1,0 +1,105 @@
+﻿
+@using AshesMapBib.Models
+@using System.Threading
+@using FrontUI.AppStates
+@using Microsoft.JSInterop
+@using MudBlazor
+@inject IJSRuntime JS
+
+<MudPaper Height="100%" Style="">
+
+    <!-- NodePosition Auswahl -->
+    @if (_mapData.SelectedPosition != null)
+    {
+        <NodePositionComponent NodePosition="_mapData.SelectedPosition" />
+    }
+
+
+    @if (_mapData.FilteredPosList != null)
+    {
+
+        <MudRadioGroup T="NodePositionView" @bind-Value="selectedNode" Style="display:flex; flex-direction: column;flex-wrap: nowrap;overflow-y:auto;height:100%;">
+            @foreach (var spot in _mapData.FilteredPosList)
+            {
+                <MudRadio Value="spot" Color="Color.Primary" Dense="true"  >
+                    <ChildContent>
+                        <NodePositionComponent NodePosition="spot" />
+                    </ChildContent>
+
+                </MudRadio>
+            }
+        </MudRadioGroup>
+    }
+
+
+</MudPaper>
+<style>
+    .mud-input-control>.mud-input-control-input-container {
+    position: relative;
+    display: flex
+    ;
+    flex-direction: column;
+    }
+</style>
+@code {
+    // @CascadingParameter ermöglicht den Zugriff auf den globalen Zustand von _mapData
+    [CascadingParameter] public CascadingMapData _mapData { get; set; }
+
+    // Variablen und Timer-Setup
+    public NodePositionView selectedNode { get; set; }
+    private Timer _timer;
+    private bool _open = false; // Steuert, ob das Drawer geöffnet ist
+    public void UpdateSelectedNode(NodePositionView spot){
+        selectedNode = new();
+        selectedNode = spot;
+    }
+    // Entfernt alle Marker von der Karte
+    private async Task RemoveMarkers()
+    {
+        await JS.InvokeVoidAsync("removeCustomMarkers");
+    }
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+    // Timer-Update-Funktion, die den Zustand bei aktivem Timer jede Sekunde aktualisiert
+    protected override void OnInitialized()
+    {
+        _timer = new Timer(UpdateTimer, null, 0, 1000);
+        base.OnInitialized();
+    }
+
+    private void UpdateTimer(object state)
+    {
+        if (_mapData.Timer)
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    // Callback-Methode, wenn der Drawer geöffnet/geschlossen werden soll
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+
+    // Wird aufgerufen, wenn ein Node ausgewählt wird
+    private void OnNodeSelected(NodePositionView node)
+    {
+        CenterOnMap(node);
+    }
+
+    // Zentriert die Karte auf den ausgewählten Node
+    private void CenterOnMap(NodePositionView node)
+    {
+        Console.WriteLine($"Center on map: {node.Node.Name}");
+    }
+
+    // Entsorgt den Timer, wenn die Komponente zerstört wird
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}
+

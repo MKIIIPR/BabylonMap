@@ -1,0 +1,254 @@
+﻿/*
+  https://developer.mozilla.org/en/docs/Web/CSS/box-shadow
+  box-shadow: [inset?] [top] [left] [blur] [size] [color];
+
+  Tips:
+    - We're setting all the blurs to 0 since we want a solid fill.
+    - Add the inset keyword so the box-shadow is on the inside of the element
+    - Animating the inset shadow on hover looks like the element is filling in from whatever side you specify ([top] and [left] accept negative values to become [bottom] and [right])
+    - Multiple shadows can be stacked
+    - If you're animating multiple shadows, be sure to keep the same number of shadows on hover/focus as non-hover/focus (even if you have to create a transparent shadow) so the animation is smooth. Otherwise, you'll get something choppy.
+*/
+@import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
+.raise:hover,
+.raise:focus {
+  box-shadow: 0 0.5em 0.5em -0.4em var(--hover);
+  transform: translateY(-0.25em);
+  background-color: none;
+}
+
+.offset {
+  box-shadow: 0.3em 0.3em 0 0 var(--color), inset 0.3em 0.3em 0 0 var(--color);
+}
+.offset:hover, .offset:focus {
+  border-radius: 20px;
+  box-shadow: 0 0 0 0 var(--hover), inset 16em 3.5em 0 0 var(--hover);
+  box-shadow: inset 0 0 10px var(--hover);
+}
+
+.raise {
+  --color: #f5d546;
+  --hover: #4666f5;
+}
+
+.sc-button {
+  color: var(--color) !important;
+  transition: 0.05s !important;
+  font-family: "Russo One";
+}
+.sc-button:hover, .sc-button:focus {
+  border-color: var(--hover);
+  color: #fff;
+  text-shadow: 2px 2px 3px white;
+}
+
+.sc-button {
+  background: none;
+  border: 3px solid !important;
+  border-color: #f5d546 !important;
+  font: inherit;
+  line-height: 1;
+  margin: 0.5em;
+  padding: 0em 0em;
+  height: 30px;
+  font-size: 13px;
+  min-width: 100px;
+  border: 1px solid !important;
+  border-color: white !important;
+}
+
+h1 {
+  font-weight: 400;
+}
+
+.w50 {
+  min-width: 40% !important;
+}
+
+code {
+  color: peachpuff;
+  font: inherit;
+}
+
+.sub-menu {
+  display: none;
+  position: relative;
+  bottom: 20px;
+  width: 50%;
+  height: 0px;
+  background-color: red;
+  animation-name: enlarge;
+  animation-duration: 0.05s;
+  animation: entrance 400ms 700ms linear backwards 1;
+}
+
+.sub-menu::before {
+  padding: 0;
+  margin: 0;
+  display: block;
+  /* probably not really needed? */
+  content: "";
+  width: 100%;
+  height: 100%;
+  /* slight higher to work around rounding errors(?) on some zoom levels in some browsers. */
+  background: #1e1e1e url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+  position: absolute;
+  right: -1px;
+  top: -1px;
+}
+
+#wrapper {
+  width: 100%;
+}
+#wrapper .menu-items {
+  box-sizing: box-sizing(border-box);
+  margin: 0 auto;
+  padding: 0;
+  height: 60px;
+  background-color: #ffffff00;
+  font-size: 0px;
+}
+#wrapper .menu-items:active lable, #wrapper .menu-items:hover lable {
+  width: 15%;
+  transition: all 0.5s ease;
+}
+#wrapper .menu-items lable {
+  display: inline-block;
+  float: left;
+  width: 20%;
+  transform: transition(all 0.1s);
+  height: 100%;
+  text-shadow: text-shadow(0px 1px 3px white);
+  border-right: thin solid white;
+}
+#wrapper .menu-items lable label {
+  width: 100%;
+  height: 100%;
+}
+#wrapper .menu-items lable:last-child {
+  border-right: none;
+}
+#wrapper .menu-items lable:active, #wrapper .menu-items lable:hover {
+  background: rgba(0, 0, 0, 0.3);
+  width: 40%;
+  box-shadow: inset 10px 10px 10px -10px rgba(255, 255, 255, 0.3), inset -10px 10px 10px -10px #ffffff99;
+}
+#wrapper .menu-items lable:active .sub-menu, #wrapper .menu-items lable:hover .sub-menu {
+  padding-top: 10px;
+  width: 100%;
+  top: -16px;
+  height: auto;
+  background: none;
+  display: flex;
+  transition: all 0.25s;
+  flex-direction: row;
+  align-content: flex-start;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+#wrapper .menu-items lable:activelable, #wrapper .menu-items lable:hoverlable {
+  height: auto;
+}
+#wrapper .menu-items lable .a {
+  height: inherit;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: row;
+  position: relative;
+}
+#wrapper .menu-items lable .a .sub-menu {
+  position: relative;
+  bottom: 0px;
+}
+#wrapper .menu-items lable div {
+  margin-top: 5px;
+  font-weight: 600;
+  font-size: 13px;
+}
+@keyframes enlarge {
+  0% {
+    background-color: none;
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+#wrapper .menu-items-2 {
+  box-sizing: box-sizing(border-box);
+  margin: 0 auto;
+  padding: 0;
+  height: 30px;
+  background-color: #f5d546, 0;
+  font-size: 0px;
+}
+#wrapper .menu-items-2 .sub-menu {
+  height: 200px;
+}
+#wrapper .menu-items-2:active lable, #wrapper .menu-items-2:hover lable {
+  width: 16.6666666667%;
+  transition: all 0.05s ease;
+}
+#wrapper .menu-items-2 lable {
+  display: inline-block;
+  float: left;
+  width: 33.3333333333%;
+  transform: transition(all 0.1s);
+  height: 100%;
+  text-shadow: text-shadow(0px 1px 3px #f5d546);
+  border-right: thin solid #f5d546;
+}
+#wrapper .menu-items-2 lable label {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+#wrapper .menu-items-2 lable:last-child {
+  border-right: none;
+}
+#wrapper .menu-items-2 lable:active, #wrapper .menu-items-2 lable:hover {
+  background: rgba(245, 213, 70, 0.5);
+  width: 66.6666666667%;
+  box-shadow: inset 10px 10px 10px -10px #f5d546, inset -10px 10px 10px -10px #f5d546;
+}
+#wrapper .menu-items-2 lable:active .sub-menu, #wrapper .menu-items-2 lable:hover .sub-menu {
+  display: flex;
+  padding-top: 5px;
+  width: inherit;
+  height: 170px;
+  top: 25px;
+  z-index: 301;
+  display: flex;
+  transition: all 0.05s;
+  flex-direction: row;
+  align-content: flex-start;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: linear-gradient(0deg, rgba(245, 213, 70, 0.1) 0%, rgba(17, 17, 17, 0) 100%);
+  position: absolute;
+}
+#wrapper .menu-items-2 lable:activelable, #wrapper .menu-items-2 lable:hoverlable {
+  height: auto;
+}
+#wrapper .menu-items-2 lable .a {
+  height: inherit;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: row;
+  position: relative;
+}
+#wrapper .menu-items-2 lable .a .sub-menu {
+  position: relative;
+  bottom: 0px;
+}
+#wrapper .menu-items-2 lable div {
+  margin-top: 5px;
+  font-weight: 600;
+  font-size: 13px;
+}

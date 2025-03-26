@@ -1,0 +1,138 @@
+﻿@import url(https://fonts.googleapis.com/css?family=Lato:400,700,900,300);
+.sctab-container {
+  max-width: 960px;
+  height: 100px;
+  margin: 0 auto;
+  padding: 0px;
+}
+
+/* ------------------- */
+/* PEN STYLES      -- */
+/* ----------------- */
+/* MAKE IT CUTE ----- */
+.gradient-layer {
+  background: linear-gradient(0deg, rgba(245, 213, 70, 0.1) 0%, rgba(17, 17, 17, 0) 100%);
+}
+
+.sc-tab-order {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.sctab-tabs {
+  position: relative;
+  display: flex;
+  min-height: 200px;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+}
+
+.sctab-tab {
+  flex: 1;
+}
+.sctab-tab label {
+  display: flex;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 2px;
+  text-align: center;
+  border-top: 1px solid #f5d546;
+  border-bottom: 1px solid #f5d546;
+  cursor: pointer;
+  transition: background 0.5s ease;
+  justify-content: space-around;
+}
+.sctab-tab label:hover {
+  background: #f5d54690;
+}
+
+.sctab-content {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  top: 40px;
+  padding: 5px;
+  border-radius: 0 0 8px 8px;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  opacity: 0;
+  transform: scale(0.1);
+  transform-origin: top left;
+  height: 70%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 3px;
+  padding-bottom: 5px;
+  flex-direction: row;
+  align-items: flex-start;
+}
+/* MAKE IT WORK ----- */
+.sctab-tab [type=radio] {
+  display: none;
+}
+
+[type=radio]:checked ~ label {
+  background: #f5d54690;
+  z-index: 2;
+}
+[type=radio]:checked ~ label ~ .sctab-content {
+  z-index: 1;
+  /* show/hide */
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* BREAKPOINTS ----- */
+.mod-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.mod-logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.svg-icon-container {
+  display: flex;
+}
+
+.svg-color {
+  max-width: 35px;
+  max-height: 35px;
+  min-height: 35px;
+  max-height: 35px;
+}
+
+.mud-tabs-toolbar .mud-tabs-toolbar-inner {
+  display: flex;
+  min-height: 37px;
+}
+
+.pa-6 {
+  padding: 5px !important;
+}
+
+.loadout-tab {
+  width: 100%;
+  min-width: 40px;
+}
+
+.loadout-content {
+  padding: 0px;
+}
+
+.mud-tabs-toolbar {
+  background-color: rgba(0, 0, 0, 0);
+  min-height: 0px;
+}
+
+.mud-tabs-toolbar .mud-tabs-toolbar-inner .mud-tab {
+  padding: 0px;
+  min-height: 40px;
+  min-width: 30px;
+}

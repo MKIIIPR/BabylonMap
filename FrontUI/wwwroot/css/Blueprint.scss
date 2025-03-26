@@ -1,0 +1,61 @@
+﻿
+$kutschup: --sc-secondary;
+$accent-color: #355cc9;
+// colors
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$ketchup-mayo-opa: #f5d54690;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+$deepblue: #00001b;
+// add component style here
+
+// template style
+$duration: 400ms;
+$shift: 200ms;
+$start: 800ms;
+$sc-border: 2px solid $ketchup-mayo;
+$background: lighten($onyx, 5%) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+$div-bg: linear-gradient(0deg, rgba($ketchup-mayo, .1) 0%, rgba($onyx, 0) 100%);
+$div-bg-2: linear-gradient(0deg, rgba($ketchup-mayo, .2) 20%, rgba($onyx, 1) 100%);
+
+.blueprint-iso img {
+   
+    filter: invert(1) hue-rotate(182deg) brightness(5) contrast(1) grayscale(0) opacity(0.7);
+}
+
+.blueprint-iso {
+    background-color: #f5d54690;
+    opacity: inherit;
+    width: auto;
+    display: flex;
+    height: 100%;
+    -webkit-mask-repeat: no-repeat;
+
+   
+}
+
+
+.blueprint-front img {
+    width: 250px;
+    filter: invert(1) hue-rotate(182deg) brightness(0.45) contrast(1) grayscale(1) opacity(1);
+}
+
+.blueprint-front {
+    background-color: #f5d54690;
+    opacity: inherit;
+
+}
+
+.blueprint-profile img {
+    width: 250px;
+    filter: invert(1) hue-rotate(182deg) brightness(0.45) contrast(1) grayscale(1) opacity(0.51);
+}
+
+.blueprint-profile {
+    background-color: #f5d54690;
+    opacity: inherit;
+
+}

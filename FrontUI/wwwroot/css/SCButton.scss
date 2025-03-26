@@ -1,0 +1,337 @@
+﻿/*
+  https://developer.mozilla.org/en/docs/Web/CSS/box-shadow
+  box-shadow: [inset?] [top] [left] [blur] [size] [color];
+
+  Tips:
+    - We're setting all the blurs to 0 since we want a solid fill.
+    - Add the inset keyword so the box-shadow is on the inside of the element
+    - Animating the inset shadow on hover looks like the element is filling in from whatever side you specify ([top] and [left] accept negative values to become [bottom] and [right])
+    - Multiple shadows can be stacked
+    - If you're animating multiple shadows, be sure to keep the same number of shadows on hover/focus as non-hover/focus (even if you have to create a transparent shadow) so the animation is smooth. Otherwise, you'll get something choppy.
+*/
+
+
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+$duration: 400ms;
+$shift: 200ms;
+$start: 100ms;
+
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+
+// Size can also be negative; see how it's smaller than the element
+.raise:hover,
+.raise:focus {
+    box-shadow: 0 0.5em 0.5em -0.4em var(--hover);
+    transform: translateY(-0.25em);
+    background-color:none;
+}
+
+
+// Multiple shadows, one on the outside, another on the inside
+.offset {
+    box-shadow: 0.3em 0.3em 0 0 var(--color), inset 0.3em 0.3em 0 0 var(--color);
+
+    &:hover,
+    &:focus {
+        border-radius: 20px;
+        box-shadow: 0 0 0 0 var(--hover), inset 16em 3.5em 0 0 var(--hover);
+        box-shadow: inset 0 0 10px var(--hover);
+    }
+}
+
+//=== Set button colors
+// If you wonder why use Sass vars or CSS custom properties...
+// Make a map with the class names and matching colors
+$colors: (raise: $ketchup-mayo);
+
+// Sass variables compile to a static string; CSS variables are dynamic and inherited
+// Loop through the map and set CSS custom properties using Sass variables
+@each $button, $color in $colors {.#{$button} {--color: #{$color};
+        --hover: #{adjust-hue($color, 180deg)};
+    }
+}
+
+// Now every button will have different colors as set above. We get to use the same structure, only changing the custom properties.
+.sc-button {
+    color: var(--color) !important;
+    transition: 0.05s !important;
+    font-family:'Russo One';
+
+
+    &:hover,
+    &:focus {
+        border-color: var(--hover);
+        color: #fff;
+        text-shadow: 2px 2px 3px white;
+    }
+
+}
+
+//=== Pen styling, ignore
+body {
+
+}
+
+// Basic button styles
+.sc-button {
+    background: none;
+    border: 3px solid !important;
+    border-color: $ketchup-mayo !important;
+    font: inherit;
+    line-height: 1;
+    margin: 0.5em;
+    padding: 0em 0em;
+    height: 30px;
+    font-size: 13px;
+    min-width:100px;
+    border: 1px solid !important;
+    border-color: white !important;
+}
+
+h1 {
+    font-weight: 400;
+}
+.w50{
+    min-width:40% !important;
+}
+code {
+    color: peachpuff;
+    font: inherit;
+}
+.sub-menu {
+    display: none;
+    position: relative;
+    bottom: 20px;
+    width: 50%;
+    height: 0px;
+    background-color: red;
+    animation-name: enlarge;
+    animation-duration: 0.05s;
+    animation: entrance $duration ($start + $shift * 3) linear backwards 1;
+    
+}
+
+.sub-menu::before {
+    padding: 0;
+    margin: 0;
+    display: block; /* probably not really needed? */
+    content: "";
+    width: 100%;
+    height: 100%; /* slight higher to work around rounding errors(?) on some zoom levels in some browsers. */
+    background: lighten($onyx, 5%) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+    position: absolute;
+    right: -1px;
+    top: -1px;
+
+}
+#wrapper {
+    width: 100%;
+
+    .menu-items {
+        box-sizing: box-sizing(border-box);
+        margin: 0 auto;
+        padding: 0;
+        height: 60px;
+        background-color: #ffffff00;
+        font-size: 0px;
+
+        .sub-menu {
+        }
+
+        &:active,
+        &:hover {
+            lable {
+                width: (100% / 5)/(4/3);
+                transition: all 0.5s ease;
+            }
+        }
+
+        lable {
+            display: inline-block;
+            float: left;
+            width: (100% / 5);
+            transform: transition(all 0.1s);
+            height: 100%;
+            text-shadow: text-shadow(0px 1px 3px rgba(white,1));
+            border-right: thin solid white;
+
+            label {
+                width: 100%;
+                height: 100%;
+            }
+
+            &:last-child {
+                border-right: none;
+            }
+
+            &:active,
+            &:hover {
+                background: rgba(0,0,0,0.3);
+                width: (100%/5)*2;
+                box-shadow: inset 10px 10px 10px -10px rgb(255 255 255 / 30%), inset -10px 10px 10px -10px #ffffff99;
+
+
+
+                .sub-menu {
+                    padding-top: 10px;
+                    width: 100%;
+                    top: -16px;
+                    height: auto;
+                    background: none;
+                    display: flex;
+                    transition: all 0.25s;
+                    flex-direction: row;
+                    align-content: flex-start;
+                    align-items: center;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                }
+
+                &lable {
+                    height: auto;
+                }
+            }
+
+            .a {
+                height: inherit;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                flex-direction: row;
+                position: relative;
+
+                .sub-menu {
+                    position: relative;
+                    bottom: 0px;
+                }
+
+                &:visited {
+                }
+            }
+
+            div {
+                margin-top: 5px;
+                font-weight: 600;
+                font-size: 13px;
+            }
+        }
+    }
+
+    @keyframes enlarge {
+        0% {
+            background-color: none;
+            width: 0%;
+        }
+
+        100% {
+            width: 100%;
+        }
+    }
+
+    .menu-items-2 {
+        box-sizing: box-sizing(border-box);
+        margin: 0 auto;
+        padding: 0;
+        height: 30px;
+        background-color: $ketchup-mayo,0;
+        font-size: 0px;
+
+        .sub-menu {
+            height:200px;
+        }
+
+        &:active,
+        &:hover {
+            lable {
+                width: (100% / 3)/(2/1);
+                transition: all 0.05s ease;
+            }
+        }
+
+        lable {
+            display: inline-block;
+            float: left;
+            width: (100% / 3);
+            transform: transition(all 0.1s);
+            height: 100%;
+            text-shadow: text-shadow(0px 1px 3px rgba($ketchup-mayo,1));
+            border-right: thin solid $ketchup-mayo;
+
+            label {
+                width: 100%;
+                height: 100%;
+                position:relative;
+            }
+
+            &:last-child {
+                border-right: none;
+            }
+
+            &:active,
+            &:hover {
+                background: rgba($ketchup-mayo,0.5);
+                width: (100%/3)*2;
+                box-shadow: inset 10px 10px 10px -10px $ketchup-mayo, inset -10px 10px 10px -10px $ketchup-mayo;
+
+
+
+                .sub-menu {
+                    display: flex;
+                    padding-top: 5px;
+                    width: inherit;
+                    height:170px;
+                    top: 25px;
+                   z-index:301;
+                    display: flex;
+                    transition: all 0.05s;
+                    flex-direction: row;
+                    align-content: flex-start;
+                    align-items: center;
+                    justify-content: center;
+                    flex-wrap: wrap;
+
+                    background: linear-gradient(0deg, rgba($ketchup-mayo, .1) 0%, rgba($onyx, 0) 100%);
+                   
+                    position:absolute;
+                }
+                
+
+                &lable {
+                    height: auto;
+                }
+            }
+
+            .a {
+                height: inherit;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                flex-direction: row;
+                position: relative;
+
+                .sub-menu {
+                    position: relative;
+                    bottom: 0px;
+                }
+
+                &:visited {
+                }
+            }
+
+            div {
+                margin-top: 5px;
+                font-weight: 600;
+                font-size: 13px;
+            }
+        }
+    }
+}
+
+

@@ -1,0 +1,100 @@
+﻿// colors
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$ketchup-mayo-opa: #f5d54650;
+$aqua-opa: #00ffff50;
+$civilian-50: #00ff2180;
+
+$military-50: #4800ff50;
+$competition-50: #ffd80050;
+$industrial-50: #ff6a0050;
+$stealth-50: #ff006e50;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+$space-blue:#000030;
+
+// add component style here
+
+// template style
+$duration: 400ms;
+$shift: 200ms;
+$start: 800ms;
+
+.PageBuild-TopIcon {
+    position: relative;
+    top: -10px;
+    margin-left: 2px;
+    margin-right: 2px
+}
+.PageBuild-tl-inner {
+    min-width: 25px;
+    min-height: 25px;
+    height: 10%;
+    width: 10%;
+    max-width: 30px;
+    max-height: 30px;
+    transform: translate(-10px,-8px);
+}
+.PageBuild-tr-inner {
+    min-width: 25px;
+    min-height: 25px;
+    height: 10%;
+    width: 10%;
+    max-width: 30px;
+    max-height: 30px;
+    transform: translate(10px,-8px);
+}
+.PageBuild-TopSpacer {
+    border-top: 2px solid $ketchup-mayo;
+    height: 25px;
+    width: 25%;
+}
+.field-top-sndline {
+    position:relative;
+    top:-20px;
+    display: flex;
+}
+.PageBuild-BotSpacer {
+    border-bottom: 2px solid $ketchup-mayo-opa;
+    height: 25px;
+    width: 50%;
+
+    &:before {
+        content: "";
+        height: 65%;
+        width: 50%;
+        transform: skew(41deg);
+        border-left: 3px solid rgba(245, 213, 70, 0.3137254902);
+        display: flex;
+        top: 8px;
+        left: -6px;
+        position: relative;
+        justify-content: flex-end;
+    }
+
+    &:after {
+        content: "";
+        height: 65%;
+        width: 100%;
+        transform: skew(320deg);
+        border-right: 3px solid rgba(245, 213, 70, 0.3137254902);
+        display: flex;
+        top: -6.5px;
+        right: -6px;
+        position: relative;
+        justify-content: flex-end;
+        border-start-end-radius: 0.5px;
+    }
+}
+
+
+    .PageBuild-crn-field {
+        min-width: 25px;
+        min-height: 25px;
+        height: 10%;
+        width: 10%;
+        max-width: 30px;
+        max-height: 30px;
+    }

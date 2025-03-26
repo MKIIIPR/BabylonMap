@@ -1,0 +1,47 @@
+﻿.SCCoreIcon .inner-icon-wrap {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+}
+.SCCoreIcon .stroke-grade-red {
+  stroke: red !important;
+}
+.SCCoreIcon .stroke-grade-blue {
+  stroke: blue !important;
+}
+.SCCoreIcon .fill-grade-red {
+  fill: red !important;
+}
+.SCCoreIcon .fill-grade-blue {
+  fill: blue !important;
+}
+.SCCoreIcon .font-field {
+  color: #00001b;
+  background-color: rgba(247, 212, 70, 0.6862745098);
+  position: absolute;
+  width: 106%;
+  border-radius: 5px;
+  bottom: 17%;
+  pointer-events: none;
+}
+.SCCoreIcon .sc-core-icon-1 {
+  fill: #f7d747;
+  opacity: 0.4;
+  stroke-width: 0.412px;
+}
+.SCCoreIcon .sc-core-icon-2, .SCCoreIcon .sc-core-icon-3 {
+  stroke: #f7d747;
+  stroke-miterlimit: 10;
+}
+.SCCoreIcon .sc-core-icon-2 {
+  fill: url(#imagePattern36);
+  filter: url(#InnerShadowLow);
+  stroke-width: 1.971px;
+}
+.SCCoreIcon .icon-bg {
+  fill: #00001b;
+}
+.SCCoreIcon .sc-core-icon-3 {
+  fill: url(#imagePattern36);
+  stroke-width: 0.582px;
+}

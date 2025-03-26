@@ -1,0 +1,127 @@
+﻿@charset "UTF-8";
+.stan-bg {
+  background-color: #00001b !important;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+}
+
+.tbl-head {
+  background-color: rgba(245, 213, 70, 0.4392156863) !important;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+}
+
+.tbl-selected {
+  background-color: rgba(245, 213, 70, 0.4392156863) !important;
+}
+
+.tbl-selected > td {
+  color: #f5d546 !important;
+}
+
+.tbl-selected > td .mud-input {
+  color: #f5d546 !important;
+}
+
+.tbl-head-bg {
+  background: #000020 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+}
+
+.mud-expand-panel-header {
+  padding: 0 0 0 0 !important;
+  padding-left: 5px;
+}
+
+.mud-expand-panel-content {
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+.listelement-cls-1 {
+  fill: #3eb9bf;
+}
+
+.listelement-cls-2 {
+  fill: url(#Unbenannter_Verlauf_2);
+}
+
+.listelement-cls-3 {
+  opacity: 0.5;
+}
+
+.listelement-cls-4 {
+  letter-spacing: -0.04em;
+}
+
+.listelement-cls-5 {
+  clip-path: url(#listelement-clippath-2);
+}
+
+.listelement-cls-6 {
+  letter-spacing: -0.01em;
+  font-size: 16.505px; /* Ausgangsgröße */
+  white-space: nowrap; /* Verhindert Zeilenumbruch */
+  overflow: hidden; /* Verhindert, dass der Text über das Element hinausragt */
+  text-overflow: ellipsis; /* Zeigt "..." an, wenn der Text abgeschnitten wird */
+}
+
+.listelement-cls-7 {
+  clip-path: url(#listelement-clippath-1);
+}
+
+.listelement-cls-8 {
+  fill: #f7d645;
+}
+
+.listelement-cls-9 {
+  opacity: 0.15;
+}
+
+.listelement-cls-10 {
+  font-size: 13.073px;
+}
+
+.listelement-cls-10, .listelement-cls-11, .listelement-cls-12 {
+  /*   font-family: RussoOne-Regular, 'Russo One';
+  }*/
+}
+
+.listelement-cls-10, .listelement-cls-11, .listelement-cls-13 {
+  fill: #f7d747;
+}
+
+.listelement-cls-13 {
+  fill: #f7d747;
+  cursor: pointer;
+  /* Hier wird der Filter auf das Element angewendet */
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+  transition: filter 0.1s ease; /* Füge eine Übergangseigenschaft hinzu, damit der Schatten sanft erscheint */
+}
+
+.listelement-cls-13:hover {
+  /* Hier wird der Filter angepasst, wenn der Mauszeiger darüber schwebt */
+  filter: drop-shadow(0 0 10px rgb(222, 0, 0));
+}
+
+.listelement-cls-14 {
+  letter-spacing: -0.02em;
+}
+
+.listelement-cls-15 {
+  clip-path: url(#listelement-clippath);
+}
+
+.listelement-cls-16 {
+  fill: none;
+}
+
+.listelement-cls-17 {
+  opacity: 0.42;
+}
+
+.listelement-cls-11 {
+  font-size: 24.011px;
+}
+
+.listelement-cls-12 {
+  pointer-events: none;
+  font-size: 12.505px;
+}

@@ -1,0 +1,12 @@
+﻿:root {
+    --mainColor: #f5d546;
+    /*ItemClass Colors*/
+    --civilian-50: #00ff2180 !important;
+    --military-50: #4800ff80 !important;
+    --competition-50: #ffd80080 !important;
+    --industrial-50: #ff6a0080 !important;
+    --stealth-50: #ff00dc80 !important;
+}
+h6{
+    margin-bottom:0px!important;
+}

@@ -1,0 +1,473 @@
+﻿
+$kutschup: --sc-secondary;
+$accent-color: #355cc9;
+// colors
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$ketchup-mayo-opa: #f5d54670;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+$deepblue:#00001b;
+// add component style here
+
+// template style
+$duration: 400ms;
+$shift: 200ms;
+$start: 800ms;
+$sc-border: 2px solid $ketchup-mayo;
+$background: lighten(#00001b, 1%) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+$div-bg: linear-gradient(0deg, rgba($ketchup-mayo, .1) 0%, rgba($onyx, 0) 100%);
+$div-bg-2: linear-gradient(0deg, rgba($ketchup-mayo, .3) 20%, rgba($onyx, 1) 100%);
+
+
+* {
+    box-sizing: border-box;
+}
+
+.card-multi-select {
+    max-height: 40px;
+    max-width: 40px;
+
+    .multi-select-buttons {
+        display: none;
+        position: relative;
+        top: -70px;
+
+    }
+
+    &:hover {
+        .multi-select-buttons {
+            display: flex;
+            justify-content: center;
+        }
+    }
+}
+.multi-select-buttons-container {
+    
+    display: flex;
+
+}
+.sc-drop-down-content {
+    height: auto;
+  
+    left:-5px;
+    width:90%;
+    display: none;
+    position: relative;
+    background: $background;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+
+    .selected {
+        background: $ketchup-mayo-opa;
+    }
+
+    .sc-drop-down-item {
+        width:80px;
+        margin-block: 2px;
+        padding-top:2px;
+        padding-bottom:2px;
+        &:hover {
+            background: $ketchup-mayo-opa;
+        }
+    }
+}
+.sc-drop-down {
+    width: 40px;
+    height: 20px;
+
+    &:hover {
+       
+        z-index:300;
+        position:relative;
+        .sc-drop-down-content {
+            display: flex;
+        }
+    }
+}
+
+
+.sc-card-wrapper {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    overflow: scroll;
+    height:600px;
+}
+
+.sc-card {
+    width: 310px;
+    height: 240px;
+    margin: 1em;
+    margin-left:0.5em;
+    perspective: 1500px;
+
+    .card-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.75, 0, 0.85, 1);
+    }
+}
+
+.more {
+    display: none;
+
+    &:checked ~ .card-content {
+        transform: rotateY(180deg);
+    }
+}
+
+.front,
+.back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    
+    
+    border-radius: 6px;
+    .inner {
+        height: 100%;
+        
+        padding: 0.0em;
+        transform: translateZ(80px) scale(0.94);
+    }
+}
+
+.front {
+    background-color:#d64444;
+    background: $background;
+    
+    background-size: cover;
+    background-position: center center;
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        border-radius: 15px;
+        backface-visibility: hidden;
+        background: $background;
+    }
+
+    .inner {
+        
+        justify-items: center;
+    }
+
+    h2 {
+        
+        margin-bottom: 0.3em;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: $ketchup-mayo;
+        font-weight: 500;
+        text-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+    }
+
+    
+    
+}
+
+.back {
+    transform: rotateY(180deg);
+    background: $background;
+    
+
+    .inner {
+
+        justify-items: center;
+    }
+
+   
+
+   
+
+}
+
+.button {
+    grid-row: -1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    cursor: pointer;
+    display: block;
+    padding: 0 1.5em;
+    height: 3em;
+    line-height: 2.9em;
+    min-width: 3em;
+    background-color: transparent;
+    border: $sc-border;
+    color: $ketchup-mayo;
+    border-radius: 4px;
+    text-align: center;
+    left: 50%;
+    backface-visibility: hidden;
+    transition: 0.3s ease-in-out;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+        background-color: $ketchup-mayo-opa;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        text-shadow: none;
+        color: $onyx;
+    }
+
+    &.return {
+        line-height: 3em;
+        color: $onyx;
+        border-color: $onyx;
+        text-shadow: none;
+
+        &:hover {
+            background-color: $onyx;
+            color: $ketchup-mayo-opa;
+            box-shadow: none;
+        }
+    }
+}
+
+.btn-details {
+}
+
+
+.main-content {
+    border:$sc-border;
+    border-top:none;
+    pointer-events: none;
+    position: relative;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-radius: 0px 0px 15px 15px;
+    grid-area: main-content;
+}
+
+.card-container {
+    overflow: visible;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    display: grid;
+    border-color: rebeccapurple;
+    border-radius: 0 0 15px 15px;
+    grid-template-columns: 0.5fr 2fr 1fr 2fr 1fr 2fr 0.5fr;
+    grid-template-rows: 0.5fr 0.5fr 3fr 0fr;
+    gap: 0px 0px;
+    grid-template-areas:
+        ". left-head top-left top-head top-right right-head ." "left-corner left-head . top-head . right-head right-corner" "main-content main-content main-content main-content main-content main-content main-content";
+}
+
+.left-head {
+    font-size: 10px;
+    align-self: center;
+    text-align: center;
+    grid-area: left-head;
+}
+
+.top-head {
+    display: flex;
+    grid-area: top-head;
+    flex-direction: row;
+    align-items: center;
+}
+
+.right-head {
+    text-align: justify;
+    justify-self: center;
+    align-self: center;
+    grid-area: right-head;
+}
+
+
+.top-left {
+    grid-area: top-left;
+    border-bottom-width: 2px;
+    border-color:$ketchup-mayo;
+}
+
+.top-right {
+    grid-area: top-right;
+    border-bottom-width: 2px;
+    border-color: $ketchup-mayo;
+}
+
+.left-corner {
+    grid-area: left-corner;
+    border-radius: 10px 0 0 0;
+    border-left-width: 2px;
+    border-top-width: 2px;
+    border-color: $ketchup-mayo;
+}
+
+.right-corner {
+    grid-area: right-corner;
+    border-right-width: 2px;
+    border-radius: 0 10px 0% 0%;
+    border-top-width: 2px;
+    border-color: $ketchup-mayo;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: lighten($accent-color, 20%);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: $accent-color;
+}
+
+.sc-card-icon-row {
+    display: flex;
+    position: absolute;
+    z-index: 1500;
+    pointer-events: auto;
+    top: 215px;
+    left: 5px;
+    width: 100%;
+    justify-content: space-between;
+}
+.ship-id {
+    position: absolute;
+    left: -113px;
+    bottom: 130px;
+    transform: rotate(270deg);
+    font-size: 8px;
+    width: 70%;
+    color: $ketchup-mayo-opa;
+}
+
+
+
+
+.btn-details {
+}
+
+.infobox {
+    position: absolute;
+    width: 145px;
+    height: 140px;
+    top: -0%;
+    left: 60%;
+    z-index: 350;
+    border:1px solid $ketchup-mayo;
+    border-radius:3px;
+    opacity:0.9;
+}
+
+.ship-name {
+    position: relative;
+    width:78%;
+    background-color:$ketchup-mayo;
+    height: 20px;
+    color:$onyx;
+    z-index:2;
+    padding-left:10px;
+    left: 8px;
+    top: -243px;
+    border-top-left-radius:20px;
+    border-bottom-right-radius:20px;
+}
+
+.content-pic {
+    position: absolute;
+    
+    height: 100%;
+    max-width:90%;
+    top: -10px;
+    border-radius: 5px;
+    left: 0px;
+}
+
+.main-content {
+    pointer-events: none;
+    position: relative;
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-radius: 0px 0px 15px 15px;
+    grid-area: main-content;
+}
+
+.container {
+    overflow: visible;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    display: grid;
+    color: white;
+    border-radius: 0 0 15px 15px;
+    padding: 5px 5px 5px 5px;
+    grid-template-columns: 0.5fr 2fr 1fr 2fr 1fr 2fr 0.5fr;
+    grid-template-rows: 0.5fr 0.5fr 3fr 0fr;
+    gap: 0px 0px;
+    grid-template-areas:
+        ". left-head top-left top-head top-right right-head ." "left-corner left-head . top-head . right-head right-corner" "main-content main-content main-content main-content main-content main-content main-content";
+}
+
+.left-head {
+    font-size: 10px;
+    align-self: center;
+    text-align: center;
+    grid-area: left-head;
+}
+
+.top-head {
+    display: flex;
+    grid-area: top-head;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.right-head {
+    text-align: justify;
+    justify-self: center;
+    align-self: center;
+    grid-area: right-head;
+}
+
+
+.top-left {
+    grid-area: top-left;
+    border-bottom-width: 3px;
+}
+
+.top-right {
+    grid-area: top-right;
+    border-bottom-width: 3px;
+}
+
+.left-corner {
+    grid-area: left-corner;
+    border-radius: 10px 0 0 0;
+    border-left-width: 3px;
+    border-top-width: 3px;
+}
+
+.right-corner {
+    grid-area: right-corner;
+    border-right-width: 3px;
+    border-radius: 0 10px 0% 0%;
+    border-top-width: 3px;
+}

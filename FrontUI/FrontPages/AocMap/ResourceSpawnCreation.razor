@@ -1,0 +1,126 @@
+﻿
+@using AshesMapBib.Components
+@using AshesMapBib.Models
+@using FrontUI.AppStates
+
+@inject IJSRuntime JS
+
+@if(!string.IsNullOrEmpty(_mapData.ResType)){
+    <MudCard>
+        <MudCardContent>
+            <MudForm>
+                <MudText Typo="Typo.h6">Neue Ressource hinzufügen</MudText>
+
+                @*  <MudTextField Label="Latitude" @bind-Value="Lat" Variant="Variant.Outlined" Disabled="true" />
+                <MudTextField Label="Longitude" @bind-Value="Lng" Variant="Variant.Outlined" Disabled="true" /> 
+ *@
+
+                <MudSelect @bind-Value="SelectedResource" Label="Select fast-food" HelperText="String" Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood" AdornmentColor="Color.Primary">
+
+                    @foreach (var resource in _mapData.NodeList.Where(e => e.Type == ResourceType))
+                    {
+                        <MudSelectItem Value="@resource">@resource.Name</MudSelectItem>
+                    }
+
+                </MudSelect>
+
+                <MudChipSet T="string" @bind-SelectedValue="SelectedRarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
+                    <MudChip Text="Hero" Style="background-color:#f3eb0a" Value="@("f3eb0a")"></MudChip>
+                    <MudChip Text="Epic" Style="background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>
+                    <MudChip Text="Legi" Style="background-color:#de530c" Value="@("deb80c")"></MudChip>
+                </MudChipSet>
+
+
+
+                <!-- Datei-Upload -->
+                <MudText Typo="Typo.subtitle1">Bild hochladen:</MudText>
+                <FileUploader OnImageUploaded="HandleImageUpload" />
+
+                @if (!string.IsNullOrEmpty(ImgBase64))
+                {
+                    <img src="@ImgBase64" alt="Uploaded Image" style="max-width: 100%; height: auto;" />
+                }
+                <!-- Vorschau des hochgeladenen Bildes -->
+                @if (!string.IsNullOrEmpty(ImgBase64))
+                {
+                    <MudCardMedia Image="@($"data:image/png;base64,{ImgBase64}")" Height="150" />
+                }
+
+                <MudButton OnClick="SaveResource" Color="Color.Primary" Variant="Variant.Filled">
+                    Speichern
+                </MudButton>
+            </MudForm>
+        </MudCardContent>
+    </MudCard>
+}
+
+
+@code {
+    [CascadingParameter]
+    public CascadingMapData _mapData { get; set; }
+    [Parameter] public string ResourceType { get; set; } = "";
+    [Parameter] public double Lat { get; set; }
+    [Parameter] public double Lng { get; set; }
+    public int TimeMod { get; set; }
+    public string NodeDescr{ get; set; }
+    private void HandleImageUpload(string base64Image)
+    {
+        ImgBase64 = base64Image;
+    }
+
+    public List<Node> AvailableResources { get; set; } = new();
+    public Node SelectedResource { get; set; }
+    public string SelectedRarity { get; set; } = "f3eb0a";
+    private string Message { get; set; }
+    private string ImgBase64 = string.Empty;
+
+  
+    protected override void OnInitialized()
+    {
+        // Hier werden die verfügbaren Ressourcen geladen
+
+    }
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_mapData.NodeList.Any()){
+            SelectedResource = _mapData.NodeList[0];
+        }
+    return base.OnAfterRenderAsync(firstRender);
+    }
+    private const long MaxFileSize = 6 * 1024 * 1024; // 6 MB
+
+
+
+
+
+    private void SaveResource()
+    {
+        if (SelectedResource == null)
+        {
+            Console.WriteLine("Bitte eine Ressource auswählen!");
+            return;
+        }
+
+        var newPosition = new NodePositionView
+        {
+            Node = SelectedResource,
+            Lat = Lat,
+            Lng = Lng,
+            Rarity = SelectedRarity,
+            Image = ImgBase64,
+            LastHarvest = DateTime.Now
+
+
+            
+        };
+
+        _mapData.AddResourcePosition(newPosition);
+        Console.WriteLine($"Neue Ressource hinzugefügt: {SelectedResource.Name} bei {Lat}, {Lng}");
+
+        // Optionzurücksetzenal: UI 
+        SelectedResource = null;
+        SelectedRarity = "f3eb0a";
+        ImgBase64 = string.Empty;
+        _mapData.ResType = string.Empty;
+    }
+}

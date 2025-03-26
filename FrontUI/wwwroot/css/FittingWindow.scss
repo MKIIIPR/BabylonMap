@@ -1,0 +1,127 @@
+﻿
+$kutschup: --sc-secondary;
+$accent-color: #355cc9;
+// colors
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$ketchup-mayo-opa: #f5d54670;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+$deepblue: #00001b;
+// add component style here
+
+// template style
+$duration: 400ms;
+$shift: 200ms;
+$start: 800ms;
+$sc-border: 2px solid $ketchup-mayo;
+$background: lighten(#00001b, 1%) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+$div-bg: linear-gradient(0deg, rgba($ketchup-mayo, .1) 0%, rgba($onyx, 0) 100%);
+$div-bg-2: linear-gradient(0deg, rgba($ketchup-mayo, .3) 20%, rgba($onyx, 1) 100%);
+.outer-1 {
+    fill: none;
+    stroke: $ketchup-mayo;
+    stroke-dasharray: 0 0 0 0 0 5 50 5 50 5;
+    stroke-miterlimit: 10;
+    stroke-width: 3px;
+}
+.fwd-1 {
+    stroke-width: .597px;
+    stroke: $ketchup-mayo;
+}
+
+.fwd-1, .fwd-2 {
+    fill: $ketchup-mayo-opa;
+}
+
+.fwd-1, .fwd-2, .fwd-3 {
+   
+}
+
+.fwd-2 {
+    stroke-width: .534px;
+}
+
+.fwd-4 {
+    font-size: 21.861px;
+}
+
+.fwd-4, .fwd-5, .fwd-6, .fwd-7, .fwd-8, .fwd-9 {
+    fill: $leather;
+    font-family: Arial-Black, Arial;
+}
+
+.fwd-5 {
+    font-size: 16.031px;
+}
+
+.fwd-6 {
+    font-size: 11.173px;
+}
+
+.fwd-7 {
+    font-size: 27.69px;
+}
+
+.fwd-3 {
+    fill: $ketchup-mayo-opa;
+    stroke-width: 1px;
+    stroke: $ketchup-mayo;
+}
+
+.fwd-8 {
+    font-size: 11.659px;
+}
+
+.fwd-9 {
+    font-size: 25.747px;
+}
+
+.inner-circle {
+    fill: none;
+    scale:0.99;
+    transform:translate(2px,2px)
+}
+
+
+.btn:hover {
+    /* fill: red;*/
+    box-shadow: inset 0 0 20px $ketchup-mayo-opa;
+    fill: $ketchup-mayo;
+    stroke-width: 2px;
+    filter: url(#InnerShadow)
+}
+
+.btn-selected {
+    box-shadow: inset 0 0 20px $ketchup-mayo-opa;
+    fill: $ketchup-mayo;
+    stroke-width: 2px;
+    filter: url(#InnerShadow)
+}
+
+.ig-all-font {
+    pointer-events: none;
+}
+
+
+.btn {
+}
+
+.cyc-btn {
+    stroke: none;
+    fill: none;
+}
+
+.fwd-2 {
+    fill: rgb(20,27,100,1);
+}
+
+@keyframe toandback {
+    from {
+    }
+
+    to {
+    }
+}

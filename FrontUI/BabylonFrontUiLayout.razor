@@ -1,0 +1,47 @@
+﻿
+@using FrontUI.AppStates
+
+@inherits LayoutComponentBase
+
+<MudThemeProvider IsDarkMode="true" Theme="_myDarkTheme" />
+
+<MudPopoverProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggle" />
+        My Application
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="@_drawerOpen">
+        <MudNavMenu />
+    </MudDrawer>
+
+    <MudMainContent>
+
+            @ChildContent
+    </MudMainContent>
+
+</MudLayout>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    private bool _drawerOpen = false;
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private MudTheme _myDarkTheme = new MudTheme()
+        {
+             PaletteDark = new PaletteDark()
+            {
+                Primary = "#1E88E5",
+                Secondary = "#E91E63",
+                Background = "#121212",
+                Surface = "#1E1E1E"
+            }
+        };
+}

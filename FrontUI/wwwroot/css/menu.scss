@@ -1,0 +1,441 @@
+﻿// colors
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+$midnight:#00001b;
+// add component style here
+
+// template style
+$duration: 400ms;
+$shift: 200ms;
+$start: 800ms;
+$font: 'Teko', sans-serif;
+
+.page-name-bg {
+    position:absolute;
+    left:50%;
+    top:-10px;
+    font-size:30px;
+    font-family:$font
+}
+
+.main-content-frame {
+    -webkit-clip-path: polygon(0% 3%, 2% 0, 35.5% 0%, 37% 2%, 63% 2%, 64.5% 0%, 98% 0, 100% 3%, 100% 28%, 98.7% 30%, 98.7% 70%, 100% 72%, 100% 97%, 98% 100%, 64.5% 100%, 63% 98%, 37% 98%, 35.8% 100%, 2% 100%, 0% 97.2%, 0% 71.5%, 1.39% 69.3%, 1.5% 31%, 0% 29%);
+    clip-path: polygon(0% 3%, 2% 0, 35.5% 0%, 37% 2%, 63% 2%, 64.5% 0%, 98% 0, 100% 3%, 100% 28%, 98.7% 30%, 98.7% 70%, 100% 72%, 100% 97%, 98% 100%, 64.5% 100%, 63% 98%, 37% 98%, 35.8% 100%, 2% 100%, 0% 97.2%, 0% 71.5%, 1.39% 69.3%, 1.5% 31%, 0% 29%);
+    background: #00001b url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+}
+
+// =========================================
+// Width Animation Demo
+// =========================================
+.nav-head-1 {
+    width: 100%;
+    
+    width: 100%;
+    display: flex;
+    
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+.hexa-menu-btn {
+    background: #f5d54682;
+    color: white;
+    height: 60px;
+    width: 29%;
+    transition: all,0.3s width ease-in-out; // the transition effect for hover
+    &:hover {
+        cursor: pointer;
+        width: 100%; // animating to full width on hover
+        border-bottom: 2px thin white;
+    }
+
+}
+.hexa-l-img {
+    position: absolute;
+    height: 100%;
+    transform: translate(-100%, 0);
+    width: auto;
+}
+.hexa-r-img {
+    
+        position: absolute;
+        height: 100%;
+        
+        width: auto;
+    
+}
+.hexa-center {
+    
+    height: 100%;
+    left: 50%;
+    transform: translate(-50%, 0px);
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+}
+.sc-maincontent {
+    width: 100%;
+    height: 715px;
+    display: flex;
+    flex-direction: column;
+}
+.sc-navbar {
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    border-bottom:2px $ketchup-mayo solid;
+}
+
+.nav-edge {
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.hexa-m-wrap {
+    width: 200px;
+    height:80px;
+    position: relative;
+    display: flex;
+    margin-top:20px;
+    animation: entrance $duration $start linear backwards 1;
+}
+
+
+
+body {
+    
+   /* background: lighten($midnight, 100%) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+   */ 
+   display: flex;
+    height: 100vh;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: $white;
+    margin: 0;
+    padding: 0;
+    border-color: $ketchup-mayo !important;
+}
+
+h1 {
+    background-color: $ketchup-mayo;
+    padding: 0 5px 3px 5px;
+    color: lighten($onyx,.1);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 32px;
+    letter-spacing: 2px;
+    margin: 20px 0 10px;
+    border: 1px $ketchup-mayo solid;
+    border-radius: 5px;
+}
+
+h1, p {
+    font-weight: 500;
+}
+
+p {
+    opacity: 1;
+    margin: 0 0 10px 0;
+    letter-spacing: 1px;
+}
+
+a {
+    color: $ketchup-mayo;
+
+    &:hover {
+        background: $ketchup-mayo;
+        color: $onyx;
+        text-decoration: none;
+    }
+}
+.s-border {
+    border: 1px solid var(--sc-secondary)
+}
+.side-titel-bar {
+    height: 100%;
+    width: 5px;
+    position: relative;
+    top: 0;
+    left: -0px;
+    background: $ketchup-mayo;
+    animation: entrance $duration ($start + $shift * 2) linear backwards 1;
+
+    &::before {
+        @extend p;
+        
+        text-transform: uppercase;
+        text-align: right;
+        position: absolute;
+        left: -92px;
+        top: 380px;
+        transform-origin: 100% 100%;
+        transform: rotateZ(-90deg);
+    }
+}
+.side-titel-bar-r {
+    height: 100%;
+    content:'wtf';
+    width: 5px;
+    position: relative;
+    top: 0;
+    left: -0px;
+    background: $ketchup-mayo;
+    animation: entrance $duration ($start + $shift * 2) linear backwards 1;
+
+    &::before {
+        @extend p;
+        content: 'sci-fi ui #X';
+        text-transform: uppercase;
+        text-align: right;
+        position: absolute;
+        left: -85px;
+        top: 90px;
+        transform-origin: 100% 100%;
+        transform: rotateZ(90deg);
+    }
+}
+
+.holo-button-skew {
+    height: 40px;
+    padding: 0 0px 2% 0;
+    margin: 0 0px 0px 0;
+    border: 2px #111 solid;
+    outline: 1px #f5d546 solid;
+    background-color: transparent;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    transition: 300ms all ease-out;
+    transform: skewX(-30deg);
+    flex-direction: column;
+    align-items: flex-start;
+
+    btntext {
+        transform: skewX(-30deg);
+        padding-left: 10px;
+    }
+
+    &:hover, &:focus, &.active {
+        background-color: rgba($ketchup-mayo,.5);
+
+        .btn-vbar {
+            background-color: $ketchup-mayo;
+        }
+    }
+
+    &.active {
+        border: 2px $ketchup-mayo solid;
+        background-color: rgba($ketchup-mayo,1);
+        color: lighten($onyx,.1)
+    }
+}
+.holo-button::before {
+    height: 20px;
+    width:20px;
+    border: 2px #ffffff solid;
+}
+.holo-button {
+    height: 40px;
+    padding: 0 10px;
+    margin: 0 10px 15px 0;
+    border: 2px $onyx solid;
+    outline: 1px $ketchup-mayo solid;
+    background-color: transparent;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: $white;
+    cursor: pointer;
+    transition: 300ms all ease-out;
+    &:before{
+        height:20px;
+        width:20px;
+        border:2px #ffffff solid;
+    }
+    &:hover, &:focus, &.active {
+        background-color: rgba($ketchup-mayo,.5);
+    }
+
+    &.active {
+        border: 2px $ketchup-mayo solid;
+        background-color: rgba($ketchup-mayo,1);
+        color: lighten($onyx,.1)
+    }
+}
+
+#shot {
+    width: 400px;
+    margin: auto;
+    position: relative;
+
+    .card {
+        width: 100%;
+        height: 300px;
+        display: flex;
+        background: linear-gradient(0deg, rgba($ketchup-mayo, .1) 0%, rgba($onyx, 0) 100%);
+        border: 1px $ketchup-mayo solid;
+        border-radius: 5px;
+        animation: entrance $duration $start linear backwards 1;
+
+        #component {
+            margin: auto
+        }
+    }
+
+    .description {
+        animation: entrance $duration ($start + $shift) linear backwards 1;
+    }
+
+    .title {
+        height: 100%;
+        width: 5px;
+        position: absolute;
+        top: 0;
+        left: -50px;
+        background: $ketchup-mayo;
+        animation: entrance $duration ($start + $shift * 2) linear backwards 1;
+
+        &::before {
+            @extend p;
+            content: 'sci-fi ui #X';
+            text-transform: uppercase;
+            text-align: right;
+            position: absolute;
+            left: -92px;
+            top: -17px;
+            transform-origin: 100% 100%;
+            transform: rotateZ(-90deg);
+        }
+    }
+
+    .options {
+        width: 200px;
+        height: auto;
+        display: flex;
+        flex-wrap: wrap;
+        position: absolute;
+        top: 0;
+        right: -220px;
+        animation: entrance $duration ($start + $shift * 3) linear backwards 1;
+
+        .btn-vbar {
+            height: 90%;
+            margin: 3px;
+            width: 4px;
+            background-color: white;
+            position: relative;
+        }
+
+      
+        .holo-button-skew {
+            height: 40px;
+            padding: 0 0px 2% 0;
+            margin: 0 0px 0px 0;
+            border: 2px #111 solid;
+            outline: 1px #f5d546 solid;
+            background-color: transparent;
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            transition: 300ms all ease-out;
+            transform: skewX(-30deg);
+            flex-direction: column;
+            align-items: flex-start;
+
+            btntext {
+                transform: skewX(-30deg);
+                padding-left: 10px;
+            }
+
+            &:hover, &:focus, &.active {
+                background-color: rgba($ketchup-mayo,.5);
+
+                .btn-vbar {
+                    background-color: $ketchup-mayo;
+                }
+            }
+
+            &.active {
+                border: 2px $ketchup-mayo solid;
+                background-color: rgba($ketchup-mayo,1);
+                color: lighten($onyx,.1)
+            }
+        }
+    }
+}
+
+
+
+// entrance animation
+@-webkit-keyframes entrance {
+    to, 20%, 40%, 60%, 80% {
+        opacity: 1
+    }
+
+    from, 10%, 30%, 50%, 70%, 90% {
+        opacity: 0
+    }
+}
+
+.quad-a-border-on-top {
+    border-top: 1px solid black;
+    position: relative;
+}
+
+.quad-a-border-on-top:after {
+    padding: 0;
+    margin: 0;
+    display: block; /* probably not really needed? */
+    content: "";
+    width: 20%;
+    height: 1.1px; /* slight higher to work around rounding errors(?) on some zoom levels in some browsers. */
+    background-color: $ketchup-mayo;
+    position: absolute;
+    left: -1px;
+    top: -1px;
+}
+.half-a-border-on-top {
+
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    position: relative;
+    border-bottom: none;
+}
+
+.half-a-border-on-top:after {
+    padding: 0;
+    margin: 0;
+    display: block; /* probably not really needed? */
+    content: "";
+    width: 30%;
+    height: 1.1px; /* slight higher to work around rounding errors(?) on some zoom levels in some browsers. */
+    background-color: $ketchup-mayo;
+    position: absolute;
+    left: -1px;
+    top: -1px;
+}
+.half-a-border-on-top:before {
+    padding: 0;
+    margin: 0;
+    display: block; /* probably not really needed? */
+    content: "";
+    width: 30%;
+    height: 1.1px; /* slight higher to work around rounding errors(?) on some zoom levels in some browsers. */
+    background-color: $ketchup-mayo;
+    position: absolute;
+    right: -1px;
+    top: -1px;
+}
+
+

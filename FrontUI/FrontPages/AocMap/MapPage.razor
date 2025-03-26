@@ -1,0 +1,20 @@
+﻿@page "/map"
+@using FrontUI.AppStates
+@inject IJSRuntime JS
+
+
+<CascadingMapData>
+    <MudDialogProvider />
+    <AOCMap/>
+</CascadingMapData>
+
+@code{
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+           
+        }
+    }
+}

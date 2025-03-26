@@ -1,0 +1,702 @@
+﻿.IgItemPortViewer{
+
+}
+.d-flex-aj {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.portview-container {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    padding: 0 !important;
+    display: flex;
+    justify-content: space-around;
+
+
+    .element {
+        width: 90px;
+        height: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.2s ease, filter 0.2s ease;
+        /* Allgemeiner Hover-Effekt für alle `.dod` */
+        &:hover .dod {
+            transform: translateY(-2px); // Standard-Hover nach oben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6)); // Gelber Schatten
+        }
+        /* Hover- und Checked-Status für `.element` basierend auf spezifischen Klassen */
+
+        &.tl:hover .dod,
+        &.tl input[type="radio"]:checked + .dod {
+            transform: translate(-2px, -2px); // Nach links oben verschieben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.tr:hover .dod,
+        &.tr input[type="radio"]:checked + .dod {
+            transform: translate(2px, -2px); // Nach rechts oben verschieben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.bl:hover .dod,
+        &.bl input[type="radio"]:checked + .dod {
+            transform: translate(-2px, 2px); // Nach links unten verschieben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.br:hover .dod,
+        &.br input[type="radio"]:checked + .dod {
+            transform: translate(2px, 2px); // Nach rechts unten verschieben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.l:hover .dod,
+        &.l input[type="radio"]:checked + .dod {
+            transform: translateX(-4px); // Linksseitige Verschiebung
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.r:hover .dod,
+        &.r input[type="radio"]:checked + .dod {
+            transform: translateX(4px); // Rechtsseitige Verschiebung
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+        /* Radio-Button Styling */
+        input[type="radio"] {
+            display: none;
+            /* Standardmäßig bei Auswahl */
+            &:checked + .dod {
+                transform: translateY(-6px); // Bewegung nach oben bei Auswahl
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow2);
+                }
+            }
+        }
+    }
+
+    .hewxheal-container {
+        position: relative;
+        width: 250px;
+        height: 250px;
+        padding: 0 !important;
+
+        .element {
+            position: absolute;
+            width: 36%;
+            height: 36%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s ease;
+
+            &:hover .dod {
+                transform: translateY(-2px); // Standard-Hover nach oben
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6)); // Gelber Schatten
+            }
+            /* Hover- und Checked-Status für `.element` basierend auf spezifischen Klassen */
+
+            &.tl:hover .dod,
+            &.tl input[type="radio"]:checked + .dod {
+                transform: translate(-2px, -2px); // Nach links oben verschieben
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow);
+                }
+            }
+
+            &.tr:hover .dod,
+            &.tr input[type="radio"]:checked + .dod {
+                transform: translate(2px, -2px); // Nach rechts oben verschieben
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow);
+                }
+            }
+
+            &.bl:hover .dod,
+            &.bl input[type="radio"]:checked + .dod {
+                transform: translate(-2px, 2px); // Nach links unten verschieben
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow);
+                }
+            }
+
+            &.br:hover .dod,
+            &.br input[type="radio"]:checked + .dod {
+                transform: translate(2px, 2px); // Nach rechts unten verschieben
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow);
+                }
+            }
+
+            &.l:hover .dod,
+            &.l input[type="radio"]:checked + .dod {
+                transform: translateX(-4px); // Linksseitige Verschiebung
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow);
+                }
+            }
+
+            &.r:hover .dod,
+            &.r input[type="radio"]:checked + .dod {
+                transform: translateX(4px); // Rechtsseitige Verschiebung
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow);
+                }
+            }
+            /* Radio-Button Styling */
+            input[type="radio"] {
+                display: none;
+                /* Standardmäßig bei Auswahl */
+                &:checked + .dod {
+                    transform: translateY(-6px); // Bewegung nach oben bei Auswahl
+                    filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                    .svg-btn {
+                        filter: url(#InnerShadow2);
+                    }
+                }
+            }
+            /* Allgemeiner Hover-Effekt für alle `.dod` */
+            /*&:hover .dod {
+                transform: translateY(-2px); // Standard-Hover nach oben
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6)); // Gelber Schatten
+            }*/
+            /* Hover- und Checked-Status für `.element` basierend auf spezifischen Klassen */
+            /*&:hover .dod,
+            &input[type="radio"]:checked + .dod {
+                transform: translate(-2px, -2px); // Nach links oben verschieben
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow);
+                }
+            }*/
+            /* Radio-Button Styling */
+            /*input[type="radio"] {
+                display: none;*/
+            /* Standardmäßig bei Auswahl */
+            /*&:checked + .dod {
+                    transform: translateY(-6px); // Bewegung nach oben bei Auswahl
+                    filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                    .svg-btn {
+                        filter: url(#InnerShadow2);
+                    }
+                }
+            }*/
+        }
+    }
+}
+.hewxheal-container {
+    position: relative;
+    width: 218px;
+    height: 218px;
+    padding: 0 !important;
+    pointer-events:auto;
+
+    .element {
+        position: absolute;
+        width: 36%;
+        height: 36%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.2s ease, filter 0.2s ease;
+
+        &:hover .dod {
+            transform: translateY(-2px); // Standard-Hover nach oben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6)); // Gelber Schatten
+        }
+        /* Hover- und Checked-Status für `.element` basierend auf spezifischen Klassen */
+
+        &.tl:hover .dod,
+        &.tl input[type="radio"]:checked + .dod {
+            transform: translate(-2px, -2px); // Nach links oben verschieben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.tr:hover .dod,
+        &.tr input[type="radio"]:checked + .dod {
+            transform: translate(2px, -2px); // Nach rechts oben verschieben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.bl:hover .dod,
+        &.bl input[type="radio"]:checked + .dod {
+            transform: translate(-2px, 2px); // Nach links unten verschieben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.br:hover .dod,
+        &.br input[type="radio"]:checked + .dod {
+            transform: translate(2px, 2px); // Nach rechts unten verschieben
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.l:hover .dod,
+        &.l input[type="radio"]:checked + .dod {
+            transform: translateX(-4px); // Linksseitige Verschiebung
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+
+        &.r:hover .dod,
+        &.r input[type="radio"]:checked + .dod {
+            transform: translateX(4px); // Rechtsseitige Verschiebung
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+            .svg-btn {
+                filter: url(#InnerShadow);
+            }
+        }
+        /* Radio-Button Styling */
+        input[type="radio"] {
+            display: none;
+            /* Standardmäßig bei Auswahl */
+            &:checked + .dod {
+                transform: translateY(-6px); // Bewegung nach oben bei Auswahl
+                filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+
+                .svg-btn {
+                    filter: url(#InnerShadow2);
+                }
+            }
+        }
+        
+    }
+}
+.Ig-Item-container {
+    .element {
+        transition: transform 0.1s ease, filter 0.1s ease;
+        /* Hover-Effekt */
+        &:hover {
+            transform: translateY(-3px);
+        }
+    }
+    /* Wenn der Radio-Button ausgewählt ist */
+    .element-radio {
+        display: none; // Versteckt den Radio-Button
+
+        &:checked + .element {
+            transform: translateY(-6px); // Bewegung nach oben bei Auswahl
+            filter: drop-shadow(0 4px 6px rgba(244, 212, 70, 0.6));
+        }
+    }
+}
+
+    .radio-element {
+    }
+
+    .center {
+        position: absolute;
+        width: 70%;
+        height: 70%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+    }
+
+
+
+    .tl {
+        top: 15%;
+        left: 31.3%;
+        transform: translate(-50%, -50%);
+    }
+
+    .tr {
+        top: 15%;
+        right: 31.3%;
+        transform: translate(50%, -50%);
+    }
+
+    .bl {
+        bottom: 15.8%;
+        left: 31.3%;
+        transform: translate(-50%, 50%);
+    }
+
+    .br {
+        bottom: 15.8%;
+        right: 31.3%;
+        transform: translate(50%, 50%);
+    }
+
+    .r {
+        top: 43%;
+        right: 9%;
+        height: 28% !important;
+        width: 28% !important;
+        transform: translate(50%, -50%);
+    }
+
+    .l {
+        top: 43%;
+        left: 9%;
+        height: 28% !important;
+        width: 28% !important;
+        transform: translate(-50%, -50%);
+    }
+
+    .dod {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    .svg-bg-pattern4 {
+        fill: url(#imagePattern4);
+        /*filter: url(#InnerShadow);*/
+        pointer-events: none;
+    }
+
+    .svg-bg-pattern6 {
+        fill: url(#imagePattern6);
+        /*filter: url(#InnerShadow);*/
+        pointer-events: none;
+    }
+
+    .svg-bg-pattern8 {
+        fill: url(#imagePattern8);
+        /*filter: url(#InnerShadow);*/
+        pointer-events: none;
+    }
+
+    .svg-bg-pattern12 {
+        fill: url(#imagePattern12);
+        /*filter: url(#InnerShadow);*/
+        pointer-events: none;
+    }
+
+    .IsLoadout {
+        width: 60%;
+        height: 60%;
+        position: absolute;
+        left: 13%;
+        top: -6%;
+
+        .inner-icon-wrap {
+
+
+            .score-icon-manuicon {
+                display: none !important;
+            }
+        }
+    }
+
+    .DescBot {
+        position: absolute;
+        bottom: -13px;
+        height: 30px
+    }
+
+    .svg-background {
+        fill: #00001b;
+    }
+
+    .svg-wrapstroke-clr {
+        fill: #f5d546;
+    }
+
+    .svg-fill-maincolor {
+        fill: #f5d546;
+    }
+
+    .NameStyle {
+        background-color: #f7d747;
+        display: flex;
+        width: 117%;
+        font-size: 0.5rem;
+        position: absolute;
+        max-width: 117px;
+        justify-content: center;
+        font-weight: bold;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        top: 49px;
+        border-radius: 5px;
+        transform: scale(1, 1.2);
+    }
+
+    .hasPorts {
+        color: #f7d747;
+        display: flex;
+        width: 15%;
+        font-size: 0.5rem;
+        position: absolute;
+        max-width: 15%;
+        justify-content: center;
+        font-weight: bold;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        top: 30%;
+        border-radius: 5px;
+        transform: scale(1, 1.2);
+        left: 11%;
+    }
+
+    .PortRoot {
+        position: absolute;
+        width: 24%;
+        height: 24%;
+        bottom: -10%;
+        left: 38%;
+    }
+
+    .stroke-size-1 {
+        stroke-width: 1px;
+        stroke: #f7d747;
+    }
+
+    .stroke-size-2 {
+        stroke-width: 2px;
+        stroke: #f7d747;
+    }
+    /*
+    .svg-btn:hover {
+        filter: url(#InnerShadow);
+    }
+
+    .svg-btn:active {
+        filter: url(#InnerShadow);
+    }*/
+
+    .svg-btn {
+    }
+
+    h1.iconfont {
+        color: red;
+    }
+
+    .itemportviewer {
+        .inner-icon-wrap {
+
+            .IsEquipedItem {
+                top: -5px;
+                left: 5px;
+            }
+        }
+    }
+
+    .gCROkU::before {
+        background: linear-gradient(93.69deg, rgb(200, 137, 39) 16.44%, rgb(18, 143, 235) 80.82%);
+        border-radius: inherit;
+    }
+
+    .gCROkU::before, .gCROkU::after {
+        content: "";
+        position: absolute;
+        inset: 0px;
+        z-index: -1;
+    }
+
+    .gCROkU {
+        --ch-outline-offset: -1;
+        position: relative;
+        transition: background-color 250ms, color 250ms, opacity 250ms;
+        z-index: 1;
+        mask-image: none, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23000' preserveAspectRatio='none' viewBox='0 0 24 24'%3E%3Cpath d='M0 0h4.7a8 8 0 015.6 2.3l11.4 11.4a8 8 0 012.3 5.6V24H0V0z'/%3E%3C/svg%3E"), none, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23000' preserveAspectRatio='none' viewBox='0 0 24 24'%3E%3Cpath d='M24 24h-4.7a8 8 0 01-5.6-2.3L2.3 10.3A8 8 0 010 4.7V0h24v24z'/%3E%3C/svg%3E"), linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0)), linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0)), linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0)), linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0)), linear-gradient(rgb(0, 0, 0), rgb(0, 0, 0));
+        mask-size: 0px 0px, 24px 24px, 0px 0px, 24px 24px, calc(100% - 22px) 1px, 25px calc(100% - 22px), calc(100% - 46px) calc(100% + 2px), 25px calc(100% - 22px), calc(100% - 22px) 1px;
+        mask-position: left top, right top, right bottom, left bottom, -1px top, left -1px, 23px -1px, right 23px, 23px bottom;
+        mask-repeat: no-repeat;
+        padding: 1rem 1.5rem;
+        min-width: 3rem;
+        min-height: 3rem;
+    }
+
+.fw-checkbox {
+    position: absolute;
+    display: inline-block; /* Passt das Verhalten von SVG an */
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+
+
+    input.fitting-slot-checkbox {
+        display: none;
+        pointer-events: none; /* Deaktiviert jegliche Mausinteraktion */
+    }
+
+    .fitting-slot-pos {
+        position: relative; /* SVG bleibt sichtbar */
+        pointer-events: auto; /* Mausinteraktionen für SVG aktivieren */
+        pointer-events: none;
+
+        .fitting-slot {
+            opacity: 0.5;
+            fill: #f7d747;
+            filter: url(#Bevel2);
+            transition: fill 0.2s ease, filter 0.2s ease; /* Animierter Übergang */
+        }
+
+        .lable-item {
+            pointer-events: fill;
+            filter: none;
+            transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
+            position: absolute;
+            width: 78px;
+        }
+    }
+
+    input.fitting-slot-checkbox:checked + .fitting-slot-pos {
+        .fitting-slot {
+            fill: #f7d747;
+            filter: url(#InnerShadow33);
+        }
+
+        .lable-item {
+            transform: translate(0px, -1%);
+            filter: drop-shadow(0px 0px 5px #f7d747aa);
+            transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
+        }
+    }
+
+
+
+    &:hover .fitting-slot-pos .fitting-slot {
+        fill: #f7d747aa; /* Farbe, wenn ausgewählt */
+    }
+
+
+    .fw-checkbox:checked + .fitting-slot-pos .label-item,
+    .fw-checkbox:hover .fitting-slot-pos .label-item {
+        transform: translateX(Xpx); /* Ersetze X mit deiner gewünschten Verschiebung */
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .igitemportslot-desk {
+        position: absolute;
+        bottom: 1%;
+        width: 99%;
+        left: 0.5%;
+    }
+
+    .deskbot-PortRoot {
+        position: absolute;
+        width: 15px;
+        bottom: 7px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .PortRoot-bg {
+        position: absolute;
+        width: 48px;
+        bottom: 0%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        opacity: 0.5;
+    }
+
+    .port-bot-desc-1 {
+        fill: #00001b;
+        stroke: #f7d747;
+        stroke-miterlimit: 10;
+        stroke-width: 1.204px;
+    }
+
+    .port-bot-desc-2 {
+        fill: #f7d747;
+        font-family: NameSmile, 'Name Smile';
+        font-size: 4.789px;
+    }
+
+    .has-equiped-items-count {
+        position: absolute;
+        top: 79%;
+        left: 21%;
+        font-size: 12px;
+        background: radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(0,0,27,0.03125) 60%);
+        z-index: 1;
+        width: 11%;
+        border-radius: 5px;
+    }
+
+    .deskbot-PortRoot-lastitem {
+        position: absolute;
+        width: 13px;
+        bottom: 8.3px;
+        left: 27%;
+        transform: translateX(-50%);
+    }
+
+    .deskbot-PortRoot-Type {
+        position: absolute;
+        width: 14px;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}

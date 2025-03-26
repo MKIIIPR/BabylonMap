@@ -1,0 +1,50 @@
+﻿[
+  {
+    "outputFile": "Testcomponent/IconSet.razor.css",
+    "inputFile": "Testcomponent/IconSet.razor.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/LoadoutComponent.css",
+    "inputFile": "wwwroot/css/LoadoutComponent.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/Icon.css",
+    "inputFile": "wwwroot/css/Icon.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/css/sc.css",
+    "inputFile": "wwwroot/css/css/sc.scss"
+  },
+  {
+    "outputFile": "Pages/Fitting/FittingCycle/FittingCycle.razor.css",
+    "inputFile": "Pages/Fitting/FittingCycle/FittingCycle.razor.scss"
+  },
+  {
+    "outputFile": "Pages/Fitting/FittingCycle1.razor.css",
+    "inputFile": "Pages/Fitting/FittingCycle1.razor.scss"
+  },
+  {
+    "outputFile": "Pages/Fitting/FittingCycle/PortOfPorts.razor.css",
+    "inputFile": "Pages/Fitting/FittingCycle/PortOfPorts.razor.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/svg.css",
+    "inputFile": "wwwroot/css/svg.scss"
+  },
+  {
+    "outputFile": "Components/SCIcons/SCCoreIcon.razor.css",
+    "inputFile": "Components/SCIcons/SCCoreIcon.razor.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/SCCoreIcon.css",
+    "inputFile": "wwwroot/css/SCCoreIcon.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/HexWheal.css",
+    "inputFile": "wwwroot/css/HexWheal.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/sc.css",
+    "inputFile": "wwwroot/css/sc.scss"
+  }
+]

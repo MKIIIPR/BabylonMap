@@ -1,0 +1,12 @@
+﻿.small-caps-centered {
+    display: flex;
+    align-items: center; /* Vertikale Zentrierung */
+    justify-content: center; /* Horizontale Zentrierung, falls gewünscht */
+    text-transform: lowercase;
+    font-variant: small-caps;
+    height: 100px; /* Oder eine andere feste Höhe, je nach Bedarf */
+}
+.SCIcon_Stats{
+    display:flex;
+    align-content:center;
+}

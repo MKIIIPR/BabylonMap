@@ -1,0 +1,27 @@
+﻿@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">@Message</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="ConfirmRequest" Color="Color.Primary">OK</MudButton>
+        <MudButton OnClick="Cancel" Color="Color.Secondary">Abbrechen</MudButton>
+        
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string Message { get; set; }
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void ConfirmRequest()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

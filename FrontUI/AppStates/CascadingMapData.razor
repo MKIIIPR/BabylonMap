@@ -1,0 +1,341 @@
+﻿@using System.Collections.Generic
+@using AshesMapBib.Models
+@using FrontUI.FtpService
+@using FrontUI.Helper.MapHelper
+@inject IJSRuntime JS
+@inject ResourceApiClient<Node> _nodes
+@inject ResourceApiClient<NodePosition> _positions
+@inject FTPConnection _ftp
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    // List von ResourcePositionen, die die Daten enthalten
+    public List<NodePositionView> NodePositionList { get; set; } = new List<NodePositionView>();
+    public NodePositionView SelectedPosition { get; set; } 
+    [Parameter] public RenderFragment ChildContent { get; set;  }
+    private bool _timer = true;
+    public bool Timer
+    {
+        get => _timer;
+        set
+        {
+            if (_timer != value)
+            {
+                _timer = value;
+
+                if (_timer)
+                {
+                    // Timer wurde gestartet
+                    StartedTimerAt = DateTime.Now;
+                    TimeStopHistory.Add(MBetweenStartStop);
+                }
+                else
+                {
+                    // Timer wurde gestoppt
+                    StoppedTimerAt = DateTime.Now;
+                }
+            }
+        }
+    }
+    public DateTime? StartedTimerAt { get; set; }
+    public DateTime? StoppedTimerAt { get; set; }
+    public List<int> TimeStopHistory { get; set; } = new();
+    private IReadOnlyCollection<string> _selectedFilter = new List<string>();
+
+    public IReadOnlyCollection<string> selectedFilter
+    {
+        get => _selectedFilter ?? new List<string>(); // Falls null, gib eine leere Liste zurück
+        set
+        {
+            _selectedFilter = value ?? new List<string>(); // Falls null, initialisiere mit einer leeren Liste
+
+            UpdateFilteredPosList();
+            UpdateMapMarkers();
+        }
+    }
+    private async Task UpdateMapMarkers()
+    {
+        try
+        {
+            // Prüfe, ob removeCustomMarkers existiert und rufe es dann auf
+            if (await JsFunctionExists("removeCustomMarkers"))
+            {
+                await JS.InvokeVoidAsync("removeCustomMarkers");
+            }
+            else
+            {
+                Console.WriteLine("❌ JS-Funktion 'removeCustomMarkers' nicht gefunden.");
+            }
+
+            foreach (var newSpot in FilteredPosList)
+            {
+                // Prüfe, ob addCustomMarker existiert, bevor es aufgerufen wird
+                if (await JsFunctionExists("addCustomMarker"))
+                {
+                    await JS.InvokeVoidAsync("addCustomMarker", newSpot.Lat, newSpot.Lng, newSpot, newSpot.TimeLeft);
+                }
+                else
+                {
+                    Console.WriteLine("❌ JS-Funktion 'addCustomMarker' nicht gefunden.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Fehler beim Aufruf von JavaScript: {ex.Message}");
+        }
+    }
+    private DotNetObjectReference<CascadingMapData>? objRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Lade die initMap Funktion über JSInterop
+                await JS.InvokeVoidAsync("initMap");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler bei der Ausführung von initMap: {ex.Message}");
+            }
+            NodeList = await GetAllNodes();
+            NodePositionList = await GetNodePositions();
+            NodePositionList = NodePositionList.Where(e => !e.Ghost).ToList();
+            UpdateFilteredPosList();
+
+        }
+    }
+    // ✅ Hilfsmethode: Prüft, ob eine JS-Funktion existiert
+    private async Task<bool> JsFunctionExists(string functionName)
+    {
+        try
+        {
+            return await JS.InvokeAsync<bool>("eval", $"typeof {functionName} !== 'undefined'");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler bei der Überprüfung der Funktion: {ex.Message}");
+            return false;
+        }
+    }
+
+
+
+    public IEnumerable<NodePositionView> FilteredPosList { get; private set; }
+
+    private void UpdateFilteredPosList()
+    {
+        if (_selectedFilter != null && _selectedFilter.Any())
+        {
+            FilteredPosList = NodePositionList
+                .Where(node => _selectedFilter.Contains(node.Node.Name))
+                .ToList().OrderBy(e=>e.TimeLeft);
+        }
+        else
+        {
+            FilteredPosList = NodePositionList.OrderBy(e => e.TimeLeft);
+        }
+    }
+
+    // Die Timer-Eigenschaft, die den Start- und Stoppzeitpunkt setzt
+
+
+    // Berechnung der Zeitspanne zwischen Start und Stop (in Minuten)
+    public int MBetweenStartStop => (int)(StoppedTimerAt - StartedTimerAt).GetValueOrDefault().TotalSeconds;
+
+    public string ResType { get; set; } = "";
+    // Methode zum Hinzufügen einer neuen ResourcePosition
+    public async Task AddNode(Node toAdd)
+    {
+        toAdd.Id = Guid.NewGuid().ToString();
+        NodeList.Add(toAdd);
+        await _nodes.CreateAsync(toAdd, "/node");
+        if (!string.IsNullOrEmpty(toAdd.NodeImageUrl))
+        {
+            // Erstelle den neuen Dateinamen (GUID.png)
+            var fileName = Guid.NewGuid().ToString() + ".png";
+            // Erstelle einen temporären Dateipfad
+            var tempFilePath = Path.Combine(Path.GetTempPath(), fileName);
+
+            try
+            {
+                // Konvertiere den Base64-Datenstring in ein Byte-Array
+                byte[] fileBytes = Convert.FromBase64String(toAdd.NodeImageUrl);
+                // Schreibe das Byte-Array in eine Datei
+                File.WriteAllBytes(tempFilePath, fileBytes);
+                Console.WriteLine($"Datei lokal erstellt: {tempFilePath}");
+
+                // Lade die Datei per FTP hoch. Hier wird angenommen, dass _ftp.UploadFile den lokalen Pfad und
+                // den Remote-Dateinamen als Parameter erwartet.
+                // Beispiel: "/remote_path/" kann durch den gewünschten Zielordner ersetzt werden.
+                bool uploadSuccess = _ftp.UploadFile(tempFilePath, "/images/" + fileName);
+                if (uploadSuccess)
+                {
+                    Console.WriteLine("Datei erfolgreich hochgeladen.");
+                }
+                else
+                {
+                    Console.WriteLine("Fehler beim Hochladen der Datei.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler: {ex.Message}");
+            }
+            finally
+            {
+                // Lösche die temporäre Datei nach dem Upload
+                if (File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                    Console.WriteLine("Temporäre Datei gelöscht.");
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("Kein NodeImageUrl vorhanden.");
+        }
+
+    }
+    public async Task AddResourcePosition(NodePositionView node)
+    {
+
+        NodePositionList.Add(node);
+
+        await JS.InvokeVoidAsync("addCustomMarker",node.Lat, node.Lng, node, node.TimeLeft);
+        if (selectedFilter == null || !selectedFilter.Contains(node.Node.Type))
+        {
+            var test = node.Node.Type.ToList();
+        }
+
+        var postNode = new NodePosition { Id=Guid.NewGuid().ToString(),Node=null, ResourceId=node.Node.Id, Description=node.Description, Lat=node.Lat, Lng=node.Lng, Rarity=node.Rarity, Image=node.Image, LastHarvest= node.LastHarvest,TimerMod=0 };
+        await _positions.CreateAsync(postNode, "/nodeposition");
+
+        StateHasChanged();
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+    }
+
+    public async Task<List<NodePositionView>> GetNodePositions(){
+        var result = new List<NodePositionView>();
+        var fromClient = await _positions.GetAllAsync("/nodeposition?ghost=eq.false");
+        foreach(var spot in fromClient){
+            NodePositionView newSpot = new();
+
+            newSpot.Id = spot.Id;
+            newSpot.Node = NodeList.Where(e => e.Id == spot.ResourceId).FirstOrDefault();
+            newSpot.ResourceId = NodeList.Where(e => e.Id == spot.ResourceId).FirstOrDefault().Id;
+            newSpot.Description = spot.Description;
+            newSpot.Lat = spot.Lat;
+            newSpot.Lng = spot.Lng;
+            newSpot.Rarity = spot.Rarity;
+            newSpot.Image = spot.Image;
+            newSpot.LastHarvest = spot.LastHarvest;
+            newSpot.TimerMod = 0;
+            newSpot.Ghost = spot.Ghost;
+
+            result.Add(newSpot);
+            if(!newSpot.Ghost)
+                await JS.InvokeVoidAsync("addCustomMarker", newSpot.Lat, newSpot.Lng, newSpot, newSpot.TimeLeft);
+        }
+
+        return result;
+    }
+    public async Task SaveNode(NodePosition node)
+    { 
+
+    }
+    public async Task UpdateNodePosition(NodePositionView nodeView)
+    {
+
+        var nodeToRemove = NodePositionList.FirstOrDefault(e => e.Id == nodeView.Id);
+
+        var putNode = new NodePosition { Id = nodeView.Id ,Node = null, ResourceId = nodeView.Node.Id, Description = nodeView.Description, Lat = nodeView.Lat, Lng = nodeView.Lng, Rarity = nodeView.Rarity, Image = nodeView.Image, LastHarvest = nodeView.LastHarvest,Ghost=nodeView.Ghost, TimerMod = 0 };
+
+
+        await _positions.UpdateAsync(putNode.Id, putNode, $"/nodeposition?id=eq.");
+        if (nodeToRemove != null)
+        {
+            if (nodeView.Ghost)
+                NodePositionList.Remove(nodeToRemove);
+            UpdateFilteredPosList();
+            await JS.InvokeVoidAsync("removeMarker", nodeToRemove.Id);
+            if(!nodeView.Ghost)
+                await JS.InvokeVoidAsync("addCustomMarker", nodeView.Lat, nodeView.Lng, nodeView, nodeView.TimeLeft);
+        }
+    }
+
+    public async Task DeleteNodePositionComplete(NodePosition position)
+    {
+        await _positions.DeleteAsync(position.Id, "/nodeposition?id=eq."); ;
+    }
+
+    public static string _selectedPositionId { get; set; }
+
+
+    public List<Node> NodeList { get; set; } = new();
+    public async Task<List<Node>> GetAllNodes()
+    {
+        List<Node> blob = new();
+        blob = await _nodes.GetAllAsync("/node");
+        return blob;
+    }
+    public async Task CreateNode(Node node){
+
+    }
+    // Action-Delegat, um Funktionen zu registrieren, die bei Änderungen an der ID ausgeführt werden
+    public static Action<string> OnNodeIdChanged;
+
+    // Methode, um die ID zu ändern und die Action auszulösen
+    public void UpdateSelectedPositionId(string newId)
+    {
+        SelectedPositionId = newId;
+
+
+        // Wenn ein Listener für das Ereignis existiert, rufen wir ihn auf
+        OnNodeIdChanged?.Invoke(newId);
+    }
+    public string SelectedPositionId { get; set; }
+
+    // Der Listener für das Event, das von MapHandler ausgelöst wird
+    protected override void OnInitialized()
+    {
+        // Abonniere das Event von MapHandler
+        MapHandler.OnNodeIdChanged += HandleNodeIdChanged;
+    }
+
+    // Diese Methode wird aufgerufen, wenn die NodeId geändert wird
+    private void HandleNodeIdChanged(string newId)
+    {
+        // Aktualisiere die Instanzvariable mit der neuen ID
+        SelectedPositionId = newId;
+        if (NodePositionList != null)
+        {
+            SelectedPosition = NodePositionList.FirstOrDefault(e => e.Id == SelectedPositionId);
+            StateHasChanged();
+
+        }
+        // UI aktualisieren
+       
+    }
+
+    // Diese Methode sucht nach der NodePosition basierend auf der ID und aktualisiert die Liste
+   
+
+    // Event-Handler abmelden, wenn die Komponente zerstört wird
+    public void Dispose()
+    {
+        MapHandler.OnNodeIdChanged -= HandleNodeIdChanged;
+    }
+
+
+}

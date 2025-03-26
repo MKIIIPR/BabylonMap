@@ -1,0 +1,142 @@
+﻿$kutschup: --sc-secondary;
+$accent-color: #355cc9;
+// colors
+$onyx: #111;
+$white: #fff;
+$ketchup-mayo: #f5d546;
+$ketchup-mayo-opa: #f5d54670;
+$leather: #4f4c4d;
+$light-azur: #C7E3F9;
+$tomato: #d64444;
+$deepblue: #00001b;
+// add component style here
+
+// template style
+$duration: 400ms;
+$shift: 200ms;
+$start: 800ms;
+$sc-border: 2px solid $ketchup-mayo;
+$background: lighten(#00001b, 1%) url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+$div-bg: linear-gradient(0deg, rgba($ketchup-mayo, .1) 0%, rgba($onyx, 0) 100%);
+$div-bg-2: linear-gradient(0deg, rgba($ketchup-mayo, .3) 20%, rgba($onyx, 1) 100%);
+
+.stan-bg {
+    background-color: #00001b !important;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+}
+.tbl-head {
+    background-color: $ketchup-mayo-opa !important;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAG0lEQVQYV2P8//+/FCMj4zMGJMCIzIGxKRQEAJgPBAbJqUVTAAAAAElFTkSuQmCC) repeat;
+}
+.tbl-selected {
+    background-color: $ketchup-mayo-opa !important;
+}
+
+.tbl-selected > td {
+    color: $ketchup-mayo !important;
+}
+
+.tbl-selected > td .mud-input {
+    color: $ketchup-mayo !important;
+}
+.tbl-head-bg{
+    background: $background;
+   
+}
+.mud-expand-panel-header {
+    padding: 0 0 0 0 !important;
+    padding-left:5px;
+}
+.mud-expand-panel-content{
+    padding-left:5px!important;
+    padding-right:5px!important;
+}
+.listelement-cls-1 {
+    fill: #3eb9bf;
+}
+
+.listelement-cls-2 {
+    fill: url(#Unbenannter_Verlauf_2);
+}
+
+.listelement-cls-3 {
+    opacity: .5;
+}
+
+.listelement-cls-4 {
+    letter-spacing: -.04em;
+}
+
+.listelement-cls-5 {
+    clip-path: url(#listelement-clippath-2);
+}
+
+.listelement-cls-6 {
+    letter-spacing: -.01em;
+    font-size: 16.505px; /* Ausgangsgröße */
+    white-space: nowrap; /* Verhindert Zeilenumbruch */
+    overflow: hidden; /* Verhindert, dass der Text über das Element hinausragt */
+    text-overflow: ellipsis; /* Zeigt "..." an, wenn der Text abgeschnitten wird */
+}
+
+.listelement-cls-7 {
+    clip-path: url(#listelement-clippath-1);
+}
+
+.listelement-cls-8 {
+    fill: #f7d645;
+}
+
+.listelement-cls-9 {
+    opacity: .15;
+}
+
+.listelement-cls-10 {
+    font-size: 13.073px;
+}
+
+.listelement-cls-10, .listelement-cls-11, .listelement-cls-12 {
+ /*   font-family: RussoOne-Regular, 'Russo One';
+}*/
+ }
+.listelement-cls-10, .listelement-cls-11, .listelement-cls-13 {
+    fill: #f7d747;
+}
+
+.listelement-cls-13 {
+    fill: #f7d747;
+    cursor: pointer;
+    /* Hier wird der Filter auf das Element angewendet */
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+    transition: filter 0.1s ease; /* Füge eine Übergangseigenschaft hinzu, damit der Schatten sanft erscheint */
+}
+
+.listelement-cls-13:hover {
+    /* Hier wird der Filter angepasst, wenn der Mauszeiger darüber schwebt */
+    filter: drop-shadow(0 0 10px rgba(222, 0, 0, 1));
+}
+
+.listelement-cls-14 {
+    letter-spacing: -.02em;
+}
+
+.listelement-cls-15 {
+    clip-path: url(#listelement-clippath);
+}
+
+.listelement-cls-16 {
+    fill: none;
+}
+
+.listelement-cls-17 {
+    opacity: .42;
+}
+
+.listelement-cls-11 {
+    font-size: 24.011px;
+}
+
+.listelement-cls-12 {
+    pointer-events: none;
+    font-size: 12.505px;
+}
