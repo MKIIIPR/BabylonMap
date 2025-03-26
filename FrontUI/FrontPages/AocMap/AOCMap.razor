@@ -59,19 +59,20 @@
    
 </MudPaper>
 <MudPaper Style="height:93.7vh;width:450px">
-    
         <NodePositionViever></NodePositionViever>
-    
 </MudPaper>
 </div>
 <MudDialog @bind-Visible="_dialogVisible" Options="_dialogOptions">
     <TitleContent>
-        <MudText Typo="Typo.h6">Add Node</MudText>
+        <MudText Typo="Typo.h6">Add node</MudText>
     </TitleContent>
     <DialogContent>
         <MudTextField @bind-Value="SelectedNode.Name" Label="Node Name" />
         <MudTextField @bind-Value="SelectedNode.Type" Label="Node Type" />
-        <MudTextField @bind-Value="SelectedNode.NodeImageUrl" Label="Node Image URL" />
+        <MudTextField @bind-Value="SelectedNode.NodeImageUrl" Label="Node Image URL">
+            <FileUploader OnImageUploaded="@(image => SelectedNode.NodeImageUrl = image)" />
+        </MudTextField>
+
         <MudNumericField @bind-Value="SelectedNode.RespawnTimer" Label="Respawn Timer (min)" />
     </DialogContent>
     <DialogActions>
@@ -88,8 +89,8 @@
         <MudMenuItem Label="@group.Key" OnClick="()=>OpenDialogAsync(group.Key)" />
     }
     <MudDivider Class="my-2" />
-    <MudMenuItem Label ="AddNode" OnClick="OpenDialog"></MudMenuItem>
-    <MudMenuItem Label="AddNode2" OnClick="OpenNodeDialog"></MudMenuItem>
+    <MudMenuItem Label="Add node" OnClick="OpenDialog"></MudMenuItem>
+    <MudMenuItem Label="Edit nodes" OnClick="OpenNodeDialog"></MudMenuItem>
 </MudMenu>
 @code {
     public NodePositionView ToCreateNewPos { get; set; } = new();
@@ -133,7 +134,7 @@
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth=true,MaxWidth =MaxWidth.Medium };
 
-        return DialogService.ShowAsync<NodeDialog>("Simple Dialog", options);
+        return DialogService.ShowAsync<NodeDialog>("Edit nodes", options);
     }
     string _returnValue = "Dialog return value (not yet set)";
 
@@ -143,7 +144,7 @@
         var options = new DialogOptions { CloseOnEscapeKey = true };
        
 
-        var dialogReference = await DialogService.ShowAsync<NodePositionDialog>("Add Position", options);
+        var dialogReference = await DialogService.ShowAsync<NodePositionDialog>("Add node position", options);
         _returnValue = "Waiting for dialog to conclude ...";
         StateHasChanged();
         var dialogResult = await dialogReference.Result;
