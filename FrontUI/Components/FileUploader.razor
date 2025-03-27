@@ -1,30 +1,26 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JS
 @implements IAsyncDisposable
-<div class="image-container">
-    @foreach (var imageSource in imageSources)
-    {
-        <img src="@imageSource" style="max-width: 200px; height: auto;" />
-    }
-</div>
+
 
 <div @ref="fileDropContainer" class="file-drop-zone @HoverClass"
-     @ondragenter="OnDragEnter"
-     @ondragleave="OnDragLeave" @ondragover="OnDragEnter">
+@ondragenter="OnDragEnter"
+@ondragleave="OnDragLeave" @ondragover="OnDragEnter">
     <!-- Benutzerdefiniertes Label -->
     <label for="inputFile" class="custom-file-label">
-       klick or drag for upload
+        klick or drag for upload
     </label>
 
     <!-- Das eigentliche InputFile wird versteckt -->
     <InputFile id="inputFile" style="display: none;" @ref="inputFile" multiple OnChange="@OnChange" />
 </div>
-@* 
-<button @onclick="PasteImageFromClipboard">📋</button>
- *@
+<MudButton OnClick="PasteImageFromClipboard">📋</MudButton>
+
 
 @code {
+    private string ImgString { get; set; }
     [Parameter] public EventCallback<string> OnImageUploaded { get; set; } // Übergabe des Bildes an das Parent
     private const int maxAllowedSize = 8 * 1024 * 1024; // 8 MB
     private List<string> imageSources = new List<string>();
@@ -40,16 +36,7 @@
     {
         if (firstRender)
         {
-            try
-            {
-                // Importiere das Clipboard-Modul für das Einfügen von Bildern
-                _clipboardModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/clipboard.js");
-                Console.WriteLine("✅ Clipboard.js erfolgreich geladen.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Fehler beim Laden von clipboard.js: {ex.Message}");
-            }
+           
         }
     }
 
@@ -78,21 +65,24 @@
 
     private async Task PasteImageFromClipboard()
     {
-        if (_clipboardModule != null)
+        try
         {
-            try
-            {
-                Console.WriteLine("📋 Versuche Bild aus Zwischenablage einzufügen...");
-                await _clipboardModule.InvokeVoidAsync("getClipboardImage", DotNetObjectReference.Create(this));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Fehler beim Einfügen des Bildes aus der Zwischenablage: {ex.Message}");
-            }
+            Console.WriteLine("📋 Versuche, Bild aus der Zwischenablage einzufügen...");
+            await JS.InvokeVoidAsync("getClipboardImage", DotNetObjectReference.Create(this));
+
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("⚠️ Clipboard-Modul nicht geladen!");
+            // Detaillierte Fehlermeldung inklusive innerer Ausnahmen und StackTrace
+            var errorDetails = $"❌ Fehler beim Einfügen des Bildes aus der Zwischenablage: {ex.Message}\n" +
+                               $"StackTrace: {ex.StackTrace}";
+
+            if (ex.InnerException != null)
+            {
+                errorDetails += $"\nInner Exception: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}";
+            }
+
+            Console.WriteLine(errorDetails);
         }
     }
 

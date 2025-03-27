@@ -6,9 +6,9 @@ namespace FrontUI.FtpService
 {
     public class FTPConnection
     {
-        private readonly string _ftpServer = "ftp.deinedomain.com";
-        private readonly string _username = "deinBenutzername";
-        private readonly string _password = "deinPasswort";
+        private readonly string _ftpServer = "invi.rocks";
+        private readonly string _username = "beelzee";
+        private readonly string _password = "8lDI$T*ybGrJz%BY19SF";
 
         /// <summary>
         /// Wandelt einen Base64-String in eine Datei um und gibt den Pfad zurück.
@@ -17,6 +17,16 @@ namespace FrontUI.FtpService
         {
             try
             {
+                // Falls der String mit "data:" beginnt, entferne den Präfix
+                if (base64String.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+                {
+                    var commaIndex = base64String.IndexOf(',');
+                    if (commaIndex >= 0)
+                    {
+                        base64String = base64String.Substring(commaIndex + 1);
+                    }
+                }
+
                 // Base64-String dekodieren
                 byte[] fileBytes = Convert.FromBase64String(base64String);
 
@@ -60,14 +70,15 @@ namespace FrontUI.FtpService
     public class FileUploader
     {
         /// <summary>
-        /// Wandelt einen Base64-String in eine Datei um, lädt diese per FTP hoch und löscht anschließend die lokale Datei.
+        /// Wandelt einen Base64-String in eine Datei um, lädt diese per FTP hoch und löscht die lokale Datei.
+        /// Der Remote-Dateiname wird dabei verwendet.
         /// </summary>
-        public void UploadBase64File(string base64String)
+        public void UploadBase64FileToRemote(string base64String, string remoteFileName)
         {
-            // Erstelle einen temporären Dateipfad (z.B. im Temp-Verzeichnis)
-            string tempFilePath = Path.Combine(Path.GetTempPath(), "temp_image.png");
+            // Erstelle einen temporären Dateipfad basierend auf dem Remote-Dateinamen
+            string tempFilePath = Path.Combine(Path.GetTempPath(), remoteFileName);
 
-            // Base64 in Datei umwandeln
+            // Konvertiere den Base64-String in eine Datei
             string createdFilePath = FTPConnection.ConvertBase64ToFile(base64String, tempFilePath);
             if (createdFilePath == null)
             {
@@ -75,11 +86,10 @@ namespace FrontUI.FtpService
                 return;
             }
 
-            // Instanz der FTP-Verbindung
+            // Erstelle eine Instanz der FTP-Verbindung
             var ftpConn = new FTPConnection();
-
-            // Beispiel: Upload der Datei ins Verzeichnis "/remote_path/" unter dem Namen "image.png"
-            bool uploadSuccess = ftpConn.UploadFile(createdFilePath, "/remote_path/image.png");
+            // Beispiel: Datei wird ins Verzeichnis "/remote_path/" hochgeladen. Passe den Pfad ggf. an.
+            bool uploadSuccess = ftpConn.UploadFile(createdFilePath, "/images/" + remoteFileName);
 
             if (uploadSuccess)
             {
@@ -90,7 +100,7 @@ namespace FrontUI.FtpService
                 Console.WriteLine("Fehler beim Hochladen der Datei.");
             }
 
-            // Optional: Lösche die temporäre Datei
+            // Lösche die temporäre Datei nach dem Upload
             try
             {
                 if (File.Exists(createdFilePath))
@@ -105,4 +115,5 @@ namespace FrontUI.FtpService
             }
         }
     }
+
 }

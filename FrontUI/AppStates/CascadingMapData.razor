@@ -129,6 +129,8 @@
 
     private void UpdateFilteredPosList()
     {
+
+
         if (_selectedFilter != null && _selectedFilter.Any())
         {
             FilteredPosList = NodePositionList
@@ -154,70 +156,54 @@
         toAdd.Id = Guid.NewGuid().ToString();
         NodeList.Add(toAdd);
         await _nodes.CreateAsync(toAdd, "/node");
-        if (!string.IsNullOrEmpty(toAdd.NodeImageUrl))
-        {
-            // Erstelle den neuen Dateinamen (GUID.png)
-            var fileName = Guid.NewGuid().ToString() + ".png";
-            // Erstelle einen temporären Dateipfad
-            var tempFilePath = Path.Combine(Path.GetTempPath(), fileName);
-
-            try
-            {
-                // Konvertiere den Base64-Datenstring in ein Byte-Array
-                byte[] fileBytes = Convert.FromBase64String(toAdd.NodeImageUrl);
-                // Schreibe das Byte-Array in eine Datei
-                File.WriteAllBytes(tempFilePath, fileBytes);
-                Console.WriteLine($"Datei lokal erstellt: {tempFilePath}");
-
-                // Lade die Datei per FTP hoch. Hier wird angenommen, dass _ftp.UploadFile den lokalen Pfad und
-                // den Remote-Dateinamen als Parameter erwartet.
-                // Beispiel: "/remote_path/" kann durch den gewünschten Zielordner ersetzt werden.
-                bool uploadSuccess = _ftp.UploadFile(tempFilePath, "/images/" + fileName);
-                if (uploadSuccess)
-                {
-                    Console.WriteLine("Datei erfolgreich hochgeladen.");
-                }
-                else
-                {
-                    Console.WriteLine("Fehler beim Hochladen der Datei.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Fehler: {ex.Message}");
-            }
-            finally
-            {
-                // Lösche die temporäre Datei nach dem Upload
-                if (File.Exists(tempFilePath))
-                {
-                    File.Delete(tempFilePath);
-                    Console.WriteLine("Temporäre Datei gelöscht.");
-                }
-            }
-        }
-        else
-        {
-            Console.WriteLine("Kein NodeImageUrl vorhanden.");
-        }
-
     }
     public async Task AddResourcePosition(NodePositionView node)
     {
-
+        // Füge die Position zur Liste hinzu
         NodePositionList.Add(node);
 
-        await JS.InvokeVoidAsync("addCustomMarker",node.Lat, node.Lng, node, node.TimeLeft);
+        // Falls im node.Image ein Base64-String enthalten ist, verarbeite diesen:
+        if (!string.IsNullOrEmpty(node.Image))
+        {
+            // Generiere einen eindeutigen Dateinamen (GUID.png)
+            var fileName = Guid.NewGuid().ToString() + ".png";
+
+            // Erstelle eine Instanz des FileUploaders und lade die Datei per FTP hoch
+            var uploader = new FileUploader();
+            uploader.UploadBase64FileToRemote(node.Image, fileName);
+
+            // Ersetze den Base64-String durch den Dateinamen, sodass in der Datenbank
+            // der Dateiname gespeichert wird und nicht der ganze Base64-String
+            node.Image = fileName;
+        }
+
+        // Füge den Marker in der Karte hinzu
+        await JS.InvokeVoidAsync("addCustomMarker", node.Lat, node.Lng, node, node.TimeLeft);
+
         if (selectedFilter == null || !selectedFilter.Contains(node.Node.Type))
         {
             var test = node.Node.Type.ToList();
         }
 
-        var postNode = new NodePosition { Id=Guid.NewGuid().ToString(),Node=null, ResourceId=node.Node.Id, Description=node.Description, Lat=node.Lat, Lng=node.Lng, Rarity=node.Rarity, Image=node.Image, LastHarvest= node.LastHarvest,TimerMod=0 };
+        // Erstelle einen neuen NodePosition-Eintrag für den Server, wobei nun im Image-Feld der Dateiname steht
+        var postNode = new NodePosition
+            {
+                Id = Guid.NewGuid().ToString(),
+                Node = null,
+                ResourceId = node.Node.Id,
+                Description = node.Description,
+                Lat = node.Lat,
+                Lng = node.Lng,
+                Rarity = node.Rarity,
+                Image = node.Image,
+                LastHarvest = node.LastHarvest,
+                TimerMod = 0
+            };
         await _positions.CreateAsync(postNode, "/nodeposition");
 
         StateHasChanged();
     }
+
 
 
     protected override async Task OnInitializedAsync()

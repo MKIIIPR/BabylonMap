@@ -15,7 +15,7 @@
                 <MudTextField Label="Longitude" @bind-Value="Lng" Variant="Variant.Outlined" Disabled="true" /> 
  *@
 
-                <MudSelect @bind-Value="SelectedResource" Label="Select fast-food" HelperText="String" Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood" AdornmentColor="Color.Primary">
+                <MudSelect @bind-Value="SelectedResource" Dense="true" Label="Select fast-food" HelperText="String" Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood" AdornmentColor="Color.Primary">
 
                     @foreach (var resource in _mapData.NodeList.Where(e => e.Type == ResourceType))
                     {
