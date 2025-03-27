@@ -31,8 +31,8 @@ function initMap() {
             zoom: function (zoom) { return Math.log(zoom / data.scale) / Math.LN2; }
         }),
         zoomControl: false,
-        minZoom: 3,
-        maxZoom: 7,
+        minZoom: 2,
+        maxZoom: 8,
         zoom: 4,
         attributionControl: false,
         layers: [
