@@ -18,7 +18,7 @@
     @if (_mapData.FilteredPosList != null)
     {
 
-        <MudRadioGroup T="NodePositionView" @bind-Value="selectedNode" Style="display:flex; flex-direction: column;flex-wrap: nowrap;overflow-y:auto;height:100%;">
+        <MudRadioGroup T="NodePositionView" @bind-Value="_mapData.SelectedPosition" Style="display:flex; flex-direction: column;flex-wrap: nowrap;overflow-y:auto;height:100%;">
             @foreach (var spot in _mapData.FilteredPosList)
             {
                 <MudRadio Value="spot" Color="Color.Primary" Dense="true"  >

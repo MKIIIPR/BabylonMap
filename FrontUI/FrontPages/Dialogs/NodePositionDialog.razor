@@ -1,6 +1,7 @@
-﻿@using AshesMapBib.Components
+﻿
 @using AshesMapBib.Models
 @using FrontUI.AppStates
+@using FrontUI.Components
 @using FrontUI.Helper.MapHelper
 @using MudBlazor
 
@@ -99,18 +100,11 @@
                }" />
                             </div>
                             <MudTextField ShrinkLabel @bind-Value="ToCreateNewPos.Description" Lines="4" Label="Description" Variant="Variant.Outlined"></MudTextField>
+                            <div class="TEST"><FileUploader OnImageUploaded="base64 => { ToCreateNewPos.Image = base64;  }" /></div>
+                            
 
-                            <FileUploader OnImageUploaded="base64 => { ToCreateNewPos.Image = base64;  }" />
+                                                       <!-- Vorschau des hochgeladenen Bildes -->
 
-                            @if (!string.IsNullOrEmpty(ToCreateNewPos.Image))
-                            {
-                                <img src="@ToCreateNewPos.Image" alt="Uploaded Image" style="max-width: 100%; height: auto;" />
-                            }
-                            <!-- Vorschau des hochgeladenen Bildes -->
-                            @if (!string.IsNullOrEmpty(ToCreateNewPos.Image))
-                            {
-                                <MudCardMedia Image="@($"data:image/png;base64,{ToCreateNewPos.Image}")" Height="150" />
-                            }
                             @* 
                     <MudButton OnClick="()=>{ _mapData.AddResourcePosition(ToCreateNewPos); _dialogSpawnVis =false;}" Color="Color.Primary" Variant="Variant.Filled">
                         Speichern

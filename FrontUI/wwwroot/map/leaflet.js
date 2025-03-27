@@ -130,12 +130,17 @@ function addCustomMarker(lat, lng, node, timeleft) {
         iconAnchor: [30, 90]
     });
 
-    var marker = L.marker([lat, lng], { icon: svgIcon }).addTo(map)
-        .bindPopup(node.node.name)
-        .on("click", function () {
-            console.log("Marker geklickt:", node.id);
-            sendNodeToBlazor(node.id); // Blazor informieren
-        });
+    var marker = L.marker([lat, lng], { icon: svgIcon }).addTo(map);
+
+    // Nur ein Popup binden, wenn node.description vorhanden ist und nicht leer ist
+    if (node.description && node.description.trim().length > 0) {
+        marker.bindPopup(node.description);
+    }
+
+    marker.on("click", function () {
+        console.log("Marker geklickt:", node.id);
+        sendNodeToBlazor(node.id); // Blazor informieren
+    });
 
     markers.push({ id: node.id, marker: marker, node: node });
     console.log("addCustomMarker: Benutzerdefinierter Marker mit ID", node.id, "hinzugefügt.");
