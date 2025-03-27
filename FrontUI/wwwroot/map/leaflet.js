@@ -33,12 +33,12 @@ function initMap() {
         zoomControl: false,
         minZoom: 2,
         maxZoom: 8,
-        zoom: 4,
+        zoom: 3,
         attributionControl: false,
         layers: [
             L.tileLayer('_content/FrontUI/map/{z}/{x}/{y}.webp', { tileSize: data.tileSize })
         ]
-    }).setView([207998, -879827]);
+    }).setView([599103, -859263]);
     console.log("initMap: Karte initialisiert.");
 
     // Event-Listener für das Kontextmenü (Rechtsklick)
