@@ -1,7 +1,7 @@
 ﻿@using System.Net.Http.Json
-@using AshesMapBib.Components
 @using AshesMapBib.Models
 @using FrontUI.AppStates
+@using FrontUI.Components
 @using MudBlazor
 @inject HttpClient httpClient
 @inject ISnackbar Snackbar
@@ -47,7 +47,6 @@ RowEditCommit="@(ts =>  NodeHasBeenCommitted(ts))" IsEditRowSwitchingBlocked="@b
             <MudAvatar Rounded="true" Color="Color.Secondary" Variant="Variant.Outlined">
                 <MudImage Src="@context.NodeImageUrl"></MudImage>
             </MudAvatar>
-
         </MudTd>
     </RowTemplate>
     <RowEditingTemplate>

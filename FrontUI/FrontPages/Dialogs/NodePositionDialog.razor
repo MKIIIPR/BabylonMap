@@ -164,7 +164,7 @@
 
     protected override void OnInitialized()
     {
-        if (MudDialog.Title.Contains("Add Position"))
+        if (MudDialog.Title.Contains("Add node position"))
         {
             ToCreateNewPos = new();
             ToCreateNewPos.Node = _mapData.NodeList.Where(e => e.Type == _mapData.ResType).FirstOrDefault();
