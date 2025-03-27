@@ -131,8 +131,6 @@ namespace ApiServer.Controllers.ComunityController
                     {
                         var tileUrl = $"{baseUrl}/{tile.Z}/{x}/{y}.webp";
 
-                    https://cdn.ashescodex.com/map/20250227/8/93/145.webp
-
                         // Erstelle das Verzeichnis für die Kachel, falls es nicht existiert
                         var tileDirectory = Path.Combine(zoomLevelDirectory, x.ToString());
                         if (!Directory.Exists(tileDirectory))
@@ -200,13 +198,13 @@ namespace ApiServer.Controllers.ComunityController
         {
             MapTileSrc _result = new();
             _result.Tiles = new List<TileSet>();
-            _result.Tiles.Add(new TileSet { Z = 2,  X = 5 ,Y = 5});
-            _result.Tiles.Add(new TileSet { Z = 3,  X = 10 ,Y = 10});
-            _result.Tiles.Add(new TileSet { Z = 4,  X = 7 ,Y = 10});
-            _result.Tiles.Add(new TileSet { Z = 5,  X = 13 ,Y = 19});
-            _result.Tiles.Add(new TileSet { Z = 6,  X = 26 ,Y = 39});
-            _result.Tiles.Add(new TileSet { Z = 7,  X = 52 ,Y = 77});
-            _result.Tiles.Add(new TileSet { Z = 8,  X = 104 ,Y = 152});
+            //_result.Tiles.Add(new TileSet { Z = 2,  X = 5 ,Y = 5});
+            //_result.Tiles.Add(new TileSet { Z = 3,  X = 10 ,Y = 10});
+            //_result.Tiles.Add(new TileSet { Z = 4,  X = 7 ,Y = 10});
+            //_result.Tiles.Add(new TileSet { Z = 5,  X = 13 ,Y = 19});
+            //_result.Tiles.Add(new TileSet { Z = 6,  X = 26 ,Y = 39});
+            //_result.Tiles.Add(new TileSet { Z = 7,  X = 52 ,Y = 77});
+            //_result.Tiles.Add(new TileSet { Z = 8,  X = 104 ,Y = 152});
             _result.Tiles.Add(new TileSet { Z = 9,  X = 208 ,Y = 304});
 
             _result.Name = "AOC";
