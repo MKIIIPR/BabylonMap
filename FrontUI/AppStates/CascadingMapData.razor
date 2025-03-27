@@ -1,4 +1,4 @@
-﻿@using System.Collections.Generic
+@using System.Collections.Generic
 @using AshesMapBib.Models
 @using FrontUI.FtpService
 @using FrontUI.Helper.MapHelper
@@ -129,13 +129,22 @@
 
     private void UpdateFilteredPosList()
     {
+        IEnumerable<NodePositionView> resultByType = Enumerable.Empty<NodePositionView>();
+        IEnumerable<NodePositionView> resultByName = Enumerable.Empty<NodePositionView>();
 
-
-        if (_selectedFilter != null && _selectedFilter.Any())
+        if (selectedFilter != null && _selectedFilter.Any())
         {
-            FilteredPosList = NodePositionList
-                .Where(node => _selectedFilter.Contains(node.Node.Name))
-                .ToList().OrderBy(e=>e.TimeLeft);
+            resultByType = NodePositionList
+                .Where(node => _selectedFilter.Contains(node.Node.Type));
+
+            resultByName = NodePositionList
+                .Where(node => _selectedFilter.Contains(node.Node.Name));
+
+            // Beide Ergebnisse zusammenführen, sortieren und optional Duplikate entfernen
+            FilteredPosList = resultByType
+                .Concat(resultByName)
+                .OrderBy(e => e.TimeLeft)
+                .Distinct(); // Entfernt doppelte Einträge, falls notwendig
         }
         else
         {

@@ -175,7 +175,7 @@
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
 
         
-        var dialog = DialogService.Show<NodePositionDialog>("Edit Position", parameters, options);
+        var dialog = DialogService.Show<NodePositionDialog>("Edit node position", parameters, options);
 
         // Warte auf das Ergebnis
         var result = await dialog.Result;
