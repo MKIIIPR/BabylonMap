@@ -32,7 +32,7 @@ namespace ApiServer.Controllers.ComunityController
                          
             MapTileSrc mapTileSrc = new MapTileSrc();
             mapTileSrc =await  GetAOCMap();
-            var targetDirectory = Path.Combine("E:\\TileDownloads"+mapTileSrc.TilePath);
+            var targetDirectory = Path.Combine("D:\\TileDownloads"+mapTileSrc.TilePath);
             // Zielordner für den jeweiligen Zoom-Level erstellen, falls er nicht existiert
             
 
@@ -112,7 +112,7 @@ namespace ApiServer.Controllers.ComunityController
 
             MapTileSrc mapTileSrc = new MapTileSrc();
             mapTileSrc = await GetAOCMap();
-            var targetDirectory = Path.Combine("E:\\TileDownloads" + mapTileSrc.TilePath);
+            var targetDirectory = Path.Combine("D:\\TileDownloads" + mapTileSrc.TilePath);
             // Zielordner für den jeweiligen Zoom-Level erstellen, falls er nicht existiert
 
 
@@ -202,11 +202,12 @@ namespace ApiServer.Controllers.ComunityController
             _result.Tiles = new List<TileSet>();
             _result.Tiles.Add(new TileSet { Z = 2,  X = 5 ,Y = 5});
             _result.Tiles.Add(new TileSet { Z = 3,  X = 10 ,Y = 10});
-            _result.Tiles.Add(new TileSet { Z = 4,  X = 20 ,Y = 20});
-            _result.Tiles.Add(new TileSet { Z = 5,  X = 40 ,Y = 40});
-            _result.Tiles.Add(new TileSet { Z = 6,  X = 60 ,Y = 60});
-            _result.Tiles.Add(new TileSet { Z = 7,  X = 80 ,Y = 80});
-            _result.Tiles.Add(new TileSet { Z = 8,  X = 130 ,Y = 130});
+            _result.Tiles.Add(new TileSet { Z = 4,  X = 7 ,Y = 10});
+            _result.Tiles.Add(new TileSet { Z = 5,  X = 13 ,Y = 19});
+            _result.Tiles.Add(new TileSet { Z = 6,  X = 26 ,Y = 39});
+            _result.Tiles.Add(new TileSet { Z = 7,  X = 52 ,Y = 77});
+            _result.Tiles.Add(new TileSet { Z = 8,  X = 104 ,Y = 152});
+            _result.Tiles.Add(new TileSet { Z = 9,  X = 208 ,Y = 304});
 
             _result.Name = "AOC";
             _result.TilePath = "/AOC/tile/";
