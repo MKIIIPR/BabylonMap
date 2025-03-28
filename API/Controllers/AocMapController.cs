@@ -28,7 +28,7 @@ namespace ApiServer.Controllers.ComunityController
 
         public async Task<ActionResult> DownloadTiles(int zoomLevel)
         {
-            var baseUrl = "https://cdn.ashescodex.com/map/20250227";
+            var baseUrl = "https://cdn.ashescodex.com/map/20250327";
                          
             MapTileSrc mapTileSrc = new MapTileSrc();
             mapTileSrc =await  GetAOCMap();
@@ -40,60 +40,58 @@ namespace ApiServer.Controllers.ComunityController
             foreach (var tile in mapTileSrc.Tiles)
             {
                 var zoomLevelDirectory = Path.Combine(targetDirectory, tile.Z.ToString());
-            if (!Directory.Exists(zoomLevelDirectory))
-            {
-                Directory.CreateDirectory(zoomLevelDirectory);
-            }
-                for (int x = 0; x <= tile.X; x++) // Maximale X-Koordinate (oder nach Bedarf anpassen)
+                if (!Directory.Exists(zoomLevelDirectory))
                 {
-                    for (int y = 1; y <= tile.Y; y++) // Maximale Y-Koordinate (oder nach Bedarf anpassen)
+                    Directory.CreateDirectory(zoomLevelDirectory);
+                }
+                    for (int x = -2; x <= tile.X; x++) // Maximale X-Koordinate (oder nach Bedarf anpassen)
                     {
-                        var tileUrl = $"{baseUrl}/{tile.Z}/{x}/{y}.webp";
+                        for (int y = -2; y <= tile.Y; y++) // Maximale Y-Koordinate (oder nach Bedarf anpassen)
+                        {
+                            var tileUrl = $"{baseUrl}/{tile.Z}/{x}/{y}.webp";
                         
-                        https://cdn.ashescodex.com/map/20250227/8/93/145.webp
-
-                        // Erstelle das Verzeichnis für die Kachel, falls es nicht existiert
-                        var tileDirectory = Path.Combine(zoomLevelDirectory, x.ToString());
-                        if (!Directory.Exists(tileDirectory))
-                        {
-                            Directory.CreateDirectory(tileDirectory);
-                        }
-
-                        // Speicherpfad der Kachel
-                        var filePath = Path.Combine(tileDirectory, $"{y}.webp");
-
-                        try
-                        {
-                            var response = await _httpClient.GetAsync(tileUrl);
-
-                            // Wenn die Kachel existiert (Statuscode 200), dann herunterladen
-                            if (response.IsSuccessStatusCode)
+                            // Erstelle das Verzeichnis für die Kachel, falls es nicht existiert
+                            var tileDirectory = Path.Combine(zoomLevelDirectory, x.ToString());
+                            if (!Directory.Exists(tileDirectory))
                             {
-                                // Kachel herunterladen und speichern
-                                var tileData = await response.Content.ReadAsByteArrayAsync();
-                                await System.IO.File.WriteAllBytesAsync(filePath, tileData);
-                                foundAnyTile = true;
-                                Console.WriteLine($"Kachel {zoomLevel}/{x}/{y} erfolgreich heruntergeladen.");
+                                Directory.CreateDirectory(tileDirectory);
                             }
-                            else
+
+                            // Speicherpfad der Kachel
+                            var filePath = Path.Combine(tileDirectory, $"{y}.webp");
+
+                            try
                             {
-                                // Fehlerbehandlung für Kacheln, die nicht existieren (z. B. 404)
-                                Console.WriteLine($"Kachel {zoomLevel}/{x}/{y} nicht gefunden (Statuscode {response.StatusCode}).");
+                                var response = await _httpClient.GetAsync(tileUrl);
+
+                                // Wenn die Kachel existiert (Statuscode 200), dann herunterladen
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    // Kachel herunterladen und speichern
+                                    var tileData = await response.Content.ReadAsByteArrayAsync();
+                                    await System.IO.File.WriteAllBytesAsync(filePath, tileData);
+                                    foundAnyTile = true;
+                                    Console.WriteLine($"Kachel {tile.Z}/{x}/{y} erfolgreich heruntergeladen.");
+                                }
+                                else
+                                {
+                                    // Fehlerbehandlung für Kacheln, die nicht existieren (z. B. 404)
+                                    Console.WriteLine($"Kachel {tile.Z}/{x}/{y} nicht gefunden (Statuscode {response.StatusCode}).");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // Fehlerbehandlung bei anderen Problemen (z. B. Netzwerkfehler)
+                                Console.WriteLine($"Fehler beim Herunterladen der Kachel {tile.Z}/{x}/{y}: {ex.Message}");
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            // Fehlerbehandlung bei anderen Problemen (z. B. Netzwerkfehler)
-                            Console.WriteLine($"Fehler beim Herunterladen der Kachel {zoomLevel}/{x}/{y}: {ex.Message}");
-                        }
-                    }
 
                     // Falls keine Kachel in dieser Reihe (X) für den angegebenen Zoom-Level heruntergeladen wurde
-                    if (!foundAnyTile)
-                    {
-                        Console.WriteLine($"Keine Kacheln gefunden für Zoom-Level {zoomLevel}, X {x}. Wechsele zu höherem Zoom-Level oder breche ab.");
-                        break; // Wir brechen die Schleife ab, wenn keine Kacheln für diesen X-Wert vorhanden sind.
-                    }
+                    //if (!foundAnyTile)
+                    //{
+                    //    Console.WriteLine($"Keine Kacheln gefunden für Zoom-Level {tile.Z}, X {x}. Wechsele zu höherem Zoom-Level oder breche ab.");
+                    //    break; // Wir brechen die Schleife ab, wenn keine Kacheln für diesen X-Wert vorhanden sind.
+                    //}
                 }
             }
             // Schleife durch X und Y-Koordinaten für das angegebene Zoom-Level
@@ -108,7 +106,7 @@ namespace ApiServer.Controllers.ComunityController
 
         public async Task<ActionResult> DLAocTilesPerZoomLvl(int zoomLevel)
         {
-            var baseUrl = "https://cdn.ashescodex.com/map/20250227";
+            var baseUrl = "https://cdn.ashescodex.com/map/20250327";
 
             MapTileSrc mapTileSrc = new MapTileSrc();
             mapTileSrc = await GetAOCMap();
@@ -198,13 +196,14 @@ namespace ApiServer.Controllers.ComunityController
         {
             MapTileSrc _result = new();
             _result.Tiles = new List<TileSet>();
-            //_result.Tiles.Add(new TileSet { Z = 2,  X = 5 ,Y = 5});
-            //_result.Tiles.Add(new TileSet { Z = 3,  X = 10 ,Y = 10});
-            //_result.Tiles.Add(new TileSet { Z = 4,  X = 7 ,Y = 10});
-            //_result.Tiles.Add(new TileSet { Z = 5,  X = 13 ,Y = 19});
-            //_result.Tiles.Add(new TileSet { Z = 6,  X = 26 ,Y = 39});
-            //_result.Tiles.Add(new TileSet { Z = 7,  X = 52 ,Y = 77});
-            //_result.Tiles.Add(new TileSet { Z = 8,  X = 104 ,Y = 152});
+            _result.Tiles.Add(new TileSet { Z = 1, X = 5, Y = 5 });
+            _result.Tiles.Add(new TileSet { Z = 2, X = 5, Y = 5 });
+            _result.Tiles.Add(new TileSet { Z = 3, X = 10, Y = 10 });
+            _result.Tiles.Add(new TileSet { Z = 4, X = 7, Y = 10 });
+            _result.Tiles.Add(new TileSet { Z = 5, X = 13, Y = 19 });
+            _result.Tiles.Add(new TileSet { Z = 6, X = 26, Y = 39 });
+            _result.Tiles.Add(new TileSet { Z = 7, X = 52, Y = 77 });
+            _result.Tiles.Add(new TileSet { Z = 8, X = 104, Y = 152 });
             _result.Tiles.Add(new TileSet { Z = 9,  X = 208 ,Y = 304});
 
             _result.Name = "AOC";
