@@ -32,11 +32,11 @@ function initMap() {
         }),
         zoomControl: false,
         minZoom: 1,
-        maxZoom: 8,
+        maxZoom: 9,
         zoom: 3,
         attributionControl: false,
         layers: [
-            L.tileLayer('_content/FrontUI/map/{z}/{x}/{y}.webp', { tileSize: data.tileSize })
+            L.tileLayer('https://aoc-gathering.invi.rocks/AOC/tile/{z}/{x}/{y}.webp', { tileSize: data.tileSize })
         ]
     }).setView([599103, -859263]);
     console.log("initMap: Karte initialisiert.");
