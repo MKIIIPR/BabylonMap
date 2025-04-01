@@ -14,224 +14,255 @@
 
 <MudPaper Class="mud-width-full" Style="overflow:hidden;position:relative;height:93.7vh">
 
-    <MudDrawerContainer Class="mud-height-full" Style="overflow:hidden">
-        <!-- MudDrawer mit Navigation und Filteroptionen -->
-        <MudDrawer @bind-Open="@_open" Fixed="false" Anchor="Anchor.End" Elevation="1" Style="overflow:hidden" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
-            <MudPaper Width="250px" Class="d-inline-flex py-3" Elevation="0" Style="overflow:hidden">
+	<MudDrawerContainer Class="mud-height-full" Style="overflow:hidden">
+		<!-- MudDrawer mit Navigation und Filteroptionen -->
+		<MudDrawer @bind-Open="@_open" Fixed="false" Anchor="Anchor.End" Elevation="1" Style="overflow:hidden" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+			<MudPaper Width="250px" Class="d-inline-flex py-3" Elevation="0" Style="overflow:hidden">
 
-                <MudNavMenu Class="mud-width-full">
-                    <!-- Divideren für visuelle Trennung -->
-@*                     <MudDivider Class="my-2" />
+				<MudNavMenu Class="mud-width-full">
+					<!-- Divideren für visuelle Trennung -->
+						@*                     <MudDivider Class="my-2" />
                     <MudDivider Class="my-2" />
                     <MudDivider Class="my-2" />
                     <MudDivider Class="my-2" />
                     <MudDivider Class="my-2" /> *@
 
-                    <!-- Filter-Menu -->
-                    <MudNavGroup Title="Filter" Icon="@Icons.Material.Filled.Settings" Expanded="true">
-                        <!-- Filter für verschiedene Kategorien -->
-                        @foreach (var category in new[] { "wood", "metal", "flower", "gem", "stone", "named" })
-                        {
-                            <MudNavGroup Title="@category" Icon="@Icons.Material.Filled.Settings" Expanded="false">
-                                <div style="margin-left:60px">
-                                    <MudChipSet @bind-SelectedValues="_mapData.selectedFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark>
-                                        <MudChip Value="@(@category)" >
-                                                @("All " + category)
-                                        </MudChip>
+					<!-- Filter-Menu -->
+					<MudNavGroup Title="Filter" Icon="@Icons.Material.Filled.Settings" Expanded="true">
 
-                                        @foreach (var node in _mapData.NodeList.Where(e => e.Type.Contains(category)))
-                                        {
-                                            <MudChip Value="@(node.Name)" />
-                                        }
-                                    </MudChipSet>
-                                </div>
-                            </MudNavGroup>
-                        }
-                    </MudNavGroup>
-                </MudNavMenu>
+							<!-- Filter für alle Raritäten Kategorien -->
+							<MudNavGroup Title="Rarity Filter" Icon="@Icons.Material.Filled.Star" Expanded="false">
+								<div style="margin-left:60px">
+									<MudChipSet @bind-SelectedValues="_mapData.selectedFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark>
+										@foreach (var rarity in _mapData.NodePositionList.Select(node => node.Rarity).Distinct().OrderBy(r => r).ToList())
+											{
+											<MudChip Value="@rarity">
+												@GetRarityText(rarity)
+											</MudChip>
+											}
+									</MudChipSet>
+								</div>
+							</MudNavGroup>
 
-            </MudPaper>
-        </MudDrawer>
+							<!-- Filter für verschiedene Kategorien -->
+							@foreach (var category in _mapData.NodeList.Select(node => node.Type).Distinct().OrderBy(type => type).ToList())
+							{
+								<MudNavGroup Title="@category" Icon="@Icons.Material.Filled.Settings" Expanded="false">
+									<div style="margin-left:60px">
+										<MudChipSet @bind-SelectedValues="_mapData.selectedFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark>
+											<MudChip Value="@(@category)" >
+												@("All " + category)
+											</MudChip>
 
-        <div id="map" style="height: 100%; display: flex; flex-direction: row;" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
-        </div>
+											@foreach (var node in _mapData.NodeList.Where(e => e.Type.Contains(category)))
+											{
+														<MudChip Value="@(node.Name)" />
+											}
+										</MudChipSet>
+									</div>
+								</MudNavGroup>
+							}
 
-    </MudDrawerContainer>
-   
+					</MudNavGroup>
+				</MudNavMenu>
+
+			</MudPaper>
+		</MudDrawer>
+
+		<div id="map" style="height: 100%; display: flex; flex-direction: row;" @oncontextmenu="@(OpenContextMenu)" @oncontextmenu:preventDefault @oncontextmenu:stopPropagation>
+		</div>
+
+	</MudDrawerContainer>
+
 </MudPaper>
 <MudPaper Style="height:93.7vh;width:450px">
-        <NodePositionViever></NodePositionViever>
+		<NodePositionViever></NodePositionViever>
 </MudPaper>
 </div>
 <MudDialog @bind-Visible="_dialogVisible" Options="_dialogOptions">
-    <TitleContent>
-        <MudText Typo="Typo.h6">Add node</MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudTextField @bind-Value="SelectedNode.Name" Label="Node Name" />
-        <MudTextField @bind-Value="SelectedNode.Type" Label="Node Type" />
-        <MudTextField @bind-Value="SelectedNode.NodeImageUrl" Label="Node Image URL">
-            <FileUploader OnImageUploaded="@(image => SelectedNode.NodeImageUrl = image)" />
-        </MudTextField>
+	<TitleContent>
+		<MudText Typo="Typo.h6">Add node</MudText>
+	</TitleContent>
+	<DialogContent>
+		<MudTextField @bind-Value="SelectedNode.Name" Label="Node Name" />
+		<MudTextField @bind-Value="SelectedNode.Type" Label="Node Type" />
+		<MudTextField @bind-Value="SelectedNode.NodeImageUrl" Label="Node Image URL">
+			<FileUploader OnImageUploaded="@(image => SelectedNode.NodeImageUrl = image)" />
+		</MudTextField>
 
-        <MudNumericField @bind-Value="SelectedNode.RespawnTimer" Label="Respawn Timer (min)" />
-    </DialogContent>
-    <DialogActions>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitNode" Class="px-10">Save</MudButton>
-        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Close" Class="px-10">Cancel</MudButton>
-    </DialogActions>
+		<MudNumericField @bind-Value="SelectedNode.RespawnTimer" Label="Respawn Timer (min)" />
+	</DialogContent>
+	<DialogActions>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitNode" Class="px-10">Save</MudButton>
+		<MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Close" Class="px-10">Cancel</MudButton>
+	</DialogActions>
 </MudDialog>
 
 
 <MudMenu PositionAtCursor @ref="_contextMenu">
 
-    @foreach (var group in _mapData.NodeList.GroupBy(r => r.Type))
-    {
-        <MudMenuItem Label="@group.Key" OnClick="()=>OpenDialogAsync(group.Key)" />
-    }
-    <MudDivider Class="my-2" />
-    <MudMenuItem Label="Add node" OnClick="OpenDialog"></MudMenuItem>
-    <MudMenuItem Label="Edit nodes" OnClick="OpenNodeDialog"></MudMenuItem>
+	@foreach (var group in _mapData.NodeList.GroupBy(r => r.Type))
+	{
+							<MudMenuItem Label="@group.Key" OnClick="()=>OpenDialogAsync(group.Key)" />
+	}
+	<MudDivider Class="my-2" />
+	<MudMenuItem Label="Add node" OnClick="OpenDialog"></MudMenuItem>
+	<MudMenuItem Label="Edit nodes" OnClick="OpenNodeDialog"></MudMenuItem>
 </MudMenu>
 @code {
-    public NodePositionView ToCreateNewPos { get; set; } = new();
-    public bool _dialogSpawnVis { get; set; }
-    public bool _open { get; set; }
+	public NodePositionView ToCreateNewPos { get; set; } = new();
+	public bool _dialogSpawnVis { get; set; }
+	public bool _open { get; set; }
 
-    private bool _dialogVisible;
-    private int _rating;
-    private readonly DialogOptions _dialogOptions = new() { FullWidth = true };
-    public bool _nodeSpawnVis { get; set; } = false;
-    public Node SelectedNode = null;
+	private bool _dialogVisible;
+	private int _rating;
+	private readonly DialogOptions _dialogOptions = new() { FullWidth = true };
+	public bool _nodeSpawnVis { get; set; } = false;
+	public Node SelectedNode = null;
 
-    private void OpenDialog() 
-    {
-        SelectedNode = new();
-        _dialogVisible = true;
+	private void OpenDialog()
+	{
+		SelectedNode = new();
+		_dialogVisible = true;
 
-    }
-    private void OpenDialogNodePos(string type)
-    {
-        _mapData.ResType = type;
-        ToCreateNewPos = new();
-        _dialogSpawnVis = true;
+	}
+	private void OpenDialogNodePos(string type)
+	{
+		_mapData.ResType = type;
+		ToCreateNewPos = new();
+		_dialogSpawnVis = true;
 
-    }
-    private async Task SubmitNode() 
-    {
-        await _mapData.AddNode(SelectedNode);
-        _dialogVisible = false;
-    }
-    private async Task SubmitNodePos()
-    {
-        await _mapData.AddNode(SelectedNode);
-        _dialogSpawnVis= false;
-    }
-    private void Close() {
-        _dialogVisible = false;
-    }
+	}
+	private async Task SubmitNode()
+	{
+		await _mapData.AddNode(SelectedNode);
+		_dialogVisible = false;
+	}
+	private async Task SubmitNodePos()
+	{
+		await _mapData.AddNode(SelectedNode);
+		_dialogSpawnVis = false;
+	}
+	private void Close()
+	{
+		_dialogVisible = false;
+	}
 
-    private Task OpenNodeDialog()
-    {
-        var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth=true,MaxWidth =MaxWidth.Medium };
+	private Task OpenNodeDialog()
+	{
+		var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth = true, MaxWidth = MaxWidth.Medium };
 
-        return DialogService.ShowAsync<NodeDialog>("Edit nodes", options);
-    }
-    string _returnValue = "Dialog return value (not yet set)";
+		return DialogService.ShowAsync<NodeDialog>("Edit nodes", options);
+	}
+	string _returnValue = "Dialog return value (not yet set)";
 
-    private async Task OpenDialogAsync(string type)
-    {
-        _mapData.ResType = type;
-        var options = new DialogOptions { CloseOnEscapeKey = true };
-       
+	private async Task OpenDialogAsync(string type)
+	{
+		_mapData.ResType = type;
+		var options = new DialogOptions { CloseOnEscapeKey = true };
 
-        var dialogReference = await DialogService.ShowAsync<NodePositionDialog>("Add node position", options);
-        _returnValue = "Waiting for dialog to conclude ...";
-        StateHasChanged();
-        var dialogResult = await dialogReference.Result;
 
-        if (dialogResult.Canceled)
-        {
-            _returnValue = "Dialog was canceled";
-        }
-        else
-        {
-            // Daten aus dem Dialog holen und in SelectedNode speichern
-            if (dialogResult.Data is NodePositionView nodeData)
-            {
-                var SelectedNode = nodeData;
-                SelectedNode.Lat = MapHandler.Lat;
-                SelectedNode.Lng = MapHandler.Lng;
-                await _mapData.AddResourcePosition(SelectedNode);
-            }
-            else
-            {
-                _returnValue = "Unexpected dialog result";
-            }
-        }
+		var dialogReference = await DialogService.ShowAsync<NodePositionDialog>("Add node position", options);
+		_returnValue = "Waiting for dialog to conclude ...";
+		StateHasChanged();
+		var dialogResult = await dialogReference.Result;
 
-    }
+		if (dialogResult.Canceled)
+		{
+			_returnValue = "Dialog was canceled";
+		}
+		else
+		{
+			// Daten aus dem Dialog holen und in SelectedNode speichern
+			if (dialogResult.Data is NodePositionView nodeData)
+			{
+				var SelectedNode = nodeData;
+				SelectedNode.Lat = MapHandler.Lat;
+				SelectedNode.Lng = MapHandler.Lng;
+				await _mapData.AddResourcePosition(SelectedNode);
+			}
+			else
+			{
+				_returnValue = "Unexpected dialog result";
+			}
+		}
 
-    private MudMenu _contextMenu = null!;
-    [CascadingParameter]
-    public CascadingMapData? _mapData { get; set; } // Referenz zur CascadingMapData
-    public void SetResType(string type){
-        _dialogSpawnVis = true;
-        _mapData.ResType = type;
-    }
+	}
 
-    private void EnlargeImg(string img){
+	private MudMenu _contextMenu = null!;
+	[CascadingParameter]
+	public CascadingMapData? _mapData { get; set; } // Referenz zur CascadingMapData
+	public void SetResType(string type)
+	{
+		_dialogSpawnVis = true;
+		_mapData.ResType = type;
+	}
 
-    }
-    private async Task OpenContextMenu(MouseEventArgs args)
-    {
-        await _contextMenu.OpenMenuAsync(args);
-    }
-    protected override void OnParametersSet()
-    {
- 
+	private void EnlargeImg(string img)
+	{
 
-        if (_mapData == null)
-        {
-            Console.WriteLine("⚠️ _mapData ist noch NULL!");
-        }
-        else
-        {
-            Console.WriteLine("✅ _mapData ist gesetzt!");
-        }
-    }
-    private void AddNewResourcePosition(Node resource, int rarity)
-    {
-        double lat = MapHandler.Lat; // Hier holen wir uns die Koordinaten aus der MapHandler-Klasse
-        double lng = MapHandler.Lng;
+	}
+	private async Task OpenContextMenu(MouseEventArgs args)
+	{
+		await _contextMenu.OpenMenuAsync(args);
+	}
+	protected override void OnParametersSet()
+	{
 
-        // Hier greifst du auf die Cascading-Werte zu, um neue Ressourcen hinzuzufügen
 
-        // Deine Logik für das Hinzufügen der Ressource
-        Console.WriteLine($"Ressource {resource.Name} hinzugefügt bei {lat}, {lng}");
-    }
+		if (_mapData == null)
+		{
+			Console.WriteLine("⚠️ _mapData ist noch NULL!");
+		}
+		else
+		{
+			Console.WriteLine("✅ _mapData ist gesetzt!");
+		}
+	}
+	private void AddNewResourcePosition(Node resource, int rarity)
+	{
+		double lat = MapHandler.Lat; // Hier holen wir uns die Koordinaten aus der MapHandler-Klasse
+		double lng = MapHandler.Lng;
 
-    
+		// Hier greifst du auf die Cascading-Werte zu, um neue Ressourcen hinzuzufügen
 
-    public List<Node> ResourceList { get; set; } = new List<Node>();
+		// Deine Logik für das Hinzufügen der Ressource
+		Console.WriteLine($"Ressource {resource.Name} hinzugefügt bei {lat}, {lng}");
+	}
 
-    private string GetIconForType(string type)
-    {
-        return type.ToLower() switch
-        {
-            "metal" => Icons.Material.Filled.Build,
-            "wood" => Icons.Material.Filled.Forest,
-            "gem" => Icons.Material.Filled.Diamond,
-            _ => Icons.Material.Filled.HelpOutline,
-        };
-    }
 
-    private Timer? _timer;
 
-    protected override void OnInitialized()
-    {
-        
-    }
+	public List<Node> ResourceList { get; set; } = new List<Node>();
 
-    
+	private string GetIconForType(string type)
+	{
+		return type.ToLower() switch
+		{
+			"metal" => Icons.Material.Filled.Build,
+			"wood" => Icons.Material.Filled.Forest,
+			"gem" => Icons.Material.Filled.Diamond,
+			_ => Icons.Material.Filled.HelpOutline,
+		};
+	}
+
+	private Timer? _timer;
+
+	protected override void OnInitialized()
+	{
+
+	}
+
+	private string GetRarityText(string hexColor)
+	{
+		return hexColor switch
+		{
+			"2c35be" => "Rare",
+			"f3eb0a" => "Heroic",
+			"9b1cdc" => "Epic",
+			"ff5700" => "Legendary",
+			_ => "Unknown"
+		};
+	}
+
+
 }

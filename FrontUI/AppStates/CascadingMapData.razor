@@ -123,17 +123,19 @@
         }
     }
 
-
-
     public IEnumerable<NodePositionView> FilteredPosList { get; private set; }
 
     private void UpdateFilteredPosList()
     {
         IEnumerable<NodePositionView> resultByType = Enumerable.Empty<NodePositionView>();
         IEnumerable<NodePositionView> resultByName = Enumerable.Empty<NodePositionView>();
+        IEnumerable<NodePositionView> resultByRarity = Enumerable.Empty<NodePositionView>();
 
         if (selectedFilter != null && _selectedFilter.Any())
         {
+            resultByRarity = NodePositionList
+                .Where(node => _selectedFilter.Contains(node.Rarity));
+
             resultByType = NodePositionList
                 .Where(node => _selectedFilter.Contains(node.Node.Type));
 
@@ -143,6 +145,7 @@
             // Beide Ergebnisse zusammenführen, sortieren und optional Duplikate entfernen
             FilteredPosList = resultByType
                 .Concat(resultByName)
+                .Concat(resultByRarity)
                 .OrderBy(e => e.TimeLeft)
                 .Distinct(); // Entfernt doppelte Einträge, falls notwendig
         }
@@ -213,8 +216,6 @@
         StateHasChanged();
     }
 
-
-
     protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
@@ -276,7 +277,6 @@
 
     public static string _selectedPositionId { get; set; }
 
-
     public List<Node> NodeList { get; set; } = new();
     public async Task<List<Node>> GetAllNodes()
     {
@@ -324,7 +324,6 @@
     }
 
     // Diese Methode sucht nach der NodePosition basierend auf der ID und aktualisiert die Liste
-   
 
     // Event-Handler abmelden, wenn die Komponente zerstört wird
     public void Dispose()
