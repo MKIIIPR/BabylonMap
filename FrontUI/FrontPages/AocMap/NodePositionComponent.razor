@@ -142,6 +142,7 @@
     {
         NodePosition.LastHarvest = DateTime.Now;
         await _mapData.UpdateNodePosition(NodePosition);
+        
     }
     private async Task OpenDeleteConfirmationDialog(NodePositionView spot)
     {
