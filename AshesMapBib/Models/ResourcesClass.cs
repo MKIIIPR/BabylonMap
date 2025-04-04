@@ -119,6 +119,7 @@
                 LastHarvest = DateTime.Now;
             }
         }
+        public bool IsSelected { get; set; }
     }
 
 
