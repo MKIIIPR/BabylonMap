@@ -67,6 +67,7 @@
             _selectedFilter = value ?? new List<string>(); // Falls null, initialisiere mit einer leeren Liste
 
             UpdateFilteredPosList();
+            UpdateFilterByTime();
             UpdateMapMarkers();
         }
     }
