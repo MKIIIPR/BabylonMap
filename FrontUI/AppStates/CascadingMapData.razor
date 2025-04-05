@@ -150,27 +150,38 @@
             {
                 switch (timeSpan.ToLowerInvariant()) // Damit Vergleiche nicht case-sensitiv sind
                 {
-                    case "active":
+                    case "act":
                         // Logik für "active"
                         var firstTimeLeft = FilteredPosList
                         .OrderByDescending(x => x.TimeLeft)
                         .Select(x => x.TimeLeft)
                         .FirstOrDefault();
 
-
-
                         Console.WriteLine(firstTimeLeft);
-                        FilteredByTime=FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft > 0).Distinct());
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft >= -3600).Distinct());
                         break;
 
-                    case "< -4h":
+                    case "<-4h":
                         // Logik für kleiner als -4 Stunden
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= 0 && e.TimeLeft >= -14400).Distinct()
-    );
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -14400).Distinct());
+                        
                         break;
 
-                    case "< -8h":
+                    case "<-8h":
                         // Logik für kleiner als -8 Stunden
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -14400 && e.TimeLeft >= -28800).Distinct());
+
+                        break;
+
+                    case "<-1d":
+                        // Logik für kleiner als -24 Stunden
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -28800 && e.TimeLeft >= -86400).Distinct());
+
+                        break;
+
+                    case ">-1d":
+                        // Logik für grösser als -1 Tag
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -86400).Distinct());
 
                         break;
 

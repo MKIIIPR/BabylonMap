@@ -1,4 +1,4 @@
-﻿
+
 @using AshesMapBib.Models
 @using System.Threading
 @using FrontUI.AppStates
@@ -15,17 +15,21 @@
           
         <MudToggleGroup Outlined="false" T="string" SelectionMode="SelectionMode.MultiSelection" @bind-Values="_mapData.timeLeftFilter" Color="Color.Secondary" CheckMark>
 
-
-            <MudToggleItem Style="background-color: forestgreen;color:black" Value="@("active")"
+            <MudToggleItem Style="background-color: forestgreen;color:black" Value="@("act")"
                            UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
                            SelectedIcon="@Icons.Material.Filled.CheckBox" />
-            <MudToggleItem Style="background-color: darkorange; color:black" Value="@("< -4h")"
+            <MudToggleItem Style="background-color: darkorange; color:black" Value="@("<-4h")"
                            UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
                            SelectedIcon="@Icons.Material.Filled.CheckBox" />
-            <MudToggleItem Style="background-color: rebeccapurple; color:black" Value="@("< -8h")"
+            <MudToggleItem Style="background-color: rebeccapurple; color:black" Value="@("<-8h")"
                            UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
                            SelectedIcon="@Icons.Material.Filled.CheckBox" />
-
+            <MudToggleItem Style="background-color: orangered; color:black" Value="@("<-1d")"
+                           UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
+                           SelectedIcon="@Icons.Material.Filled.CheckBox" />
+            <MudToggleItem Style="background-color: red; color:black" Value="@(">-1d")"
+                           UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
+                           SelectedIcon="@Icons.Material.Filled.CheckBox" />
         </MudToggleGroup>
       
         @code {
