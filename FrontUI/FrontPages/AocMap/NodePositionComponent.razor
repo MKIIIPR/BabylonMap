@@ -6,8 +6,8 @@
 @inject IJSRuntime JS
 @inject IDialogService DialogService
 
-<MudExpansionPanel  Style="padding-left:3px ;width:200px" >
-    <TitleContent>
+@* <MudExpansionPanel  Style="padding-left:3px ;width:200px" >
+    <TitleContent> *@
         <div style="display:flex">
 
             <div style="width:12px;/* @($"background-color: {NodePosition.TimeRemainingColor}") */ "></div>
@@ -98,14 +98,14 @@
             />
 
         </div> *@
-    </TitleContent>
+@*     </TitleContent>
     <ChildContent>
         <div style="width:100%;height:100%;" @onclick="() => EnlargeImg()">
             <img src="@NodePosition.Image" style="width:100%;height:100%" />
         </div>
     </ChildContent>
 </MudExpansionPanel>
-
+ *@
 @code {
     [Parameter] public NodePositionView NodePosition { get; set; }
     [CascadingParameter] public CascadingMapData _mapData { get; set; }

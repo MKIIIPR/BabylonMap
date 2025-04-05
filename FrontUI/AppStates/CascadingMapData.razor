@@ -42,6 +42,21 @@
     public DateTime? StartedTimerAt { get; set; }
     public DateTime? StoppedTimerAt { get; set; }
     public List<int> TimeStopHistory { get; set; } = new();
+    private IEnumerable<string>? _timeLeftFilter = Enumerable.Empty<string>();
+
+    public IEnumerable<string> timeLeftFilter
+    {
+        get => _timeLeftFilter ?? Enumerable.Empty<string>(); // Falls null, gib eine leere Liste zurück
+        set
+        {
+            _timeLeftFilter = value ?? new List<string>(); // Falls null, initialisiere mit einer leeren Liste
+
+            UpdateFilteredPosList();
+            UpdateFilterByTime();
+            UpdateMapMarkers();
+        }
+    }
+
     private IReadOnlyCollection<string> _selectedFilter = new List<string>();
 
     public IReadOnlyCollection<string> selectedFilter
@@ -55,6 +70,7 @@
             UpdateMapMarkers();
         }
     }
+
     private async Task UpdateMapMarkers()
     {
         try
@@ -125,6 +141,49 @@
 
     public IEnumerable<NodePositionView> FilteredPosList { get; private set; }
 
+    private void UpdateFilterByTime()
+    {
+        IEnumerable<NodePositionView> FilteredByTime = Enumerable.Empty<NodePositionView>();
+        if (timeLeftFilter != null && timeLeftFilter.Any() && FilteredPosList.Any())
+        {
+            foreach (var timeSpan in timeLeftFilter)
+            {
+                switch (timeSpan.ToLowerInvariant()) // Damit Vergleiche nicht case-sensitiv sind
+                {
+                    case "active":
+                        // Logik für "active"
+                        var firstTimeLeft = FilteredPosList
+                        .OrderByDescending(x => x.TimeLeft)
+                        .Select(x => x.TimeLeft)
+                        .FirstOrDefault();
+
+
+
+                        Console.WriteLine(firstTimeLeft);
+                        FilteredByTime=FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft > 0).Distinct());
+                        break;
+
+                    case "< -4h":
+                        // Logik für kleiner als -4 Stunden
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= 0 && e.TimeLeft >= -14400).Distinct()
+    );
+                        break;
+
+                    case "< -8h":
+                        // Logik für kleiner als -8 Stunden
+
+                        break;
+
+                    default:
+                        // Unbekannter Filter – optional ignorieren oder loggen
+
+                        break;
+                }
+            }
+            FilteredPosList = FilteredByTime;
+        }
+        
+    }
     private void UpdateFilteredPosList()
     {
         IEnumerable<NodePositionView> resultByType = Enumerable.Empty<NodePositionView>();

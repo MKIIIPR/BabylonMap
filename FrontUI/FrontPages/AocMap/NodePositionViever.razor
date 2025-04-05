@@ -6,19 +6,60 @@
 @using MudBlazor
 @inject IJSRuntime JS
 
-<MudPaper Height="100%" Style="">
+<MudPaper Height="91.3vh" Style="overflow:hidden">
 
     <!-- NodePosition Auswahl -->
+       @if (_mapData.FilteredPosList != null)
+    {
+          
+        <MudToggleGroup Outlined="false" T="string" SelectionMode="SelectionMode.MultiSelection" @bind-Values="_mapData.timeLeftFilter" Color="Color.Secondary" CheckMark>
+
+
+            <MudToggleItem Style="background-color: forestgreen;color:black" Value="@("active")"
+                           UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
+                           SelectedIcon="@Icons.Material.Filled.CheckBox" />
+            <MudToggleItem Style="background-color: darkorange; color:black" Value="@("< -4h")"
+                           UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
+                           SelectedIcon="@Icons.Material.Filled.CheckBox" />
+            <MudToggleItem Style="background-color: rebeccapurple; color:black" Value="@("< -8h")"
+                           UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
+                           SelectedIcon="@Icons.Material.Filled.CheckBox" />
+
+        </MudToggleGroup>
+      
+        @code {
+        private IEnumerable<string> _value2 = Enumerable.Empty<string>();
+        private IEnumerable<string>? _value21 = Enumerable.Empty<string>();
+        private string _style = "custom-striped";
+        private string _value = "Antimatter";
+    }
+      <MudChipSet @bind-SelectedValues="_mapData.selectedFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark>
+				@foreach (var rarity in _mapData.NodePositionList.Select(node => node.Rarity).Distinct().OrderBy(r => r).ToList())
+					{
+					<MudChip Value="@rarity">
+						@GetRarityText(rarity)
+					</MudChip>
+					}
+			</MudChipSet>
+        <br />
+        <MudDivider>
+            
+        </MudDivider>
     @if (_mapData.SelectedPosition != null)
     {
         <NodePositionComponent NodePosition="_mapData.SelectedPosition" />
     }
+ 
+      
+      
 
+
+    }
 
     @if (_mapData.FilteredPosList != null)
     {
 
-        <MudRadioGroup T="NodePositionView" @bind-Value="_mapData.SelectedPosition" Style="display:flex; flex-direction: column;flex-wrap: nowrap;overflow-y:auto;height:100%;">
+        <MudRadioGroup T="NodePositionView" @bind-Value="_mapData.SelectedPosition" Style="display:flex; flex-direction: column;flex-wrap: nowrap;overflow-y:auto;height:90%;">
             @foreach (var spot in _mapData.FilteredPosList)
             {
                 <MudRadio Value="spot" Color="Color.Primary" Dense="true"  >
@@ -101,5 +142,16 @@
     {
         _timer?.Dispose();
     }
+    private string GetRarityText(string hexColor)
+	{
+		return hexColor switch
+		{
+			"2c35be" => "Rare",
+			"f3eb0a" => "Heroic",
+			"9b1cdc" => "Epic",
+			"ff5700" => "Legendary",
+			_ => "Unknown"
+		};
+	}
 }
 
