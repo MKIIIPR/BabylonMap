@@ -2,6 +2,7 @@
 @using AshesMapBib.Models
 @using System.Threading
 @using FrontUI.AppStates
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
 @using MudBlazor
 @inject IJSRuntime JS
@@ -59,17 +60,18 @@
     @if (_mapData.FilteredPosList != null)
     {
 
-        <MudRadioGroup T="NodePositionView" @bind-Value="_mapData.SelectedPosition" Style="display:flex; flex-direction: column;flex-wrap: nowrap;overflow-y:auto;height:90%;">
-            @foreach (var spot in _mapData.FilteredPosList)
-            {
-                <MudRadio Value="spot" Color="Color.Primary" Dense="true"  >
-                    <ChildContent>
-                        <NodePositionComponent NodePosition="spot" />
-                    </ChildContent>
-
-                </MudRadio>
-            }
-        </MudRadioGroup>
+     <MudRadioGroup T="NodePositionView" @bind-Value="_mapData.SelectedPosition"
+               Style="display:flex; flex-direction: column; overflow-y:auto; height:90%;">
+    <Virtualize TItem="NodePositionView" Items="@_mapData.FilteredPosList.ToList()" ItemSize="12">
+        <ItemContent Context="spot">
+            <MudRadio T="NodePositionView" Value="spot" Color="Color.Primary" Dense="true">
+                <ChildContent>
+                    <NodePositionComponent NodePosition="spot" />
+                </ChildContent>
+            </MudRadio>
+        </ItemContent>
+    </Virtualize>
+</MudRadioGroup>
     }
 
 
