@@ -36,8 +36,8 @@ function initMap() {
         zoom: 3,
         attributionControl: false,
         layers: [
-            L.tileLayer('https://cdn.ashescodex.com/map/20250426/{z}/{x}/{y}.webp', { tileSize: data.tileSize })
-            //von ashescodex src = "https://cdn.ashescodex.com/map/20250426/9/149/228.webp"
+            L.tileLayer('https://cdn.ashescodex.com/map/20250612/{z}/{x}/{y}.webp', { tileSize: data.tileSize })
+            //von ashescodex src = "https://cdn.ashescodex.com/map/20250612/9/149/228.webp"
         ]
     }).setView([599103, -859263]);
     console.log("initMap: Karte initialisiert.");
