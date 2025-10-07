@@ -33,13 +33,13 @@ function initMap() {
         zoomControl: false,
         minZoom: 1,
         maxZoom: 9,
-        zoom: 3,
+        zoom: 2,
         attributionControl: false,
         layers: [
             L.tileLayer('https://cdn.ashescodex.com/map/20250612/{z}/{x}/{y}.webp', { tileSize: data.tileSize })
             //von ashescodex src = "https://cdn.ashescodex.com/map/20250612/9/149/228.webp"
         ]
-    }).setView([599103, -859263]);
+    }).setView([550000, -950000]);
     console.log("initMap: Karte initialisiert.");
 
     // Event-Listener für das Kontextmenü (Rechtsklick)
