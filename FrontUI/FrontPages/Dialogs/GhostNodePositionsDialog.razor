@@ -1,4 +1,4 @@
-﻿@using AshesMapBib.Models
+@using AshesMapBib.Models
 @using FrontUI.AppStates
 @using FrontUI.Components
 @using FrontUI.Helper.MapHelper
@@ -132,6 +132,7 @@
         int sekunden = ParseErntezeitToSeconds(_formattedTime);
         var toGhost = _mapData.NodePositionList
             .Where(pos =>
+                (string.IsNullOrEmpty(selectedType) || pos.Node.Type == selectedType) &&
                 (selectedResource == null || pos.Node == selectedResource) &&
                 (string.IsNullOrEmpty(selectedRarity) || pos.Rarity == selectedRarity) &&
                 pos.TimeLeft <= -sekunden
