@@ -15,9 +15,14 @@
             <MudCardContent>
                 <MudForm>
 
-                    <!-- Typ-Auswahl mit Badge -->
+                    <!-- Typ-Auswahl: auf Value/ValueChanged umstellen, um beim Wechsel die Resource zu resetten -->
                     <MudBadge Color="Color.Info" Content="@GhostCount" MaxValue="999" Overlap="true" Class="mb-2">
-                        <MudSelect T="string" Label="Resource Type" @bind-Value="selectedType" Placeholder="Typ wählen" HelperText="Filter für Ressourcen">
+                        <MudSelect T="string"
+                                   Label="Resource Type"
+                                   Value="selectedType"
+                                   ValueChanged="OnTypeChanged"
+                                   Placeholder="Typ wählen"
+                                   HelperText="Filter für Ressourcen">
                             <MudSelectItem Value="@string.Empty">(alle)</MudSelectItem>
                             @foreach (var t in ResourceTypeOptions)
                             {
@@ -26,11 +31,15 @@
                         </MudSelect>
                     </MudBadge>
 
-                    <!-- Resource-Auswahl mit Badge -->
+                    <!-- Resource-Auswahl: "(alle)"-Option hinzufügen -->
                     <MudBadge Color="Color.Info" Content="@GhostCount" MaxValue="999" Overlap="true" Class="mb-2">
-                        <MudSelect @bind-Value="selectedResource" Label="select resource" HelperText="Rarity"
-                                   Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood"
+                        <MudSelect @bind-Value="selectedResource"
+                                   Label="select resource"
+                                   HelperText="Rarity"
+                                   Placeholder="Please Select"
+                                   AdornmentIcon="@Icons.Material.Filled.Fastfood"
                                    AdornmentColor="Color.Primary">
+                            <MudSelectItem Value="@(null as Node)">(alle)</MudSelectItem>
                             @foreach (var resource in _mapData.NodeList
                                 .Where(e => (string.IsNullOrEmpty(selectedType) || e.Type == selectedType)))
                             {
@@ -189,6 +198,14 @@
             pos.Ghost = true;
             await _mapData.UpdateNodePosition(pos);
         }
+    }
+
+    private Task OnTypeChanged(string value)
+    {
+        // Typ setzen (leerer String => alle) und Ressource zurück auf "alle" (null)
+        selectedType = string.IsNullOrWhiteSpace(value) ? null : value;
+        selectedResource = null;
+        return Task.CompletedTask;
     }
 
 
