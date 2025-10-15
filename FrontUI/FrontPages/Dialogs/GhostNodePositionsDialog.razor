@@ -6,7 +6,7 @@
 
 @inject MapHandler MapHandler
 
-<MudDialog >
+<MudDialog MaxWidth="MaxWidth.False" Style="width:50vw; max-width:50vw">
     <TitleContent>
         <MudText Typo="Typo.h6">@MudDialog.Title</MudText>
     </TitleContent>
@@ -15,34 +15,41 @@
             <MudCardContent>
                 <MudForm>
 
-                    <!-- NEU: Auswahl des Typs -->
-                    <MudSelect T="string" Label="Resource Type" @bind-Value="selectedType" Placeholder="Typ wählen" HelperText="Filter für Ressourcen">
-                        <MudSelectItem Value="@string.Empty">(alle)</MudSelectItem>
-                        @foreach (var t in ResourceTypeOptions)
-                        {
-                            <MudSelectItem Value="@t">@t</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <!-- Typ-Auswahl mit Badge -->
+                    <MudBadge Color="Color.Info" Content="@GhostCount" MaxValue="999" Overlap="true" Class="mb-2">
+                        <MudSelect T="string" Label="Resource Type" @bind-Value="selectedType" Placeholder="Typ wählen" HelperText="Filter für Ressourcen">
+                            <MudSelectItem Value="@string.Empty">(alle)</MudSelectItem>
+                            @foreach (var t in ResourceTypeOptions)
+                            {
+                                <MudSelectItem Value="@t">@t (@GhostCountForType(t))</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudBadge>
 
-                    <!-- Vorhanden: Auswahl der Resource, jetzt nach Typ gefiltert -->
-                    <MudSelect @bind-Value="selectedResource" Label="select resource" HelperText="Rarity"
-                               Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood"
-                               AdornmentColor="Color.Primary">
-                        @foreach (var resource in _mapData.NodeList
-                            .Where(e => (string.IsNullOrEmpty(selectedType) || e.Type == selectedType)))
-                        {
-                            <MudSelectItem Value="@resource">@resource.Name</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <!-- Resource-Auswahl mit Badge -->
+                    <MudBadge Color="Color.Info" Content="@GhostCount" MaxValue="999" Overlap="true" Class="mb-2">
+                        <MudSelect @bind-Value="selectedResource" Label="select resource" HelperText="Rarity"
+                                   Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood"
+                                   AdornmentColor="Color.Primary">
+                            @foreach (var resource in _mapData.NodeList
+                                .Where(e => (string.IsNullOrEmpty(selectedType) || e.Type == selectedType)))
+                            {
+                                <MudSelectItem Value="@resource">@resource.Name (@GhostCountForRessources(resource))</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudBadge>
 
+                    <!-- Rarity-Auswahl mit dynamischer Anzahl je Rarity -->
                     <MudChipSet T="string" @bind-SelectedValue="selectedRarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
-                        <MudChip Text="Rare" Style="color:#000000; background-color:#0000ff" Value="@("2c35be")" Selected="true"></MudChip>
-                        <MudChip Text="Hero" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")"></MudChip>
-                        <MudChip Text="Epic" Style="color:#000000; background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>
-                        <MudChip Text="Legi" Style="color:#000000; background-color:#ff5700" Value="@("ff5700")"></MudChip>
+                        <MudChip Text="@($"Rare ({GhostCountForRarity("2c35be")})")" Style="color:#000000; background-color:#0000ff" Value="@("2c35be")" Selected="true"></MudChip>
+                        <MudChip Text="@($"Hero ({GhostCountForRarity("f3eb0a")})")" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")"></MudChip>
+                        <MudChip Text="@($"Epic ({GhostCountForRarity("9b1cdc")})")" Style="color:#000000; background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>
+                        <MudChip Text="@($"Legi ({GhostCountForRarity("ff5700")})")" Style="color:#000000; background-color:#ff5700" Value="@("ff5700")"></MudChip>
                     </MudChipSet>
 
-                    <MudTextField Label="Letzte Erntezeit" @bind-Value="_formattedTime" HelperText="last harvest time" />
+                    <MudTextField Label='@($"Letzte Erntezeit (Anzahl Ressourcen {GhostCountForTime(_formattedTime)})")'
+                                  @bind-Value="_formattedTime"
+                                  HelperText="last harvest time" />
 
                 </MudForm>
             </MudCardContent>
@@ -51,7 +58,7 @@
     <DialogActions>
         <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="Cancel" Class="px-10">Close</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="SetGhostForSelectedTypeAndRarity" Class="px-10">
-            Als Ghost markieren
+            Als Ghost markieren (@GhostCount)
         </MudButton>
     </DialogActions>
 </MudDialog>
@@ -62,11 +69,58 @@
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
     [CascadingParameter] public CascadingMapData _mapData { get; set; }
 
-    // NEU: ausgewählter Typ
+    // Ausgewählte Filter
     private string? selectedType;
     private string? selectedRarity;
+    private Node selectedResource;
+    private string _formattedTime = "2d 0h 0m 0s";
 
-    // NEU: distinct Typ-Liste
+    // Sekunden aus Eingabe
+    private int SekundenFilter => ParseErntezeitToSeconds(_formattedTime);
+
+    // Dynamische Anzahl der zu ghostenden Ressourcen (als Label/Badge)
+    private int GhostCount =>
+        (_mapData?.NodePositionList ?? Enumerable.Empty<NodePositionView>()).Count(pos =>
+            (string.IsNullOrEmpty(selectedType) || pos.Node?.Type == selectedType) &&
+            (selectedResource == null || pos.Node == selectedResource) &&
+            (string.IsNullOrEmpty(selectedRarity) || pos.Rarity == selectedRarity) &&
+            pos.TimeLeft <= -SekundenFilter
+        );
+
+    // Anzahl der ghostbaren Ressourcen für einen konkreten Resource-Eintrag (ignoriert selectedResource)
+    private int GhostCountForRessources(Node resource) =>
+        (_mapData?.NodePositionList ?? Enumerable.Empty<NodePositionView>()).Count(pos =>
+            pos.Node == resource &&
+            (string.IsNullOrEmpty(selectedType) || pos.Node?.Type == selectedType)
+        );
+
+    // Anzahl der ghostbaren Ressourcen je Typ (ignoriert selectedType)
+    private int GhostCountForType(string type) =>
+        (_mapData?.NodePositionList ?? Enumerable.Empty<NodePositionView>()).Count(pos =>
+            pos.Node?.Type == type
+        );
+
+    // Anzahl der ghostbaren Ressourcen je Rarity (unabhängig von selectedRarity)
+    private int GhostCountForRarity(string rarity) =>
+        (_mapData?.NodePositionList ?? Enumerable.Empty<NodePositionView>()).Count(pos =>
+            (string.IsNullOrEmpty(selectedType) || pos.Node?.Type == selectedType) &&
+            (selectedResource == null || pos.Node == selectedResource) &&
+            pos.Rarity == rarity
+        );
+
+    // Anzahl der ghostbaren Ressourcen für eine konkrete Erntezeit (ignoriert selectedRarity)
+    private int GhostCountForTime(string time)
+    {
+        var seconds = ParseErntezeitToSeconds(time);
+        return (_mapData?.NodePositionList ?? Enumerable.Empty<NodePositionView>()).Count(pos =>
+            (string.IsNullOrEmpty(selectedType) || pos.Node?.Type == selectedType) &&
+            (selectedResource == null || pos.Node == selectedResource) &&
+            (string.IsNullOrEmpty(selectedRarity) || pos.Rarity == selectedRarity) &&
+            pos.TimeLeft <= -seconds
+        );
+    }
+
+    // distinct Typ-Liste
     private IEnumerable<string> ResourceTypeOptions =>
         _mapData?.NodeList?
             .Select(n => n.Type)
@@ -74,8 +128,6 @@
             .Distinct()
             .OrderBy(t => t)
         ?? Enumerable.Empty<string>();
-
-    private string _formattedTime = "2d 0h 0m 0s";
 
     private int ParseErntezeitToSeconds(string input)
     {
@@ -97,7 +149,6 @@
             }
         }
 
-        // Fallback: reine Zahl -> Sekunden
         if (totalSeconds == 0 && int.TryParse(input, out var seconds))
             totalSeconds = seconds;
 
@@ -106,11 +157,9 @@
 
     protected override Task OnParametersSetAsync()
     {
-        // Initialer Typ: falls ResType vorgegeben ist
         if (string.IsNullOrEmpty(selectedType) && !string.IsNullOrEmpty(_mapData?.ResType))
             selectedType = _mapData.ResType;
 
-        // Falls aktuelle Node nicht mehr in gefilterter Liste -> zurücksetzen
         if (ToChangePos?.Node != null &&
             !(_mapData.NodeList.Any(n => n == ToChangePos.Node &&
                                          (string.IsNullOrEmpty(selectedType) || n.Type == selectedType))))
@@ -122,17 +171,14 @@
     }
 
     private string _returnValue;
-    //private void Submit() => MudDialog.Close(DialogResult.Ok(ToChangePos));
     private void Cancel() => MudDialog.Cancel();
-
-    private Node selectedResource;
 
     private async Task SetGhostForSelectedTypeAndRarity()
     {
-        int sekunden = ParseErntezeitToSeconds(_formattedTime);
+        int sekunden = SekundenFilter;
         var toGhost = _mapData.NodePositionList
             .Where(pos =>
-                (string.IsNullOrEmpty(selectedType) || pos.Node.Type == selectedType) &&
+                (string.IsNullOrEmpty(selectedType) || pos.Node?.Type == selectedType) &&
                 (selectedResource == null || pos.Node == selectedResource) &&
                 (string.IsNullOrEmpty(selectedRarity) || pos.Rarity == selectedRarity) &&
                 pos.TimeLeft <= -sekunden
@@ -144,4 +190,6 @@
             await _mapData.UpdateNodePosition(pos);
         }
     }
+
+
 }
