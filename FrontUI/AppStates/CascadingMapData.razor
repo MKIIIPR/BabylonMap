@@ -405,10 +405,14 @@
         {
             if (nodeView.Ghost)
                 NodePositionList.Remove(nodeToRemove);
+
             UpdateFilteredPosList();
-            await JS.InvokeVoidAsync("removeMarker", nodeToRemove.Id);
-            if(!nodeView.Ghost)
-                await JS.InvokeVoidAsync("addCustomMarker", nodeView.Lat, nodeView.Lng, nodeView, nodeView.TimeLeft);
+            UpdateFilterByTime();
+            UpdateMapMarkers();
+
+            // await JS.InvokeVoidAsync("removeMarker", nodeToRemove.Id);
+            // if(!nodeView.Ghost)
+            //     await JS.InvokeVoidAsync("addCustomMarker", nodeView.Lat, nodeView.Lng, nodeView, nodeView.TimeLeft);
         }
     }
 
