@@ -176,11 +176,13 @@
             {
                 Console.WriteLine($"Fehler bei der Ausführung von initMap: {ex.Message}");
             }
+
             NodeList = await GetAllNodes();
             NodePositionList = await GetNodePositions();
             NodePositionList = NodePositionList.Where(e => !e.Ghost).ToList();
-            UpdateFilteredPosList();
 
+            // Standard-Filter setzen -> wendet Filter an und zeichnet nur diese Marker
+            timeLeftFilter = new[] { "act", "<-1d" };
         }
     }
     // ✅ Hilfsmethode: Prüft, ob eine JS-Funktion existiert
@@ -349,29 +351,33 @@
         base.OnInitialized();
     }
 
-    public async Task<List<NodePositionView>> GetNodePositions(){
+    public async Task<List<NodePositionView>> GetNodePositions()
+    {
         var result = new List<NodePositionView>();
         var fromClient = await _positions.GetAllAsync("/nodeposition?ghost=eq.false");
-        foreach(var spot in fromClient){
-            NodePositionView newSpot = new();
+        foreach (var spot in fromClient)
+        {
+            var node = NodeList.FirstOrDefault(e => e.Id == spot.ResourceId);
 
-            newSpot.Id = spot.Id;
-            newSpot.Node = NodeList.Where(e => e.Id == spot.ResourceId).FirstOrDefault();
-            newSpot.ResourceId = NodeList.Where(e => e.Id == spot.ResourceId).FirstOrDefault().Id;
-            newSpot.Description = spot.Description;
-            newSpot.Lat = spot.Lat;
-            newSpot.Lng = spot.Lng;
-            newSpot.Rarity = spot.Rarity;
-            newSpot.Image = spot.Image;
-            newSpot.LastHarvest = spot.LastHarvest;
-            newSpot.TimerMod = 0;
-            newSpot.Ghost = spot.Ghost;
+            var newSpot = new NodePositionView
+            {
+                Id = spot.Id,
+                Node = node,
+                ResourceId = node?.Id ?? spot.ResourceId,
+                Description = spot.Description,
+                Lat = spot.Lat,
+                Lng = spot.Lng,
+                Rarity = spot.Rarity,
+                Image = spot.Image,
+                LastHarvest = spot.LastHarvest,
+                TimerMod = 0,
+                Ghost = spot.Ghost
+            };
 
             result.Add(newSpot);
-            if(!newSpot.Ghost)
-                await JS.InvokeVoidAsync("addCustomMarker", newSpot.Lat, newSpot.Lng, newSpot, newSpot.TimeLeft);
         }
 
+        // Keine Marker hier zeichnen – das übernimmt UpdateMapMarkers nach gesetzten Filtern
         return result;
     }
     public async Task SaveNode(NodePosition node)
