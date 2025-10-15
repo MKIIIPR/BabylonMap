@@ -28,8 +28,11 @@
         <ApplicationId>com.companyname.babylonmap</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationDisplayVersion>0.4.0</ApplicationDisplayVersion>
+        <ApplicationVersion>4</ApplicationVersion>
+        <Version>0.4.0</Version>
+        <AssemblyVersion>0.4.0.0</AssemblyVersion>
+        <FileVersion>0.4.0.0</FileVersion>
 
         <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
         <WindowsPackageType>None</WindowsPackageType>
