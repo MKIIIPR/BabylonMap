@@ -1,4 +1,4 @@
-﻿@using AshesMapBib.Models
+@using AshesMapBib.Models
 @using System.Threading
 @using FrontUI.AppStates
 @using Microsoft.AspNetCore.Components.Web.Virtualization
@@ -12,7 +12,7 @@
        @if (_mapData.FilteredPosList != null)
     {
           
-        <MudToggleGroup Outlined="false" T="string" SelectionMode="SelectionMode.MultiSelection" @bind-Values="_mapData.timeLeftFilter" Color="Color.Secondary" CheckMark>
+        <MudToggleGroup Style="display:flex;flex-wrap:nowrap;overflow-x:auto;" Outlined="false" T="string" SelectionMode="SelectionMode.MultiSelection" @bind-Values="_mapData.timeLeftFilter" Color="Color.Secondary" CheckMark>
             <MudIconButton Icon="@Icons.Material.Filled.Refresh"
                            Color="Color.Primary"
                            Size="Size.Medium"
