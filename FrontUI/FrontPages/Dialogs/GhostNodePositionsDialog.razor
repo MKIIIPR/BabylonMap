@@ -1,0 +1,105 @@
+@using AshesMapBib.Models
+@using FrontUI.AppStates
+@using FrontUI.Components
+@using FrontUI.Helper.MapHelper
+@using MudBlazor
+
+@inject MapHandler MapHandler
+
+<MudDialog >
+    <TitleContent>
+        <MudText Typo="Typo.h6">@MudDialog.Title</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudCard>
+            <MudCardContent>
+                <MudForm>
+
+                    <!-- NEU: Auswahl des Typs -->
+                    <MudSelect T="string" Label="Resource Type" @bind-Value="selectedType" Placeholder="Typ wählen" HelperText="Filter für Ressourcen">
+                        <MudSelectItem Value="@string.Empty">(alle)</MudSelectItem>
+                        @foreach (var t in ResourceTypeOptions)
+                        {
+                            <MudSelectItem Value="@t">@t</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <!-- Vorhanden: Auswahl der Resource, jetzt nach Typ gefiltert -->
+                    <MudSelect @bind-Value="ToChangePos.Node" Label="select resource" HelperText="Rarity"
+                               Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood"
+                               AdornmentColor="Color.Primary">
+                        @foreach (var resource in _mapData.NodeList
+                            .Where(e => (string.IsNullOrEmpty(selectedType) || e.Type == selectedType)))
+                        {
+                            <MudSelectItem Value="@resource">@resource.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudChipSet T="string" @bind-SelectedValue="ToChangePos.Rarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
+                        <MudChip Text="Rare" Style="color:#000000; background-color:#0000ff" Value="@("2c35be")" Selected="true"></MudChip>
+                        <MudChip Text="Hero" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")"></MudChip>
+                        <MudChip Text="Epic" Style="color:#000000; background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>
+                        <MudChip Text="Legi" Style="color:#000000; background-color:#ff5700" Value="@("ff5700")"></MudChip>
+                    </MudChipSet>
+
+                    <MudTextField Label="Erntezeit" @bind-Value="FormattedTime" HelperText="harvest time" />
+
+                </MudForm>
+            </MudCardContent>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Class="px-10">Save</MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel" Class="px-10">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject] private IDialogService DialogService { get; set; }
+    [Parameter] public NodePositionView? ToChangePos { get; set; } = new();
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] public CascadingMapData _mapData { get; set; }
+
+    // NEU: ausgewählter Typ
+    private string? selectedType;
+
+    // NEU: distinct Typ-Liste
+    private IEnumerable<string> ResourceTypeOptions =>
+        _mapData?.NodeList?
+            .Select(n => n.Type)
+            .Where(t => !string.IsNullOrWhiteSpace(t))
+            .Distinct()
+            .OrderBy(t => t)
+        ?? Enumerable.Empty<string>();
+
+    private string FormattedTime
+    {
+        get => ToChangePos.LastHarvest.ToString("HH:mm");
+        set
+        {
+            if (DateTime.TryParse(value, out DateTime time))
+                ToChangePos.LastHarvest = ToChangePos.LastHarvest.Date.Add(time.TimeOfDay);
+        }
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        // Initialer Typ: falls ResType vorgegeben ist
+        if (string.IsNullOrEmpty(selectedType) && !string.IsNullOrEmpty(_mapData?.ResType))
+            selectedType = _mapData.ResType;
+
+        // Falls aktuelle Node nicht mehr in gefilterter Liste -> zurücksetzen
+        if (ToChangePos?.Node != null &&
+            !(_mapData.NodeList.Any(n => n == ToChangePos.Node &&
+                                         (string.IsNullOrEmpty(selectedType) || n.Type == selectedType))))
+        {
+            ToChangePos.Node = null;
+        }
+
+        return base.OnParametersSetAsync();
+    }
+
+    private string _returnValue;
+    private void Submit() => MudDialog.Close(DialogResult.Ok(ToChangePos));
+    private void Cancel() => MudDialog.Cancel();
+}

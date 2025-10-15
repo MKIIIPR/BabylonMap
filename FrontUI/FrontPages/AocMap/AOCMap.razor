@@ -103,11 +103,12 @@
 
 	@foreach (var group in _mapData.NodeList.GroupBy(r => r.Type))
 	{
-							<MudMenuItem Label="@group.Key" OnClick="()=>OpenDialogAsync(group.Key)" />
+		<MudMenuItem Label="@group.Key" OnClick="()=>OpenDialogAsync(group.Key)" />
 	}
 	<MudDivider Class="my-2" />
 	<MudMenuItem Label="Add node" OnClick="OpenDialog"></MudMenuItem>
 	<MudMenuItem Label="Edit nodes" OnClick="OpenNodeDialog"></MudMenuItem>
+	<MudMenuItem Label="Ghost nodes" OnClick="OpenGhostNodePositionDialog"></MudMenuItem>
 </MudMenu>
 @code {
 	public NodePositionView ToCreateNewPos { get; set; } = new();
@@ -146,6 +147,13 @@
 	private void Close()
 	{
 		_dialogVisible = false;
+	}
+
+	private Task OpenGhostNodePositionDialog()
+	{
+		// Beispiel: Öffnet einen Dialog für "Ghost nodes"
+		var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth = true, MaxWidth = MaxWidth.Medium };
+		return DialogService.ShowAsync<GhostNodePositionsDialog>("Change to ghost nodes", options);
 	}
 
 	private Task OpenNodeDialog()
@@ -263,6 +271,5 @@
 			_ => "Unknown"
 		};
 	}
-
 
 }
