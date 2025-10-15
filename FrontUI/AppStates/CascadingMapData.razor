@@ -86,7 +86,7 @@
                 Console.WriteLine("❌ JS-Funktion 'removeCustomMarkers' nicht gefunden.");
             }
 
-            foreach (var newSpot in FilteredPosList)
+            foreach (var newSpot in FilteredPosList ?? Enumerable.Empty<NodePositionView>())
             {
                 // Prüfe, ob addCustomMarker existiert, bevor es aufgerufen wird
                 if (await JsFunctionExists("addCustomMarker"))
@@ -102,6 +102,63 @@
         catch (Exception ex)
         {
             Console.WriteLine($"⚠️ Fehler beim Aufruf von JavaScript: {ex.Message}");
+        }
+    }
+
+    // Öffentliche Methode zum manuellen Reload der Marker (von UI aus nutzbar)
+    public async Task ReloadMapAsync()
+    {
+        try
+        {
+            // Marker vor Daten-Reload entfernen (verhindert Duplikate)
+            if (await JsFunctionExists("removeCustomMarkers"))
+            {
+                await JS.InvokeVoidAsync("removeCustomMarkers");
+            }
+
+            // Daten aus der DB neu laden
+            NodeList = await GetAllNodes();
+
+            var fresh = await _positions.GetAllAsync("/nodeposition?ghost=eq.false");
+            var rebuilt = new List<NodePositionView>(fresh.Count);
+
+            foreach (var spot in fresh)
+            {
+                var node = NodeList.FirstOrDefault(e => e.Id == spot.ResourceId);
+
+                var view = new NodePositionView
+                {
+                    Id = spot.Id,
+                    Node = node,
+                    ResourceId = node?.Id ?? spot.ResourceId,
+                    Description = spot.Description,
+                    Lat = spot.Lat,
+                    Lng = spot.Lng,
+                    Rarity = spot.Rarity,
+                    Image = spot.Image,
+                    LastHarvest = spot.LastHarvest,
+                    TimerMod = 0,
+                    Ghost = spot.Ghost
+                };
+
+                rebuilt.Add(view);
+            }
+
+            // Nur nicht-Ghosts behalten
+            NodePositionList = rebuilt.Where(e => !e.Ghost).ToList();
+
+            // Filter anwenden und Marker neu zeichnen
+            UpdateFilteredPosList();
+            UpdateFilterByTime();
+            await UpdateMapMarkers();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ReloadMapAsync failed: {ex.Message}");
+        }
+        finally
+        {
+            StateHasChanged();
         }
     }
     private DotNetObjectReference<CascadingMapData>? objRef;
@@ -162,21 +219,21 @@
                         FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft >= -3600).Distinct());
                         break;
 
-                    case "<-4h":
-                        // Logik für kleiner als -4 Stunden
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -14400).Distinct());
+                    // case "<-4h":
+                    //     // Logik für kleiner als -4 Stunden
+                    //     FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -14400).Distinct());
                         
-                        break;
+                    //     break;
 
-                    case "<-8h":
-                        // Logik für kleiner als -8 Stunden
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -14400 && e.TimeLeft >= -28800).Distinct());
+                    // case "<-8h":
+                    //     // Logik für kleiner als -8 Stunden
+                    //     FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -14400 && e.TimeLeft >= -28800).Distinct());
 
-                        break;
+                    //     break;
 
                     case "<-1d":
                         // Logik für kleiner als -24 Stunden
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -28800 && e.TimeLeft >= -86400).Distinct());
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -86400).Distinct());
 
                         break;
 
