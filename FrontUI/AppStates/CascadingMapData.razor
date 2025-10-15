@@ -13,6 +13,7 @@
 @code {
     // List von ResourcePositionen, die die Daten enthalten
     public List<NodePositionView> NodePositionList { get; set; } = new List<NodePositionView>();
+    public List<NodePositionView> AllNodePositionList { get; set; } = new();
     public NodePositionView SelectedPosition { get; set; } 
     [Parameter] public RenderFragment ChildContent { get; set;  }
     private bool _timer = true;
@@ -110,44 +111,13 @@
     {
         try
         {
-            // Marker vor Daten-Reload entfernen (verhindert Duplikate)
             if (await JsFunctionExists("removeCustomMarkers"))
-            {
                 await JS.InvokeVoidAsync("removeCustomMarkers");
-            }
 
-            // Daten aus der DB neu laden
             NodeList = await GetAllNodes();
+            AllNodePositionList = await GetNodePositions(includeGhosts: true);
+            NodePositionList = AllNodePositionList.Where(e => !e.Ghost).ToList();
 
-            var fresh = await _positions.GetAllAsync("/nodeposition?ghost=eq.false");
-            var rebuilt = new List<NodePositionView>(fresh.Count);
-
-            foreach (var spot in fresh)
-            {
-                var node = NodeList.FirstOrDefault(e => e.Id == spot.ResourceId);
-
-                var view = new NodePositionView
-                {
-                    Id = spot.Id,
-                    Node = node,
-                    ResourceId = node?.Id ?? spot.ResourceId,
-                    Description = spot.Description,
-                    Lat = spot.Lat,
-                    Lng = spot.Lng,
-                    Rarity = spot.Rarity,
-                    Image = spot.Image,
-                    LastHarvest = spot.LastHarvest,
-                    TimerMod = 0,
-                    Ghost = spot.Ghost
-                };
-
-                rebuilt.Add(view);
-            }
-
-            // Nur nicht-Ghosts behalten
-            NodePositionList = rebuilt.Where(e => !e.Ghost).ToList();
-
-            // Filter anwenden und Marker neu zeichnen
             UpdateFilteredPosList();
             UpdateFilterByTime();
             await UpdateMapMarkers();
@@ -167,21 +137,13 @@
     {
         if (firstRender)
         {
-            try
-            {
-                // Lade die initMap Funktion über JSInterop
-                await JS.InvokeVoidAsync("initMap");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Fehler bei der Ausführung von initMap: {ex.Message}");
-            }
+            try { await JS.InvokeVoidAsync("initMap"); } catch { /* log */ }
 
             NodeList = await GetAllNodes();
-            NodePositionList = await GetNodePositions();
-            NodePositionList = NodePositionList.Where(e => !e.Ghost).ToList();
+            AllNodePositionList = await GetNodePositions(includeGhosts: true);
+            NodePositionList = AllNodePositionList.Where(e => !e.Ghost).ToList();
 
-            // Standard-Filter setzen -> wendet Filter an und zeichnet nur diese Marker
+            // Standard-Filter (ohne Ghosts)
             timeLeftFilter = new[] { "act", "<-1d" };
         }
     }
@@ -208,74 +170,34 @@
         {
             foreach (var timeSpan in timeLeftFilter)
             {
-                switch (timeSpan.ToLowerInvariant()) // Damit Vergleiche nicht case-sensitiv sind
+                switch (timeSpan.ToLowerInvariant())
                 {
                     case "act":
-                        // Logik für "active"
-                        var firstTimeLeft = FilteredPosList
-                        .OrderByDescending(x => x.TimeLeft)
-                        .Select(x => x.TimeLeft)
-                        .FirstOrDefault();
-
-                        Console.WriteLine(firstTimeLeft);
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft >= -3600).Distinct());
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft >= -3600)).Distinct();
                         break;
-
-                    // case "<-4h":
-                    //     // Logik für kleiner als -4 Stunden
-                    //     FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -14400).Distinct());
-                        
-                    //     break;
-
-                    // case "<-8h":
-                    //     // Logik für kleiner als -8 Stunden
-                    //     FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -14400 && e.TimeLeft >= -28800).Distinct());
-
-                    //     break;
-
                     case "<-1d":
-                        // Logik für kleiner als -24 Stunden
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -86400).Distinct());
-
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -86400)).Distinct();
                         break;
-
                     case ">-1d":
-                        // Logik für grösser als -1 Tag
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -86400).Distinct());
-
+                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -86400)).Distinct();
                         break;
-
-                    default:
-                        // Unbekannter Filter – optional ignorieren oder loggen
-
+                    case "ghost":
+                        var ghosts = AllNodePositionList.Where(n => n.Ghost);
+                        if (_selectedFilter != null && _selectedFilter.Any())
+                            ghosts = ghosts.Where(MatchesSelectedFilters);
+                        FilteredByTime = FilteredByTime.Concat(ghosts).Distinct();
                         break;
                 }
             }
             FilteredPosList = FilteredByTime;
         }
-        
-    }
-    private void UpdateFilteredPosList()
-    {
-        if (selectedFilter != null && _selectedFilter.Any())
-        {
-            // UND-Logik: Node muss alle gewählten Filter erfüllen
-            FilteredPosList = NodePositionList
-                .Where(node =>
-                    (_selectedFilter.Contains(node.Rarity) || !_selectedFilter.Any(f => IsRarity(f))) &&
-                    (_selectedFilter.Contains(node.Node.Type) || !_selectedFilter.Any(f => IsType(f))) &&
-                    (_selectedFilter.Contains(node.Node.Name) || !_selectedFilter.Any(f => IsName(f)))
-                )
-                .OrderBy(e => e.TimeLeft)
-                .Distinct();
-        }
-        else
-        {
-            FilteredPosList = NodePositionList.OrderBy(e => e.TimeLeft);
-        }
     }
 
-    // Hilfsfunktionen zur Filtererkennung
+    private bool MatchesSelectedFilters(NodePositionView node) =>
+        (_selectedFilter.Contains(node.Rarity) || !_selectedFilter.Any(f => IsRarity(f))) &&
+        (_selectedFilter.Contains(node.Node.Type) || !_selectedFilter.Any(f => IsType(f))) &&
+        (_selectedFilter.Contains(node.Node.Name) || !_selectedFilter.Any(f => IsName(f)));
+
     private bool IsRarity(string filter)
     {
         // Beispiel: Rarity-Werte sind Hex-Farben oder bekannte Strings
@@ -283,13 +205,12 @@
     }
     private bool IsType(string filter)
     {
-        // Beispiel: Typen sind die Namen der Node-Typen
-        var knownTypes = NodePositionList.Select(n => n.Node.Type).Distinct();
+        var knownTypes = AllNodePositionList.Select(n => n.Node.Type).Distinct();
         return knownTypes.Contains(filter);
     }
     private bool IsName(string filter)
     {
-        var knownNames = NodePositionList.Select(n => n.Node.Name).Distinct();
+        var knownNames = AllNodePositionList.Select(n => n.Node.Name).Distinct();
         return knownNames.Contains(filter);
     }
 
@@ -359,10 +280,12 @@
         base.OnInitialized();
     }
 
-    public async Task<List<NodePositionView>> GetNodePositions()
+    public async Task<List<NodePositionView>> GetNodePositions(bool includeGhosts = false)
     {
         var result = new List<NodePositionView>();
-        var fromClient = await _positions.GetAllAsync("/nodeposition?ghost=eq.false");
+        var endpoint = includeGhosts ? "/nodeposition" : "/nodeposition?ghost=eq.false";
+        var fromClient = await _positions.GetAllAsync(endpoint);
+
         foreach (var spot in fromClient)
         {
             var node = NodeList.FirstOrDefault(e => e.Id == spot.ResourceId);
@@ -385,7 +308,6 @@
             result.Add(newSpot);
         }
 
-        // Keine Marker hier zeichnen – das übernimmt UpdateMapMarkers nach gesetzten Filtern
         return result;
     }
     public async Task SaveNode(NodePosition node)
@@ -394,26 +316,69 @@
     }
     public async Task UpdateNodePosition(NodePositionView nodeView)
     {
-
-        var nodeToRemove = NodePositionList.FirstOrDefault(e => e.Id == nodeView.Id);
-
-        var putNode = new NodePosition { Id = nodeView.Id ,Node = null, ResourceId = nodeView.Node.Id, Description = nodeView.Description, Lat = nodeView.Lat, Lng = nodeView.Lng, Rarity = nodeView.Rarity, Image = nodeView.Image, LastHarvest = nodeView.LastHarvest,Ghost=nodeView.Ghost, TimerMod = 0 };
-
+        var putNode = new NodePosition
+        {
+            Id = nodeView.Id,
+            Node = null,
+            ResourceId = nodeView.Node.Id,
+            Description = nodeView.Description,
+            Lat = nodeView.Lat,
+            Lng = nodeView.Lng,
+            Rarity = nodeView.Rarity,
+            Image = nodeView.Image,
+            LastHarvest = nodeView.LastHarvest,
+            Ghost = nodeView.Ghost,
+            TimerMod = 0
+        };
 
         await _positions.UpdateAsync(putNode.Id, putNode, $"/nodeposition?id=eq.");
-        if (nodeToRemove != null)
+
+        // All-Liste aktualisieren
+        var inAll = AllNodePositionList.FirstOrDefault(e => e.Id == nodeView.Id);
+        if (inAll != null)
         {
-            if (nodeView.Ghost)
-                NodePositionList.Remove(nodeToRemove);
-
-            UpdateFilteredPosList();
-            UpdateFilterByTime();
-            UpdateMapMarkers();
-
-            // await JS.InvokeVoidAsync("removeMarker", nodeToRemove.Id);
-            // if(!nodeView.Ghost)
-            //     await JS.InvokeVoidAsync("addCustomMarker", nodeView.Lat, nodeView.Lng, nodeView, nodeView.TimeLeft);
+            inAll.Description = nodeView.Description;
+            inAll.Lat = nodeView.Lat;
+            inAll.Lng = nodeView.Lng;
+            inAll.Rarity = nodeView.Rarity;
+            inAll.Image = nodeView.Image;
+            inAll.LastHarvest = nodeView.LastHarvest;
+            inAll.Ghost = nodeView.Ghost;
+            inAll.Node = nodeView.Node;
         }
+        else
+        {
+            AllNodePositionList.Add(nodeView);
+        }
+
+        // Aktive Liste (ohne Ghosts) synchronisieren
+        var inActive = NodePositionList.FirstOrDefault(e => e.Id == nodeView.Id);
+        if (nodeView.Ghost)
+        {
+            if (inActive != null) NodePositionList.Remove(inActive);
+        }
+        else
+        {
+            if (inActive != null)
+            {
+                inActive.Description = nodeView.Description;
+                inActive.Lat = nodeView.Lat;
+                inActive.Lng = nodeView.Lng;
+                inActive.Rarity = nodeView.Rarity;
+                inActive.Image = nodeView.Image;
+                inActive.LastHarvest = nodeView.LastHarvest;
+                inActive.Ghost = nodeView.Ghost;
+                inActive.Node = nodeView.Node;
+            }
+            else
+            {
+                NodePositionList.Add(nodeView);
+            }
+        }
+
+        UpdateFilteredPosList();
+        UpdateFilterByTime();
+        await UpdateMapMarkers();
     }
 
     public async Task DeleteNodePositionComplete(NodePosition position)
@@ -478,4 +443,22 @@
     }
 
 
+    private void UpdateFilteredPosList()
+    {
+        // Beispiel-Implementierung: Filtert die NodePositionList anhand der ausgewählten Filter
+        if (NodePositionList == null)
+        {
+            FilteredPosList = Enumerable.Empty<NodePositionView>();
+            return;
+        }
+
+        IEnumerable<NodePositionView> filtered = NodePositionList;
+
+        if (_selectedFilter != null && _selectedFilter.Any())
+        {
+            filtered = filtered.Where(MatchesSelectedFilters);
+        }
+
+        FilteredPosList = filtered.ToList();
+    }
 }
