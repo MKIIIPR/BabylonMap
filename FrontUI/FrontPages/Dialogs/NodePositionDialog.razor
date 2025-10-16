@@ -1,5 +1,4 @@
-﻿
-@using AshesMapBib.Models
+﻿@using AshesMapBib.Models
 @using FrontUI.AppStates
 @using FrontUI.Components
 @using FrontUI.Helper.MapHelper
@@ -31,6 +30,7 @@
                             </MudSelect>
 
                             <MudChipSet T="string" @bind-SelectedValue="ToCreateNewPos.Rarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
+                                <MudChip Text="Unknown" Style="color:#000000; background-color:#808080" Value="@("808080")"></MudChip>
                                 <MudChip Text="Rare" Style="color:#000000; background-color:#0000ff" Value="@("2c35be")" Selected="true"></MudChip>
                                 <MudChip Text="Hero" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")"></MudChip>
                                 <MudChip Text="Epic" Style="color:#000000; background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>
@@ -78,6 +78,7 @@
                             
 
                             <MudChipSet T="string" @bind-SelectedValue="ToCreateNewPos.Rarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
+                                <MudChip Text="Unknown" Style="color:#000000; background-color:#808080" Value="@("808080")"> </MudChip>
                                 <MudChip Text="Rare" Style="color:#000000; background-color:#0000ff" Value="@("2c35be")"> </MudChip>
                                 <MudChip Text="Hero" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")"></MudChip>
                                 <MudChip Text="Epic" Style="color:#000000; background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>

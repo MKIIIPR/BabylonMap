@@ -9,9 +9,9 @@
 <MudPaper Height="91.3vh" Style="overflow:hidden">
 
     <!-- NodePosition Auswahl -->
-       @if (_mapData.FilteredPosList != null)
+    @if (_mapData.FilteredPosList != null)
     {
-          
+
         <MudToggleGroup Style="display:flex;flex-wrap:nowrap;overflow-x:auto;" Outlined="false" T="string" SelectionMode="SelectionMode.MultiSelection" @bind-Values="_mapData.timeLeftFilter" Color="Color.Secondary" CheckMark>
             <MudIconButton Icon="@Icons.Material.Filled.Refresh"
                            Color="Color.Primary"
@@ -23,12 +23,6 @@
             <MudToggleItem Style="background-color: forestgreen;color:black" Value="@("act")"
                            UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
                            SelectedIcon="@Icons.Material.Filled.CheckBox" />
-    @*         <MudToggleItem Style="background-color: darkorange; color:black" Value="@("<-4h")"
-                           UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
-                           SelectedIcon="@Icons.Material.Filled.CheckBox" />
-            <MudToggleItem Style="background-color: rebeccapurple; color:black" Value="@("<-8h")"
-                           UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
-                           SelectedIcon="@Icons.Material.Filled.CheckBox" /> *@
             <MudToggleItem Style="background-color: orangered; color:black" Value="@("<-1d")"
                            UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
                            SelectedIcon="@Icons.Material.Filled.CheckBox" />
@@ -39,33 +33,23 @@
                            UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank"
                            SelectedIcon="@Icons.Material.Filled.CheckBox" />
         </MudToggleGroup>
-      
-        @code {
-        private IEnumerable<string> _value2 = Enumerable.Empty<string>();
-        private IEnumerable<string>? _value21 = Enumerable.Empty<string>();
-        private string _style = "custom-striped";
-        private string _value = "Antimatter";
-    }
-      <MudChipSet @bind-SelectedValues="_mapData.selectedFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark>
-				@foreach (var rarity in _mapData.NodePositionList.Select(node => node.Rarity).Distinct().OrderBy(r => r).ToList())
-					{
-					<MudChip Value="@rarity">
-						@GetRarityText(rarity)
-					</MudChip>
-					}
-			</MudChipSet>
+
+        <MudChipSet Class="chipset-nowrap" @bind-SelectedValues="_mapData.selectedFilter" SelectionMode="SelectionMode.MultiSelection" CheckMark>
+            @foreach (var rarity in Rarities)
+            {
+                <MudChip Value="@rarity" Size="Size.Medium" Class="compact-chip" Style="@GetRarityStyle(rarity)">
+                    @GetRarityText(rarity)
+                </MudChip>
+            }
+        </MudChipSet>
         <br />
         <MudDivider>
-            
-        </MudDivider>
-    @if (_mapData.SelectedPosition != null)
-    {
-        <NodePositionComponent NodePosition="_mapData.SelectedPosition" />
-    }
- 
-      
-      
 
+        </MudDivider>
+        @if (_mapData.SelectedPosition != null)
+        {
+            <NodePositionComponent NodePosition="_mapData.SelectedPosition" />
+        }
 
     }
 
@@ -87,11 +71,32 @@
 
 </MudPaper>
 <style>
-    .mud-input-control>.mud-input-control-input-container {
-    position: relative;
-    display: flex
-    ;
-    flex-direction: column;
+    .mud-input-control > .mud-input-control-input-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Rarity-Chips einzeilig und zentriert darstellen */
+    .chipset-nowrap {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center; /* Chips zentrieren */
+        width: 100%;
+        overflow-x: auto;
+        gap: 8px; /* Abstand zwischen den Chips */
+        padding: 0 12px; /* Randabstände links/rechts */
+    }
+    .chipset-nowrap .mud-chip {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        margin: 0 !important; /* Standardabstände der Chips überschreiben; Abstand über gap steuern */
+    }
+    .compact-chip {
+        height: 24px;
+        line-height: 24px;
+        padding: 0 6px; /* Kleineres Padding für kompaktere Chips */
+        font-size: 0.75rem;
     }
 </style>
 @code {
@@ -102,7 +107,8 @@
     public NodePositionView selectedNode { get; set; }
     private Timer _timer;
     private bool _open = false; // Steuert, ob das Drawer geöffnet ist
-    public void UpdateSelectedNode(NodePositionView spot){
+    public void UpdateSelectedNode(NodePositionView spot)
+    {
         selectedNode = new();
         selectedNode = spot;
     }
@@ -159,16 +165,55 @@
     {
         _timer?.Dispose();
     }
+
+    // Rarities-Liste mit gewünschter Sortierung
+    private IEnumerable<string> Rarities =>
+        _mapData?.NodePositionList?
+            .Select(n => n.Rarity)
+            .Where(r => !string.IsNullOrWhiteSpace(r))
+            .Distinct()
+            .OrderBy(r => GetRarityOrderIndex(r))
+        ?? Enumerable.Empty<string>();
+
+    private static int GetRarityOrderIndex(string hexColor)
+    {
+        // gewünschte Reihenfolge: unknown, rare, heroic, epic, legendary
+        return hexColor switch
+        {
+            "808080" => 0, // Unknown
+            "2c35be" => 1, // Rare
+            "f3eb0a" => 2, // Heroic
+            "9b1cdc" => 3, // Epic
+            "ff5700" => 4, // Legendary
+            _ => 99
+        };
+    }
+
+    private static string GetRarityStyle(string hexColor)
+    {
+        // Hintergrundfarben der Chips passend zur Rarity
+        return hexColor switch
+        {
+            "808080" => "color:#000000; background-color:#808080", // Unknown (grau)
+            "2c35be" => "color:#000000; background-color:#0000ff", // Rare (blau)
+            "f3eb0a" => "color:#000000; background-color:#f3eb0a", // Heroic (gelb)
+            "9b1cdc" => "color:#000000; background-color:#9b1cdc", // Epic (violett)
+            "ff5700" => "color:#000000; background-color:#ff5700", // Legendary (orange)
+            _ => ""
+        };
+    }
+
     private string GetRarityText(string hexColor)
-	{
-		return hexColor switch
-		{
-			"2c35be" => "Rare",
-			"f3eb0a" => "Heroic",
-			"9b1cdc" => "Epic",
-			"ff5700" => "Legendary",
-			_ => "Unknown"
-		};
-	}
+    {
+        return hexColor switch
+        {
+            "808080" => "Unknown",
+            "2c35be" => "Rare",
+            "f3eb0a" => "Heroic",
+            "9b1cdc" => "Epic",
+            "ff5700" => "Legendary",
+            _ => "Unknown"
+        };
+    }
 }
 

@@ -41,7 +41,7 @@
                                    AdornmentColor="Color.Primary">
                             <MudSelectItem Value="@(null as Node)">(alle)</MudSelectItem>
                             @foreach (var resource in _mapData.NodeList
-                                .Where(e => (string.IsNullOrEmpty(selectedType) || e.Type == selectedType)))
+                                                        .Where(e => (string.IsNullOrEmpty(selectedType) || e.Type == selectedType)))
                             {
                                 <MudSelectItem Value="@resource">@resource.Name (@GhostCountForRessources(resource))</MudSelectItem>
                             }
@@ -50,6 +50,7 @@
 
                     <!-- Rarity-Auswahl mit dynamischer Anzahl je Rarity -->
                     <MudChipSet T="string" @bind-SelectedValue="selectedRarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
+                        <MudChip Text="@($"Unknown ({GhostCountForRarity("808080")})")" Style="color:#000000; background-color:#808080" Value="@("808080")"></MudChip>
                         <MudChip Text="@($"Rare ({GhostCountForRarity("2c35be")})")" Style="color:#000000; background-color:#0000ff" Value="@("2c35be")" Selected="true"></MudChip>
                         <MudChip Text="@($"Hero ({GhostCountForRarity("f3eb0a")})")" Style="color:#000000; background-color:#f3eb0a" Value="@("f3eb0a")"></MudChip>
                         <MudChip Text="@($"Epic ({GhostCountForRarity("9b1cdc")})")" Style="color:#000000; background-color:#9b1cdc" Value="@("9b1cdc")"></MudChip>
