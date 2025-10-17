@@ -11,11 +11,26 @@
 </CascadingValue>
 
 @code {
+    // Merkliste: letzte ausgewählte Resource pro Typ (nur Session-weit)
+    public Dictionary<string, string> LastSelectedResourcePerType { get; set; } = new();
+    public Node? GetLastNodeForType(string? type)
+    {
+        if (string.IsNullOrWhiteSpace(type)) return null;
+        if (LastSelectedResourcePerType.TryGetValue(type, out var id))
+            return NodeList.FirstOrDefault(n => n.Id == id && n.Type == type);
+        return null;
+    }
+    public void SetLastNodeForType(string? type, string? resourceId)
+    {
+        if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(resourceId)) return;
+        LastSelectedResourcePerType[type] = resourceId;
+    }
+
     // List von ResourcePositionen, die die Daten enthalten
     public List<NodePositionView> NodePositionList { get; set; } = new List<NodePositionView>();
     public List<NodePositionView> AllNodePositionList { get; set; } = new();
-    public NodePositionView SelectedPosition { get; set; }
-    [Parameter] public RenderFragment ChildContent { get; set; }
+    public NodePositionView SelectedPosition { get; set; } 
+    [Parameter] public RenderFragment ChildContent { get; set;  }
     private bool _timer = true;
     public bool Timer
     {
@@ -267,18 +282,18 @@
 
         // Erstelle einen neuen NodePosition-Eintrag für den Server, wobei nun im Image-Feld der Dateiname steht
         var postNode = new NodePosition
-        {
-            Id = Guid.NewGuid().ToString(),
-            Node = null,
-            ResourceId = node.Node.Id,
-            Description = node.Description,
-            Lat = node.Lat,
-            Lng = node.Lng,
-            Rarity = node.Rarity,
-            Image = node.Image,
-            LastHarvest = node.LastHarvest,
-            TimerMod = 0
-        };
+            {
+                Id = Guid.NewGuid().ToString(),
+                Node = null,
+                ResourceId = node.Node.Id,
+                Description = node.Description,
+                Lat = node.Lat,
+                Lng = node.Lng,
+                Rarity = node.Rarity,
+                Image = node.Image,
+                LastHarvest = node.LastHarvest,
+                TimerMod = 0
+            };
         await _positions.CreateAsync(postNode, "/nodeposition");
 
         StateHasChanged();
@@ -320,7 +335,7 @@
         return result;
     }
     public async Task SaveNode(NodePosition node)
-    {
+    { 
 
     }
     public async Task UpdateNodePosition(NodePositionView nodeView)
@@ -404,8 +419,7 @@
         blob = await _nodes.GetAllAsync("/node");
         return blob;
     }
-    public async Task CreateNode(Node node)
-    {
+    public async Task CreateNode(Node node){
 
     }
     // Action-Delegat, um Funktionen zu registrieren, die bei Änderungen an der ID ausgeführt werden
@@ -441,7 +455,7 @@
 
         }
         // UI aktualisieren
-
+       
     }
 
     // Diese Methode sucht nach der NodePosition basierend auf der ID und aktualisiert die Liste

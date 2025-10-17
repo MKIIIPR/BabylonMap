@@ -18,15 +18,18 @@
                     case "Add node position":
                         <MudForm>
 
-
-
-                            <MudSelect @bind-Value="ToCreateNewPos.Node" Label="select resource" HelperText="Rarity" Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood" AdornmentColor="Color.Primary">
-
+                            <MudSelect T="Node"
+                                       Value="ToCreateNewPos.Node"
+                                       ValueChanged="OnNodeChanged"
+                                       Label="select resource"
+                                       HelperText="Rarity"
+                                       Placeholder="Please Select"
+                                       AdornmentIcon="@Icons.Material.Filled.Fastfood"
+                                       AdornmentColor="Color.Primary">
                                 @foreach (var resource in _mapData.NodeList.Where(e => e.Type == _mapData.ResType))
                                 {
                                     <MudSelectItem Value="@resource">@resource.Name</MudSelectItem>
                                 }
-
                             </MudSelect>
 
                             <MudChipSet T="string" @bind-SelectedValue="ToCreateNewPos.Rarity" CheckMark SelectionMode="SelectionMode.SingleSelection">
@@ -47,9 +50,9 @@
                                 <MudNumericField @bind-Value="ToCreateNewPos.TimerMod" Label="Enter an int" Variant="Variant.Outlined" />
                                 <MudIconButton Icon="@Icons.Material.Filled.Add"
                                                OnClick="() => {
-                    ToCreateNewPos.LastHarvest = ToCreateNewPos.LastHarvest.AddMinutes(ToCreateNewPos.TimerMod);
-                    ToCreateNewPos.TimerMod = 0;
-               }" />
+                                                        ToCreateNewPos.LastHarvest = ToCreateNewPos.LastHarvest.AddMinutes(ToCreateNewPos.TimerMod);
+                                                        ToCreateNewPos.TimerMod = 0;
+                                                                 }" />
                             </div>
                             <MudTextField ShrinkLabel @bind-Value="ToCreateNewPos.Description" Lines="4" Label="Description" Variant="Variant.Outlined"></MudTextField>
 
@@ -64,10 +67,6 @@
                             {
                                 <MudCardMedia Image="@($"data:image/png;base64,{ToCreateNewPos.Image}")" Height="150" />
                             }
-                            @* 
-                    <MudButton OnClick="()=>{ _mapData.AddResourcePosition(ToCreateNewPos); _dialogSpawnVis =false;}" Color="Color.Primary" Variant="Variant.Filled">
-                        Speichern
-                    </MudButton> *@
                         </MudForm>
                         break;
                     case "Edit node position":
@@ -102,14 +101,6 @@
                             </div>
                             <MudTextField ShrinkLabel @bind-Value="ToCreateNewPos.Description" Lines="4" Label="Description" Variant="Variant.Outlined"></MudTextField>
                             <div class="TEST"><FileUploader OnImageUploaded="base64 => { ToCreateNewPos.Image = base64;  }" /></div>
-                            
-
-                                                       <!-- Vorschau des hochgeladenen Bildes -->
-
-                            @* 
-                    <MudButton OnClick="()=>{ _mapData.AddResourcePosition(ToCreateNewPos); _dialogSpawnVis =false;}" Color="Color.Primary" Variant="Variant.Filled">
-                        Speichern
-                    </MudButton> *@
                         </MudForm>
                         break;
                   
@@ -168,23 +159,33 @@
         if (MudDialog.Title.Contains("Add node position"))
         {
             ToCreateNewPos = new();
-            ToCreateNewPos.Node = _mapData.NodeList.Where(e => e.Type == _mapData.ResType).FirstOrDefault();
+
+            // Letzte Auswahl je Typ aus _mapData holen
+            var type = _mapData?.ResType;
+            var last = _mapData?.GetLastNodeForType(type);
+
+            // Fallback: erster Eintrag des aktuellen Typs
+            ToCreateNewPos.Node = last ?? _mapData.NodeList.FirstOrDefault(e => e.Type == type);
+
+            // Standard: Rarity Rare
+            ToCreateNewPos.Rarity = "2c35be";
             ToCreateNewPos.LastHarvest = DateTime.Now;
         }
         base.OnInitialized();
     }
-    protected override Task OnParametersSetAsync()
+
+    private void OnNodeChanged(Node value)
     {
-       
-        
-        return base.OnParametersSetAsync();
+        ToCreateNewPos.Node = value;
+        var type = value?.Type ?? _mapData?.ResType;
+        if (!string.IsNullOrWhiteSpace(type) && value != null)
+        {
+            _mapData.SetLastNodeForType(type, value.Id);
+        }
+        StateHasChanged();
     }
-    private string _returnValue;
 
     private void Submit() => MudDialog.Close(DialogResult.Ok(ToCreateNewPos));
 
     private void Cancel() => MudDialog.Cancel();
-
-  
-
 }
