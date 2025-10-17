@@ -180,32 +180,37 @@
 
     private void UpdateFilterByTime()
     {
-        IEnumerable<NodePositionView> FilteredByTime = Enumerable.Empty<NodePositionView>();
-        if (timeLeftFilter != null && timeLeftFilter.Any() && FilteredPosList.Any())
+        if (timeLeftFilter == null || !timeLeftFilter.Any())
+            return;
+
+        // Basis: die bereits nach Rarity/Type/Name gefilterten Nicht-Ghosts
+        var baseSet = FilteredPosList ?? Enumerable.Empty<NodePositionView>();
+        IEnumerable<NodePositionView> result = Enumerable.Empty<NodePositionView>();
+
+        foreach (var timeSpan in timeLeftFilter)
         {
-            foreach (var timeSpan in timeLeftFilter)
+            switch (timeSpan.ToLowerInvariant())
             {
-                switch (timeSpan.ToLowerInvariant())
-                {
-                    case "act":
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft >= -3600)).Distinct();
-                        break;
-                    case "<-1d":
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -86400)).Distinct();
-                        break;
-                    case ">-1d":
-                        FilteredByTime = FilteredByTime.Concat(FilteredPosList.Where(e => e.TimeLeft <= -86400)).Distinct();
-                        break;
-                    case "ghost":
-                        var ghosts = AllNodePositionList.Where(n => n.Ghost);
-                        if (_selectedFilter != null && _selectedFilter.Any())
-                            ghosts = ghosts.Where(MatchesSelectedFilters);
-                        FilteredByTime = FilteredByTime.Concat(ghosts).Distinct();
-                        break;
-                }
+                case "act":
+                    result = result.Concat(baseSet.Where(e => e.TimeLeft >= -3600)).Distinct();
+                    break;
+                case "<-1d":
+                    result = result.Concat(baseSet.Where(e => e.TimeLeft <= -3600 && e.TimeLeft >= -86400)).Distinct();
+                    break;
+                case ">-1d":
+                    result = result.Concat(baseSet.Where(e => e.TimeLeft <= -86400)).Distinct();
+                    break;
+                case "ghost":
+                    // Ghosts kommen aus der All-Liste, unabhängig davon, ob baseSet leer ist
+                    var ghosts = AllNodePositionList.Where(n => n.Ghost);
+                    if (_selectedFilter != null && _selectedFilter.Any())
+                        ghosts = ghosts.Where(MatchesSelectedFilters);
+                    result = result.Concat(ghosts).Distinct();
+                    break;
             }
-            FilteredPosList = FilteredByTime;
         }
+
+        FilteredPosList = result.ToList();
     }
 
     private bool MatchesSelectedFilters(NodePositionView node) =>
