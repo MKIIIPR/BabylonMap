@@ -7,6 +7,7 @@ var data = {
 };
 let markers = [];
 let activeTimers = {};
+let activeBlinkers = {}; // id -> { interval, stopTimeout, iconDiv, prev, prevOffset }
 var map;
 
 function initMap() {
@@ -98,6 +99,9 @@ function removeMarker(id) {
     if (markerObj) {
         map.removeLayer(markerObj.marker);
         markers = markers.filter(m => m.id !== id);
+        // Blink- und Timer-Resourcen auch bereinigen
+        stopMarkerBlink(id);
+        stopActiveTimer(id);
         console.log("removeMarker: Marker mit ID", id, "entfernt.");
     } else {
         console.warn("removeMarker: Kein Marker mit ID " + id + " gefunden.");
@@ -204,6 +208,79 @@ function startTimer(id, timeRemaining) {
     activeTimers[id] = interval; // Speichere den Timer in activeTimers
 }
 
+function stopActiveTimer(id) {
+    if (activeTimers[id]) {
+        clearInterval(activeTimers[id]);
+        delete activeTimers[id];
+    }
+}
+
+function startMarkerBlink(id, durationMs = 60000, periodMs = 500) {
+    try {
+        // Hole Marker und Icon-Element zuverlässig über Leaflet-API
+        const markerObj = markers.find(m => m.id === id);
+        if (!markerObj) return;
+        const iconDiv = markerObj.marker._icon; // Leaflet intern
+        if (!iconDiv) return;
+
+        // Bereits laufendes Blinken stoppen
+        stopMarkerBlink(id);
+
+        // Vorherige Styles sichern
+        const prev = {
+            zIndex: iconDiv.style.zIndex,
+            boxShadow: iconDiv.style.boxShadow,
+            opacity: iconDiv.style.opacity,
+            filter: iconDiv.style.filter
+        };
+        const prevOffset = markerObj.marker.options.zIndexOffset || 0;
+
+        // Marker nach vorne holen: hoher Offset + DOM-Reorder
+        markerObj.marker.setZIndexOffset(1000000);
+        iconDiv.style.zIndex = '1000000';
+        if (iconDiv.parentElement) {
+            iconDiv.parentElement.appendChild(iconDiv);
+        }
+
+        // Nur Opacity-Blink, kein Glow, keine Outline
+        iconDiv.style.transition = 'opacity 0.15s linear';
+        iconDiv.style.opacity = '1';
+
+        let visible = true;
+        const interval = setInterval(() => {
+            visible = !visible;
+            iconDiv.style.opacity = visible ? '1' : '0.55';
+        }, periodMs);
+
+        const stopTimeout = setTimeout(() => {
+            stopMarkerBlink(id);
+        }, durationMs);
+
+        activeBlinkers[id] = { interval, stopTimeout, iconDiv, prev, prevOffset, markerObj };
+    } catch (e) {
+        console.warn('startMarkerBlink failed', e);
+    }
+}
+
+function stopMarkerBlink(id) {
+    const b = activeBlinkers[id];
+    if (!b) return;
+    try {
+        clearInterval(b.interval);
+        clearTimeout(b.stopTimeout);
+        if (b.iconDiv) {
+            b.iconDiv.style.opacity = b.prev.opacity || '1';
+            b.iconDiv.style.filter = b.prev.filter || 'none';
+            b.iconDiv.style.boxShadow = b.prev.boxShadow || 'none';
+            b.iconDiv.style.zIndex = b.prev.zIndex || '';
+        }
+        if (b.markerObj && b.markerObj.marker) {
+            b.markerObj.marker.setZIndexOffset(b.prevOffset || 0);
+        }
+    } catch { }
+    delete activeBlinkers[id];
+}
+
 function removeCustomMarkers() {
     if (!map) {
         console.error("removeCustomMarkers: Karte ist nicht initialisiert.");
@@ -225,6 +302,9 @@ function removeCustomMarkers() {
                 console.log(`removeCustomMarkers: Timer für Marker ${markerObj.id} gestoppt.`);
             }
 
+            // Blinken für diesen Marker stoppen
+            stopMarkerBlink(markerObj.id);
+
             return false; // Entferne Marker aus `markers`-Array
         }
         return true; // Behalte andere Marker
@@ -233,9 +313,35 @@ function removeCustomMarkers() {
     console.log("removeCustomMarkers: Alle benutzerdefinierten Marker entfernt.");
 }
 
+// QUIETER BEEP FOR BLINK (2s)
+let bmBeepCtx = null;
+function bmPlayBlinkBeep(durationMs = 2000, volume = 0.05, frequency = 880) {
+    try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        bmBeepCtx = bmBeepCtx || new Ctx();
+        const osc = bmBeepCtx.createOscillator();
+        const gain = bmBeepCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = frequency;
+        gain.gain.value = volume;
+        osc.connect(gain);
+        gain.connect(bmBeepCtx.destination);
+        osc.start();
+        setTimeout(() => {
+            try { osc.stop(); osc.disconnect(); gain.disconnect(); } catch { }
+        }, durationMs);
+    } catch (e) {
+        console.warn('bmPlayBlinkBeep failed', e);
+    }
+}
+
 // Blazor Interop: Globale Funktionalität verfügbar machen
 window.initMap = initMap;
 window.addCustomMarker = addCustomMarker;
 window.removeMarker = removeMarker;
 window.removeCustomMarkers = removeCustomMarkers;
 window.CenterOnMap = CenterOnMap;
+window.bmPlayBlinkBeep = bmPlayBlinkBeep;
+window.startMarkerBlink = startMarkerBlink;
+window.stopMarkerBlink = stopMarkerBlink;

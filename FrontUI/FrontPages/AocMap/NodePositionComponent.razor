@@ -1,4 +1,3 @@
-
 @using AshesMapBib.Models
 @using System.Threading
 @using FrontUI.AppStates
@@ -6,115 +5,122 @@
 @inject IJSRuntime JS
 @inject IDialogService DialogService
 
-@* <MudExpansionPanel  Style="padding-left:3px ;width:200px" >
-    <TitleContent> *@
-        <div style="display:flex">
+<div class="node-row" style="@RowStyle">
+    <div style="display:flex">
 
-            <div style="width:12px;/* @($"background-color: {NodePosition.TimeRemainingColor}") */ "></div>
+        <div style="width:12px;/* @($"background-color: {NodePosition.TimeRemainingColor}") */ "></div>
 
-
-            <div style="align-self: center;min-width: 50px;min-height: 50px;display: inline-flex;align-items: center;justify-content: center;position: relative;border: 2px solid #@(NodePosition.Rarity);background-color: #221d1d;border-radius: 8px;overflow: hidden;">
-                <!-- Icon -->
-                <img src="@(NodePosition.Node.NodeImageUrl)" style="width:50px;height:50px;z-index:2"/>
-                <!-- Overlay mit Farbverlauf -->
-                <div style="position: absolute;bottom: 0; left: 0;width: 100%;height: 100%;background: linear-gradient(to top, #@(NodePosition.Rarity), #221d1d);opacity: 1;z-index: 1;"></div>
-            </div>
-
-
-            <div style="display:flex;flex-direction: column;padding-left:5px;">
-                <div style="display:flex;flex-direction: column;">
-                    <span style="font-size: smaller;">@(NodePosition.Node.Name)</span>
-                    <span style="font-size: smaller;">@(NodePosition.TimeRemainingString)</span>
-                    <span style="font-size: smaller;">@(NodePosition.ActualRespawnAt)</span>
-                </div>
-                <div style="width:190px;height:50px">
-                    <MudIconButton Icon="@Icons.Material.Filled.AdsClick"
-                    Variant="Variant.Outlined"
-                    Color="Color.Success"
-                    Size="Size.Small"
-                    OnClick="CenterMap" />
-                    <MudIconButton Icon="@Icons.Material.Filled.SyncLock"
-                    Variant="Variant.Outlined"
-                    Color="Color.Primary"
-                    Size="Size.Small"
-                    OnClick="ToggleTimerConfirmationDialog" />
-
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                    Variant="Variant.Outlined"
-                    Color="Color.Error"
-                    Size="Size.Small"
-                    OnClick="() => OpenDeleteConfirmationDialog(NodePosition)" />
-
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                    Variant="Variant.Outlined"
-                    Color="Color.Info"
-                    Size="Size.Small"
-                    OnClick="() => EditNode(NodePosition)" />
-
-                    <MudToggleIconButton @bind-Toggled="NodePosition.AlertSet"
-                    Icon="@Icons.Material.Filled.AlarmOff"
-                    Color="@Color.Error"
-                    ToggledIcon="@Icons.Material.Filled.AlarmOn"
-                    ToggledColor="@Color.Success" />
-
-                </div>
-
-            </div>
-
+        <div style="align-self: center;min-width: 50px;min-height: 50px;display: inline-flex;align-items: center;justify-content: center;position: relative;border: 2px solid #@(NodePosition.Rarity);background-color: #221d1d;border-radius: 8px;overflow: hidden;">
+            <img src="@(NodePosition.Node.NodeImageUrl)" style="width:50px;height:50px;z-index:2"/>
+            <div style="position: absolute;bottom: 0; left: 0;width: 100%;height: 100%;background: linear-gradient(to top, #@(NodePosition.Rarity), #221d1d);opacity: 1;z-index: 1;"></div>
         </div>
 
-
-        @*   <div style="width:12px;@($"background-color: {NodePosition.TimeRemainingColor}") "></div>
-        <div class="d-flex" style="background-color:#@(NodePosition.Rarity)65">
-            <div >
-                <MudImage Src="@NodePosition.Node.NodeImageUrl" Alt="Mony the dog" Elevation="25" Class="rounded-lg" />
-                <span>@(NodePosition.Node.Name)</span><br />
-                <span>@(NodePosition.TimeRemainingString)</span><br />
+        <div style="display:flex;flex-direction: column;padding-left:5px;">
+            <div style="display:flex;flex-direction: column;">
+                <span style="font-size: smaller;">@(NodePosition.Node.Name)</span>
+                <span style="font-size: smaller;">@(NodePosition.TimeRemainingString)</span>
+                <span style="font-size: smaller;">@(NodePosition.ActualRespawnAt)</span>
             </div>
-
-            <MudSpacer></MudSpacer>
-            <MudIconButton Icon="@Icons.Material.Filled.AdsClick"
-            Variant="Variant.Outlined"
-            Color="Color.Success"
-            Size="Size.Small"
-            OnClick="CenterMap" />
-            <MudIconButton Icon="@Icons.Material.Filled.SyncLock"
-            Variant="Variant.Outlined"
-            Color="Color.Primary"
-            Size="Size.Small"
-            OnClick="ToggleTimer" />
-
-            <MudIconButton Icon="@Icons.Material.Filled.Delete"
-            Variant="Variant.Outlined"
-            Color="Color.Error"
-            Size="Size.Small"
-            OnClick="() => DeleteNode(NodePosition)" />
-
-            <MudToggleIconButton @bind-Toggled="NodePosition.AlertSet"
-            Icon="@Icons.Material.Filled.AlarmOff"
-            Color="@Color.Error"
-            ToggledIcon="@Icons.Material.Filled.AlarmOn"
-            ToggledColor="@Color.Success"
-            />
-
-        </div> *@
-@*     </TitleContent>
-    <ChildContent>
-        <div style="width:100%;height:100%;" @onclick="() => EnlargeImg()">
-            <img src="@NodePosition.Image" style="width:100%;height:100%" />
+            <div style="width:220px;height:50px;display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+                <MudIconButton Icon="@Icons.Material.Filled.AdsClick" Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small" OnClick="CenterMap" />
+                <MudIconButton Icon="@Icons.Material.Filled.SyncLock" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" OnClick="ToggleTimerConfirmationDialog" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" OnClick="() => OpenDeleteConfirmationDialog(NodePosition)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small" OnClick="() => EditNode(NodePosition)" />
+                <MudToggleIconButton @bind-Toggled="NodePosition.AlertSet"
+                                      Icon="@Icons.Material.Filled.AlarmOff" Color="@Color.Error"
+                                      ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" />
+            </div>
         </div>
-    </ChildContent>
-</MudExpansionPanel>
- *@
+
+    </div>
+</div>
+
 @code {
     [Parameter] public NodePositionView NodePosition { get; set; }
     [CascadingParameter] public CascadingMapData _mapData { get; set; }
 
-    private Timer _timer;
+    private System.Timers.Timer? _blinkTimer;
+    private bool isBlinking;
+    private bool blinkPhase; // toggles to simulate blinking
+    private DateTime? blinkUntil;
+
+    private string RowStyle =>
+        isBlinking && blinkPhase
+            ? "outline:2px solid #ff9800;border-radius:6px;"
+            : "outline:2px solid transparent;border-radius:6px;";
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        StartOrStopBlinkWatcher();
+    }
+
+    protected override void OnParametersSet()
+    {
+        StartOrStopBlinkWatcher();
+    }
+
+    private void StartOrStopBlinkWatcher()
+    {
+        _blinkTimer?.Stop();
+        _blinkTimer?.Dispose();
+        _blinkTimer = null;
+
+        if (NodePosition?.AlertSet != true)
+        {
+            isBlinking = false;
+            blinkPhase = false;
+            try { _ = JS.InvokeVoidAsync("stopMarkerBlink", NodePosition?.Id); } catch { }
+            StateHasChanged();
+            return;
+        }
+
+        _blinkTimer = new System.Timers.Timer(500);
+        _blinkTimer.Elapsed += (_, __) => OnBlinkTick();
+        _blinkTimer.AutoReset = true;
+        _blinkTimer.Start();
+    }
+
+    private void OnBlinkTick()
+    {
+        if (NodePosition == null)
+            return;
+
+        // toggle visual blink if an active window exists
+        if (blinkUntil.HasValue)
+        {
+            if (DateTime.Now >= blinkUntil.Value)
+            {
+                blinkUntil = null;
+                isBlinking = false;
+                blinkPhase = false;
+                InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                blinkPhase = !blinkPhase;
+                InvokeAsync(StateHasChanged);
+            }
+            return;
+        }
+
+        EvaluateBlinkStart();
+    }
+
+    private async void EvaluateBlinkStart()
+    {
+        var minutes = (int)Math.Round(NodePosition.TimeRemaining.TotalMinutes);
+        var milestones = new HashSet<int> { 30, 20, 10, 0, -10, -20, -30 };
+
+        if (milestones.Contains(minutes))
+        {
+            isBlinking = true;
+            blinkPhase = true;
+            blinkUntil = DateTime.Now.AddMinutes(1);
+            try { await JS.InvokeVoidAsync("bmPlayBlinkBeep", 2000, 0.03, 880); } catch { }
+            try { await JS.InvokeVoidAsync("startMarkerBlink", NodePosition.Id, 60000, 500); } catch { }
+            InvokeAsync(StateHasChanged);
+        }
     }
 
     private async Task CenterMap()
@@ -123,43 +129,24 @@
     }
     private async Task ToggleTimerConfirmationDialog()
     {
-        var parameters = new DialogParameters
-        {
-            { "Message", "Reset Timer?" }
-        };
-
+        var parameters = new DialogParameters { { "Message", "Reset Timer?" } };
         var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Confirm Reset", parameters);
-
         var result = await dialog.Result;
-
         if (!result.Canceled)
-        {
-            // Wenn der Benutzer bestätigt hat, wird das Objekt gelöscht
             await ToggleTimer();
-        }
     }
     public async Task ToggleTimer()
     {
         NodePosition.LastHarvest = DateTime.Now;
         await _mapData.UpdateNodePosition(NodePosition);
-        
     }
     private async Task OpenDeleteConfirmationDialog(NodePositionView spot)
     {
-        var parameters = new DialogParameters
-        {
-            { "Message", "Möchten Sie dieses Objekt wirklich löschen?" }
-        };
-
+        var parameters = new DialogParameters { { "Message", "Möchten Sie dieses Objekt wirklich löschen?" } };
         var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Löschen bestätigen", parameters);
-
         var result = await dialog.Result;
-
         if (!result.Canceled)
-        {
-            // Wenn der Benutzer bestätigt hat, wird das Objekt gelöscht
             await DeleteNode(spot);
-        }
     }
     private async Task DeleteNode(NodePositionView spot)
     {
@@ -171,27 +158,20 @@
     {
         var parameters = new DialogParameters();
         parameters.Add("ToCreateNewPos", spot);
-
-        // Optional: Dialog-Optionen definieren
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.Small };
-
-        
         var dialog = DialogService.Show<NodePositionDialog>("Edit node position", parameters, options);
-
-        // Warte auf das Ergebnis
         var result = await dialog.Result;
         if (!result.Canceled)
         {
-            // Das Ergebnis enthält das aktualisierte NodePositionView, das du weiterverarbeiten kannst.
             var updatedSpot = (NodePositionView)result.Data;
-            // Zum Beispiel: Aktualisiere die Position im MapData-Objekt
             await _mapData.UpdateNodePosition(updatedSpot);
         }
     }
-   
-    public void EnlargeImg()
+
+    public void Dispose()
     {
-
+        _blinkTimer?.Stop();
+        _blinkTimer?.Dispose();
+        try { _ = JS.InvokeVoidAsync("stopMarkerBlink", NodePosition?.Id); } catch { }
     }
-
 }

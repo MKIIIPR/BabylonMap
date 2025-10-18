@@ -27,7 +27,7 @@
     }
     public class NodePositionView : NodePosition
     {
-        public bool AlertSet { get; set; } = true;
+        public bool AlertSet { get; set; } = false; // Standard: deaktiviert
 
         // Berechnet die Standard-Respawn-Zeit basierend auf LastHarvest und Node.RespawnTimer
         public DateTime RespawnAt => LastHarvest.AddMinutes(Node?.RespawnTimer ?? 0);
@@ -37,47 +37,8 @@
 
         // Berechnet die verbleibende Zeit bis zum Respawn
         public TimeSpan TimeRemaining => ActualRespawnAt - DateTime.Now;
-        //public DateTime PossibleNewHarvest
-        //{
-        //    get
-        //    {
-        //        if (Node == null) return DateTime.Now; // Falls Node null ist, gib einfach die aktuelle Zeit zurück
-
-        //        int respawnTime = Node.RespawnTimer; // Respawn-Zeit in Minuten
-        //        if (respawnTime <= 0) return DateTime.Now; // Sicherstellen, dass kein Fehler entsteht
-
-        //        // Berechnung: Wie viele Respawns hätten seit FirstHarvest passieren können?
-        //        TimeSpan seitErstemAbbau = DateTime.Now - FirstHarvest;
-        //        int möglicheRespawns = (int)(seitErstemAbbau.TotalMinutes / respawnTime);
-
-        //        // Nächster theoretischer Respawn seit FirstHarvest
-        //        DateTime nächsterMöglicherRespawn = FirstHarvest.AddMinutes(möglicheRespawns * respawnTime);
-
-        //        // Falls der nächste mögliche Respawn in der Vergangenheit liegt, korrigieren
-        //        while (nächsterMöglicherRespawn < DateTime.Now)
-        //        {
-        //            nächsterMöglicherRespawn = nächsterMöglicherRespawn.AddMinutes(respawnTime);
-        //        }
-
-        //        return nächsterMöglicherRespawn;
-        //    }
-        //}
-        //public string PossibleNewHarvestString
-        //{
-        //    get
-        //    {
-        //        DateTime nextHarvest = PossibleNewHarvest;
-        //        TimeSpan verbleibendeZeit = nextHarvest - DateTime.Now;
-
-        //        if (verbleibendeZeit.TotalSeconds <= 0)
-        //            return "Bereit zur Ernte";
-
-        //        return $"Nächste Ernte möglich in {verbleibendeZeit.Hours}h {verbleibendeZeit.Minutes}m {verbleibendeZeit.Seconds}s ({nextHarvest:HH:mm})";
-        //    }
-        //}
 
         public int TimeLeft => (int)(ActualRespawnAt - DateTime.Now).TotalSeconds;
-
 
         // Gibt die verbleibende Zeit als formatierte Zeichenkette zurück
         public string TimeRemainingString => TimeRemaining.TotalSeconds > 0
