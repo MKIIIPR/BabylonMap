@@ -213,10 +213,18 @@
         FilteredPosList = result.ToList();
     }
 
-    private bool MatchesSelectedFilters(NodePositionView node) =>
-        (_selectedFilter.Contains(node.Rarity) || !_selectedFilter.Any(f => IsRarity(f))) &&
-        (_selectedFilter.Contains(node.Node.Type) || !_selectedFilter.Any(f => IsType(f))) &&
-        (_selectedFilter.Contains(node.Node.Name) || !_selectedFilter.Any(f => IsName(f)));
+    private bool MatchesSelectedFilters(NodePositionView node)
+    {
+        var hasRarityFilter = _selectedFilter.Any(f => IsRarity(f));
+        var hasTypeFilter = _selectedFilter.Any(f => IsType(f));
+        var hasNameFilter = _selectedFilter.Any(f => IsName(f));
+
+        var rarityOk = !hasRarityFilter || _selectedFilter.Contains(node.Rarity);
+        var typeOk = !hasTypeFilter || (node.Node != null && _selectedFilter.Contains(node.Node.Type));
+        var nameOk = !hasNameFilter || (node.Node != null && _selectedFilter.Contains(node.Node.Name));
+
+        return rarityOk && typeOk && nameOk;
+    }
 
     // bekannte Rarities inkl. Unknown
     private static readonly HashSet<string> KnownRarities = new(StringComparer.OrdinalIgnoreCase)
@@ -234,12 +242,12 @@
     }
     private bool IsType(string filter)
     {
-        var knownTypes = AllNodePositionList.Select(n => n.Node.Type).Distinct();
+        var knownTypes = AllNodePositionList.Select(n => n.Node?.Type).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct();
         return knownTypes.Contains(filter);
     }
     private bool IsName(string filter)
     {
-        var knownNames = AllNodePositionList.Select(n => n.Node.Name).Distinct();
+        var knownNames = AllNodePositionList.Select(n => n.Node?.Name).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct();
         return knownNames.Contains(filter);
     }
 
