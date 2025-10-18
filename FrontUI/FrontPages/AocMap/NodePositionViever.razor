@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
 @using MudBlazor
+@using System.Linq
 @inject IJSRuntime JS
 
 <MudPaper Height="91.3vh" Style="overflow:hidden">
@@ -44,7 +45,7 @@
         </MudChipSet>
         <br />
         <MudDivider />
-        <br />
+
         @if (_mapData.SelectedPosition != null)
         {
             <MudPaper Class="selected-pos-highlight" Elevation="4" Style="margin:12px; padding:10px; border-radius:10px; border:2px solid #ff9800; background-color: rgba(255,152,0,0.08);">
@@ -57,7 +58,9 @@
     @if (_mapData.FilteredPosList != null)
     {
         <MudRadioGroup T="NodePositionView" @bind-Value="_mapData.SelectedPosition" Style="display:flex; flex-direction: column;flex-wrap: nowrap;overflow-y:auto;height:90%;">
-            @foreach (var spot in _mapData.FilteredPosList)
+            @foreach (var spot in _mapData.FilteredPosList
+                .OrderByDescending(p => p.AlertSet)
+                .ThenBy(p => p.TimeLeft))
             {
                 <MudRadio Value="spot" Color="Color.Primary" Dense="true">
                     <ChildContent>
