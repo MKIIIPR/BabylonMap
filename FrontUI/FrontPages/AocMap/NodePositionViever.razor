@@ -49,7 +49,7 @@
         @if (_mapData.SelectedPosition != null)
         {
             <MudPaper Class="selected-pos-highlight" Elevation="4" Style="margin:12px; padding:10px; border-radius:10px; border:2px solid #ff9800; background-color: rgba(255,152,0,0.08);">
-                <NodePositionComponent NodePosition="_mapData.SelectedPosition" />
+                <NodePositionComponent NodePosition="_mapData.SelectedPosition" Compact="false" />
             </MudPaper>
         }
 
@@ -64,7 +64,7 @@
             {
                 <MudRadio Value="spot" Color="Color.Primary" Dense="true">
                     <ChildContent>
-                        <NodePositionComponent NodePosition="spot" />
+                        <NodePositionComponent NodePosition="spot" Compact="true" />
                     </ChildContent>
 
                 </MudRadio>
@@ -106,6 +106,12 @@
     /* Selected position highlight */
     .selected-pos-highlight {
         box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Dünnere Divider zwischen Einträgen */
+    .mud-divider-dense {
+        margin: 2px 0;
+        opacity: 0.5;
     }
 </style>
 @code {

@@ -6,37 +6,54 @@
 @inject IDialogService DialogService
 
 <div class="node-row" style="@RowStyle">
-    <div style="display:flex">
+    <div style="display:flex; align-items:center; width:100%">
 
         <div style="width:12px;/* @($"background-color: {NodePosition.TimeRemainingColor}") */ "></div>
 
-        <div style="align-self: center;min-width: 50px;min-height: 50px;display: inline-flex;align-items: center;justify-content: center;position: relative;border: 2px solid #@(NodePosition.Rarity);background-color: #221d1d;border-radius: 8px;overflow: hidden;">
-            <img src="@(NodePosition.Node.NodeImageUrl)" style="width:50px;height:50px;z-index:2"/>
+        <div style="align-self: center;min-width: @(Compact ? "32px" : "50px");min-height: @(Compact ? "32px" : "50px");display: inline-flex;align-items: center;justify-content: center;position: relative;border: 2px solid #@(NodePosition.Rarity);background-color: #221d1d;border-radius: 8px;overflow: hidden;">
+            <img src="@(NodePosition.Node.NodeImageUrl)" style="width:@(Compact ? "32px" : "50px");height:@(Compact ? "32px" : "50px");z-index:2"/>
             <div style="position: absolute;bottom: 0; left: 0;width: 100%;height: 100%;background: linear-gradient(to top, #@(NodePosition.Rarity), #221d1d);opacity: 1;z-index: 1;"></div>
         </div>
 
-        <div style="display:flex;flex-direction: column;padding-left:5px;">
+        <div style="display:flex;flex-direction: column;padding-left:@(Compact ? "4px" : "5px");">
             <div style="display:flex;flex-direction: column;">
-                <span style="font-size: smaller;">@(NodePosition.Node.Name)</span>
-                <span style="font-size: smaller;">@(NodePosition.TimeRemainingString)</span>
-                <span style="font-size: smaller;">@(NodePosition.ActualRespawnAt)</span>
+                <span style="font-size: @(Compact ? "0.72rem" : "smaller");">@(NodePosition.Node.Name)</span>
+                <span style="font-size: @(Compact ? "0.72rem" : "smaller");">@(NodePosition.TimeRemainingString)</span>
+                <span style="font-size: @(Compact ? "0.72rem" : "smaller");">@(NodePosition.ActualRespawnAt)</span>
             </div>
-            <div style="width:220px;height:50px;display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
-                <MudIconButton Icon="@Icons.Material.Filled.AdsClick" Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small" OnClick="CenterMap" />
-                <MudIconButton Icon="@Icons.Material.Filled.SyncLock" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" OnClick="ToggleTimerConfirmationDialog" />
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" OnClick="() => OpenDeleteConfirmationDialog(NodePosition)" />
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small" OnClick="() => EditNode(NodePosition)" />
+            @if (!Compact)
+            {
+                <div style="width:220px;height:50px;display:flex;gap:1px;align-items:center;flex-wrap:wrap;">
+                    <MudIconButton Icon="@Icons.Material.Filled.AdsClick" Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small" OnClick="CenterMap" />
+                    <MudIconButton Icon="@Icons.Material.Filled.SyncLock" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" OnClick="ToggleTimerConfirmationDialog" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" OnClick="() => OpenDeleteConfirmationDialog(NodePosition)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small" OnClick="() => EditNode(NodePosition)" />
+                    <MudToggleIconButton @bind-Toggled="NodePosition.AlertSet"
+                                          Icon="@Icons.Material.Filled.AlarmOff" Color="@Color.Error"
+                                          ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" />
+                </div>
+            }
+        </div>
+
+        @if (Compact)
+        {
+            <div style="margin-left:auto; display:flex; gap:1px; align-items:center;">
+                <MudIconButton Icon="@Icons.Material.Filled.AdsClick" Variant="Variant.Text" Color="Color.Success" Size="Size.Small" Style="width:24px;height:24px" OnClick="CenterMap" />
+                <MudIconButton Icon="@Icons.Material.Filled.SyncLock" Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" Style="width:24px;height:24px" OnClick="ToggleTimerConfirmationDialog" />
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Style="width:24px;height:24px" OnClick="() => EditNode(NodePosition)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Text" Color="Color.Error" Size="Size.Small" Style="width:24px;height:24px" OnClick="() => OpenDeleteConfirmationDialog(NodePosition)" />
                 <MudToggleIconButton @bind-Toggled="NodePosition.AlertSet"
                                       Icon="@Icons.Material.Filled.AlarmOff" Color="@Color.Error"
-                                      ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" />
+                                      ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" Size="Size.Small" Style="width:24px;height:24px" />
             </div>
-        </div>
+        }
 
     </div>
 </div>
 
 @code {
     [Parameter] public NodePositionView NodePosition { get; set; }
+    [Parameter] public bool Compact { get; set; } = false;
     [CascadingParameter] public CascadingMapData _mapData { get; set; }
 
     private System.Timers.Timer? _blinkTimer;
