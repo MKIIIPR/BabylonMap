@@ -13,12 +13,12 @@
     @if (_mapData.FilteredPosList != null)
     {
 
-        <MudToggleGroup Style="display:flex;flex-wrap:nowrap;overflow-x:auto;" Outlined="false" T="string" SelectionMode="SelectionMode.MultiSelection" @bind-Values="_mapData.timeLeftFilter" Color="Color.Secondary" CheckMark>
+        <MudToggleGroup Style="display:flex;flex-wrap:nowrap;overflow-x:auto;margin-bottom:5px;" Outlined="false" T="string" SelectionMode="SelectionMode.MultiSelection" @bind-Values="_mapData.timeLeftFilter" Color="Color.Secondary" CheckMark>
             <MudIconButton Icon="@Icons.Material.Filled.Refresh"
-                           Color="Color.Primary"
+                           Variant="Variant.Filled"
                            Size="Size.Medium"
                            Title="Map neu laden"
-                           Style="margin-right:6px"
+                           Style="margin-right:6px; background-color:#90caf9; color:#0d47a1; border-radius:6px;"
                            OnClick="ReloadMap" />
 
             <MudToggleItem Style="background-color: forestgreen;color:black" Value="@("act")"
