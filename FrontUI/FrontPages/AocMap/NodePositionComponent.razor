@@ -15,10 +15,10 @@
             <div style="position: absolute;bottom: 0; left: 0;width: 100%;height: 100%;background: linear-gradient(to top, #@(NodePosition.Rarity), #221d1d);opacity: 1;z-index: 1;"></div>
         </div>
 
-        <div style="display:flex;flex-direction: column;padding-left:@(Compact ? "4px" : "5px");">
+        <div style="display:flex;flex-direction: column;padding-left:@(Compact ? "4px" : "5px"); flex: 1 1 auto; min-width:0;">
             <div style="display:flex;flex-direction: column;">
                 <span style="font-size: @(Compact ? "0.72rem" : "smaller");">@(NodePosition.Node.Name)</span>
-                <span style="font-size: @(Compact ? "0.72rem" : "smaller");">@(NodePosition.TimeRemainingString)</span>
+                <span style="font-size: @(Compact ? "0.72rem" : "smaller"); white-space: nowrap; font-variant-numeric: tabular-nums; font-feature-settings:'tnum' 1, 'lnum' 1; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; width: 8ch; display:inline-block;">@(NodePosition.TimeRemainingString)</span>
                 <span style="font-size: @(Compact ? "0.72rem" : "smaller");">@(NodePosition.ActualRespawnAt)</span>
             </div>
             @if (!Compact)
@@ -37,7 +37,7 @@
 
         @if (Compact)
         {
-            <div style="margin-left:auto; display:flex; gap:1px; align-items:center;">
+            <div style="margin-left:auto; display:flex; gap:1px; align-items:center; width:160px; justify-content:flex-end;">
                 <MudIconButton Icon="@Icons.Material.Filled.AdsClick" Variant="Variant.Text" Color="Color.Success" Size="Size.Small" Style="width:24px;height:24px" OnClick="CenterMap" />
                 <MudIconButton Icon="@Icons.Material.Filled.SyncLock" Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" Style="width:24px;height:24px" OnClick="ToggleTimerConfirmationDialog" />
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Style="width:24px;height:24px" OnClick="() => EditNode(NodePosition)" />
