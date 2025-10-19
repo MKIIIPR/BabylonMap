@@ -7,19 +7,18 @@ var data = {
 };
 let markers = [];
 let activeTimers = {};
-let activeBlinkers = {}; // id -> { interval, stopTimeout, iconDiv, prev, prevOffset }
+let activeBlinkers = {}; // id -> { interval, stopTimeout, iconDiv, prev, prevOffset, markerObj }
+let raisedMarkers = {}; // id -> { timeout, iconDiv, prev, prevOffset, markerObj }
+let selectedMarker = null; // { id, iconDiv, prev, prevOffset, markerObj }
 var map;
 
 function initMap() {
-    // Prüfe, ob das Container-DIV vorhanden ist
     const mapDiv = document.getElementById('map');
     if (!mapDiv) {
         console.error("initMap: Div mit der ID 'map' wurde nicht gefunden. Initialisierung wird abgebrochen.");
         return;
     }
-    console.log("initMap: Div 'map' gefunden.");
 
-    // Karte initialisieren
     map = L.map('map', {
         crs: L.extend({}, L.CRS.Simple, {
             transformation: new L.Transformation(
@@ -38,34 +37,22 @@ function initMap() {
         attributionControl: false,
         layers: [
             L.tileLayer('https://cdn.ashescodex.com/map/20250826/{z}/{x}/{y}.webp', { tileSize: data.tileSize })
-            //von ashescodex src = "https://cdn.ashescodex.com/map/20250826/9/149/228.webp"
         ]
     }).setView([550000, -950000]);
-    console.log("initMap: Karte initialisiert.");
 
-    // Event-Listener für das Kontextmenü (Rechtsklick)
     map.addEventListener('contextmenu', async function (ev) {
-        console.log("contextmenu-Event ausgelöst:", ev);
-
         const coordElem = document.getElementById('map-coordinates');
         if (coordElem) {
             coordElem.innerHTML =
                 ev.latlng.lng.toFixed(0) + ', ' + ev.latlng.lat.toFixed(0);
-            console.log("contextmenu: 'map-coordinates' aktualisiert.");
-        } else {
-            console.error("contextmenu: Element mit ID 'map-coordinates' nicht gefunden.");
         }
 
-        // Sende die Koordinaten an Blazor, wenn verfügbar
         if (typeof DotNet !== "undefined" && DotNet.invokeMethodAsync) {
             try {
                 await DotNet.invokeMethodAsync('FrontUI', 'UpdateCoordinates', ev.latlng.lat, ev.latlng.lng);
-                console.log("contextmenu: Koordinaten an Blazor gesendet.");
             } catch (err) {
                 console.error("contextmenu: Fehler beim Senden der Koordinaten an Blazor:", err);
             }
-        } else {
-            console.error("contextmenu: DotNet.invokeMethodAsync ist nicht verfügbar.");
         }
     });
 }
@@ -75,49 +62,32 @@ function addMarker(lat, lng, text) {
         console.error("addMarker: Karte ist nicht initialisiert. Marker kann nicht hinzugefügt werden.");
         return;
     }
-    L.marker([lat, lng]).addTo(map)
-        .bindPopup(text)
-        .openPopup();
-    console.log(`addMarker: Marker bei [${lat}, ${lng}] mit Text "${text}" hinzugefügt.`);
+    const m = L.marker([lat, lng]).addTo(map);
+    if (text && text.length) {
+        m.bindPopup(text, { autoPan: false });
+    }
 }
 
 function CenterOnMap(lat, lng) {
     if (map && typeof map.setView === 'function') {
         map.setView([lat, lng], map.getZoom());
-        console.log(`CenterOnMap: Karte auf [${lat}, ${lng}] zentriert.`);
-    } else {
-        console.error("CenterOnMap: Karte ist nicht initialisiert oder setView existiert nicht.");
     }
 }
 
 function removeMarker(id) {
-    if (!map) {
-        console.error("removeMarker: Karte ist nicht initialisiert.");
-        return;
-    }
+    if (!map) return;
     let markerObj = markers.find(m => m.id === id);
     if (markerObj) {
         map.removeLayer(markerObj.marker);
         markers = markers.filter(m => m.id !== id);
-        // Blink- und Timer-Resourcen auch bereinigen
         stopMarkerBlink(id);
         stopActiveTimer(id);
-        console.log("removeMarker: Marker mit ID", id, "entfernt.");
-    } else {
-        console.warn("removeMarker: Kein Marker mit ID " + id + " gefunden.");
     }
 }
 
 function addCustomMarker(lat, lng, node, timeleft) {
-    console.log("addCustomMarker aufgerufen:", { lat, lng, node });
-    if (!node || !node.id || !node.node || !node.node.name) {
-        console.error("addCustomMarker: Ungültige Daten für 'node'.");
-        return;
-    }
-    if (!map) {
-        console.error("addCustomMarker: Karte ist nicht initialisiert.");
-        return;
-    }
+    if (!node || !node.id || !node.node || !node.node.name) return;
+    if (!map) return;
 
     var imgUrl = node.node.nodeImageUrl || "https://via.placeholder.com/50";
 
@@ -137,18 +107,15 @@ function addCustomMarker(lat, lng, node, timeleft) {
 
     var marker = L.marker([lat, lng], { icon: svgIcon }).addTo(map);
 
-    // Nur ein Popup binden, wenn node.description vorhanden ist und nicht leer ist
     if (node.description && node.description.trim().length > 0) {
-        marker.bindPopup(node.description);
+        marker.bindPopup(node.description, { autoPan: false });
     }
 
     marker.on("click", function () {
-        console.log("Marker geklickt:", node.id);
-        sendNodeToBlazor(node.id); // Blazor informieren
+        sendNodeToBlazor(node.id);
     });
 
     markers.push({ id: node.id, marker: marker, node: node });
-    console.log("addCustomMarker: Benutzerdefinierter Marker mit ID", node.id, "hinzugefügt.");
 
     startTimer(node.id, timeleft);
 }
@@ -157,16 +124,9 @@ function sendNodeToBlazor(nodeId) {
     if (typeof DotNet !== "undefined" && DotNet.invokeMethodAsync) {
         let markerObj = markers.find(m => m.id === nodeId);
         if (markerObj) {
-            console.log("sendNodeToBlazor: Sende Node ID an Blazor", markerObj.id);
-            // Sende nur die ID an Blazor
             DotNet.invokeMethodAsync('FrontUI', 'ReceiveNodeData', markerObj.id)
-                .then(() => console.log("Node ID erfolgreich an Blazor gesendet"))
                 .catch(err => console.error("Fehler beim Senden der Node ID an Blazor", err));
-        } else {
-            console.warn("sendNodeToBlazor: Kein Marker mit ID", nodeId, "gefunden.");
         }
-    } else {
-        console.error("sendNodeToBlazor: Blazor Interop nicht verfügbar.");
     }
 }
 
@@ -181,12 +141,9 @@ function startTimer(id, timeRemaining) {
     let timeLeft = timeRemaining;
     const timerElement = document.getElementById(`timer-${id}`);
     if (!timerElement) {
-        
         return;
     }
-    
 
-    // Falls es schon einen Timer für diese ID gibt, zuerst stoppen
     if (activeTimers[id]) {
         clearInterval(activeTimers[id]);
         delete activeTimers[id];
@@ -196,16 +153,14 @@ function startTimer(id, timeRemaining) {
         let formatted = formatTime(timeLeft);
         if (timeLeft <= 0) {
             clearInterval(interval);
-            timerElement.textContent = "🔥"; // Timer abgelaufen
-            
+            timerElement.textContent = "🔥";
         } else {
             timerElement.textContent = formatted;
-            
             timeLeft--;
         }
     }, 1000);
 
-    activeTimers[id] = interval; // Speichere den Timer in activeTimers
+    activeTimers[id] = interval;
 }
 
 function stopActiveTimer(id) {
@@ -217,16 +172,13 @@ function stopActiveTimer(id) {
 
 function startMarkerBlink(id, durationMs = 60000, periodMs = 500) {
     try {
-        // Hole Marker und Icon-Element zuverlässig über Leaflet-API
         const markerObj = markers.find(m => m.id === id);
         if (!markerObj) return;
-        const iconDiv = markerObj.marker._icon; // Leaflet intern
+        const iconDiv = markerObj.marker._icon;
         if (!iconDiv) return;
 
-        // Bereits laufendes Blinken stoppen
         stopMarkerBlink(id);
 
-        // Vorherige Styles sichern
         const prev = {
             zIndex: iconDiv.style.zIndex,
             boxShadow: iconDiv.style.boxShadow,
@@ -235,14 +187,12 @@ function startMarkerBlink(id, durationMs = 60000, periodMs = 500) {
         };
         const prevOffset = markerObj.marker.options.zIndexOffset || 0;
 
-        // Marker nach vorne holen: hoher Offset + DOM-Reorder
         markerObj.marker.setZIndexOffset(1000000);
         iconDiv.style.zIndex = '1000000';
         if (iconDiv.parentElement) {
             iconDiv.parentElement.appendChild(iconDiv);
         }
 
-        // Nur Opacity-Blink, kein Glow, keine Outline
         iconDiv.style.transition = 'opacity 0.15s linear';
         iconDiv.style.opacity = '1';
 
@@ -281,6 +231,115 @@ function stopMarkerBlink(id) {
     delete activeBlinkers[id];
 }
 
+function raiseMarker(id, durationMs = 3000) {
+    try {
+        const markerObj = markers.find(m => m.id === id);
+        if (!markerObj) return;
+        const iconDiv = markerObj.marker._icon;
+        if (!iconDiv) return;
+
+        const existing = raisedMarkers[id];
+        if (existing) {
+            clearTimeout(existing.timeout);
+            try {
+                if (existing.iconDiv) {
+                    existing.iconDiv.style.zIndex = existing.prev.zIndex || '';
+                }
+                existing.markerObj.marker.setZIndexOffset(existing.prevOffset || 0);
+            } catch { }
+            delete raisedMarkers[id];
+        }
+
+        const prev = {
+            zIndex: iconDiv.style.zIndex
+        };
+        const prevOffset = markerObj.marker.options.zIndexOffset || 0;
+        markerObj.marker.setZIndexOffset(500000);
+        iconDiv.style.zIndex = '1000000';
+        if (iconDiv.parentElement) iconDiv.parentElement.appendChild(iconDiv);
+
+        const timeout = setTimeout(() => {
+            try {
+                iconDiv.style.zIndex = prev.zIndex || '';
+                markerObj.marker.setZIndexOffset(prevOffset || 0);
+            } catch { }
+            delete raisedMarkers[id];
+        }, durationMs);
+
+        raisedMarkers[id] = { timeout, iconDiv, prev, prevOffset, markerObj };
+    } catch (e) {
+        console.warn('raiseMarker failed', e);
+    }
+}
+
+function selectMarker(id) {
+    try {
+        if (selectedMarker) {
+            try {
+                if (selectedMarker.iconDiv) {
+                    selectedMarker.iconDiv.style.filter = selectedMarker.prev.filter || 'none';
+                    selectedMarker.iconDiv.style.boxShadow = selectedMarker.prev.boxShadow || 'none';
+                    selectedMarker.iconDiv.style.zIndex = selectedMarker.prev.zIndex || '';
+                }
+                if (selectedMarker.markerObj && selectedMarker.markerObj.marker) {
+                    selectedMarker.markerObj.marker.setZIndexOffset(selectedMarker.prevOffset || 0);
+                }
+            } catch { }
+            selectedMarker = null;
+        }
+
+        const markerObj = markers.find(m => m.id === id);
+        if (!markerObj) return;
+        const iconDiv = markerObj.marker._icon;
+        if (!iconDiv) return;
+
+        const prev = {
+            zIndex: iconDiv.style.zIndex,
+            filter: iconDiv.style.filter,
+            boxShadow: iconDiv.style.boxShadow
+        };
+        const prevOffset = markerObj.marker.options.zIndexOffset || 0;
+
+        markerObj.marker.setZIndexOffset(900000);
+        iconDiv.style.zIndex = '1000000';
+        if (iconDiv.parentElement) iconDiv.parentElement.appendChild(iconDiv);
+
+        iconDiv.style.filter = 'brightness(1.35) saturate(1.1)';
+
+        selectedMarker = { id, iconDiv, prev, prevOffset, markerObj };
+    } catch (e) {
+        console.warn('selectMarker failed', e);
+    }
+}
+
+function clearSelectedMarker() {
+    try {
+        if (!selectedMarker) return;
+        if (selectedMarker.iconDiv) {
+            selectedMarker.iconDiv.style.filter = selectedMarker.prev.filter || 'none';
+            selectedMarker.iconDiv.style.boxShadow = selectedMarker.prev.boxShadow || 'none';
+            selectedMarker.iconDiv.style.zIndex = selectedMarker.prev.zIndex || '';
+        }
+        if (selectedMarker.markerObj && selectedMarker.markerObj.marker) {
+            selectedMarker.markerObj.marker.setZIndexOffset(selectedMarker.prevOffset || 0);
+        }
+        selectedMarker = null;
+    } catch (e) {
+        console.warn('clearSelectedMarker failed', e);
+    }
+}
+
+function scrollToElementId(id) {
+    try {
+        const el = document.getElementById(id);
+        if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    } catch (e) {
+        console.warn('scrollToElementId failed', e);
+    }
+}
+
 function removeCustomMarkers() {
     if (!map) {
         console.error("removeCustomMarkers: Karte ist nicht initialisiert.");
@@ -294,26 +353,17 @@ function removeCustomMarkers() {
     markers = markers.filter(markerObj => {
         if (markerObj.marker.options.icon && markerObj.marker.options.icon.options.className === "custom-icon") {
             map.removeLayer(markerObj.marker);
-
-            // Timer für diesen Marker stoppen
             if (activeTimers[markerObj.id]) {
-                clearInterval(activeTimers[markerObj.id]); // Timer stoppen
-                delete activeTimers[markerObj.id]; // Entfernen aus Speicher
-                console.log(`removeCustomMarkers: Timer für Marker ${markerObj.id} gestoppt.`);
+                clearInterval(activeTimers[markerObj.id]);
+                delete activeTimers[markerObj.id];
             }
-
-            // Blinken für diesen Marker stoppen
             stopMarkerBlink(markerObj.id);
-
-            return false; // Entferne Marker aus `markers`-Array
+            return false;
         }
-        return true; // Behalte andere Marker
+        return true;
     });
-
-    console.log("removeCustomMarkers: Alle benutzerdefinierten Marker entfernt.");
 }
 
-// QUIETER BEEP FOR BLINK (2s)
 let bmBeepCtx = null;
 function bmPlayBlinkBeep(durationMs = 2000, volume = 0.05, frequency = 880) {
     try {
@@ -336,7 +386,6 @@ function bmPlayBlinkBeep(durationMs = 2000, volume = 0.05, frequency = 880) {
     }
 }
 
-// Blazor Interop: Globale Funktionalität verfügbar machen
 window.initMap = initMap;
 window.addCustomMarker = addCustomMarker;
 window.removeMarker = removeMarker;
@@ -345,3 +394,7 @@ window.CenterOnMap = CenterOnMap;
 window.bmPlayBlinkBeep = bmPlayBlinkBeep;
 window.startMarkerBlink = startMarkerBlink;
 window.stopMarkerBlink = stopMarkerBlink;
+window.raiseMarker = raiseMarker;
+window.selectMarker = selectMarker;
+window.clearSelectedMarker = clearSelectedMarker;
+window.scrollToElementId = scrollToElementId;

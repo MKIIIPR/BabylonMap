@@ -64,10 +64,11 @@
             {
                 <MudRadio Value="spot" Color="Color.Primary" Dense="true">
                     <ChildContent>
-                        <NodePositionComponent NodePosition="spot" Compact="true" />
+                        <NodePositionComponent NodePosition="spot" Compact="@_compactList" />
                     </ChildContent>
 
                 </MudRadio>
+                <MudDivider Class="mud-divider-dense" />
             }
         </MudRadioGroup>
     }
@@ -122,6 +123,9 @@
     public NodePositionView selectedNode { get; set; }
     private Timer _timer;
     private bool _open = false; // Steuert, ob das Drawer geöffnet ist
+    private bool _compactList = true; // steuert kompakte Darstellung der Liste
+    private string? _lastSelectedId; // track selection change
+
     public void UpdateSelectedNode(NodePositionView spot)
     {
         selectedNode = new();
@@ -147,6 +151,21 @@
     {
         _timer = new Timer(UpdateTimer, null, 0, 1000);
         base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var id = _mapData?.SelectedPosition?.Id;
+        if (id != _lastSelectedId && _mapData?.SelectedPosition != null)
+        {
+            _lastSelectedId = id;
+            try
+            {
+                // Marker nur hervorheben, nicht zentrieren
+                await JS.InvokeVoidAsync("selectMarker", _mapData.SelectedPosition.Id);
+            }
+            catch { }
+        }
     }
 
     private void UpdateTimer(object state)
