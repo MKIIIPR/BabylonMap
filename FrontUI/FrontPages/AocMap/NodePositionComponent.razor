@@ -28,7 +28,8 @@
                     <MudIconButton Icon="@Icons.Material.Filled.SyncLock" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" OnClick="ToggleTimerConfirmationDialog" />
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" OnClick="() => OpenDeleteConfirmationDialog(NodePosition)" />
                     <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small" OnClick="() => EditNode(NodePosition)" />
-                    <MudToggleIconButton @bind-Toggled="NodePosition.AlertSet"
+                    <MudToggleIconButton Toggled="@NodePosition.AlertSet"
+                                          ToggledChanged="OnFavoriteChanged"
                                           Icon="@Icons.Material.Filled.AlarmOff" Color="@Color.Error"
                                           ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" />
                 </div>
@@ -42,7 +43,8 @@
                 <MudIconButton Icon="@Icons.Material.Filled.SyncLock" Variant="Variant.Text" Color="Color.Primary" Size="Size.Small" Style="width:24px;height:24px" OnClick="ToggleTimerConfirmationDialog" />
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Text" Color="Color.Info" Size="Size.Small" Style="width:24px;height:24px" OnClick="() => EditNode(NodePosition)" />
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Text" Color="Color.Error" Size="Size.Small" Style="width:24px;height:24px" OnClick="() => OpenDeleteConfirmationDialog(NodePosition)" />
-                <MudToggleIconButton @bind-Toggled="NodePosition.AlertSet"
+                <MudToggleIconButton Toggled="@NodePosition.AlertSet"
+                                      ToggledChanged="OnFavoriteChanged"
                                       Icon="@Icons.Material.Filled.AlarmOff" Color="@Color.Error"
                                       ToggledIcon="@Icons.Material.Filled.AlarmOn" ToggledColor="@Color.Success" Size="Size.Small" Style="width:24px;height:24px" />
             </div>
@@ -103,7 +105,6 @@
         if (NodePosition == null)
             return;
 
-        // toggle visual blink if an active window exists
         if (blinkUntil.HasValue)
         {
             if (DateTime.Now >= blinkUntil.Value)
@@ -183,6 +184,13 @@
             var updatedSpot = (NodePositionView)result.Data;
             await _mapData.UpdateNodePosition(updatedSpot);
         }
+    }
+
+    private void OnFavoriteChanged(bool value)
+    {
+        NodePosition.AlertSet = value;
+        _mapData?.SetFavorite(NodePosition.Id, value);
+        StartOrStopBlinkWatcher();
     }
 
     public void Dispose()

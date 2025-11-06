@@ -2,6 +2,7 @@
 @using AshesMapBib.Models
 @using FrontUI.FtpService
 @using FrontUI.Helper.MapHelper
+@using Microsoft.JSInterop
 @inject IJSRuntime JS
 @inject ResourceApiClient<Node> _nodes
 @inject ResourceApiClient<NodePosition> _positions
@@ -24,6 +25,78 @@
     {
         if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(resourceId)) return;
         LastSelectedResourcePerType[type] = resourceId;
+    }
+
+    // Favoriten (AlertSet) persistent halten (localStorage)
+    public HashSet<string> FavoriteNodePositionIds { get; set; } = new();
+    private const string FavoriteStorageKey = "favoriteNodePositions";
+    public async Task LoadFavoritesAsync()
+    {
+        try
+        {
+            var json = await JS.InvokeAsync<string>("localStorage.getItem", FavoriteStorageKey);
+            if (!string.IsNullOrWhiteSpace(json))
+            {
+                var favs = System.Text.Json.JsonSerializer.Deserialize<HashSet<string>>(json);
+                if (favs != null)
+                    FavoriteNodePositionIds = favs;
+            }
+        }
+        catch { /* ignore */ }
+    }
+    private async Task PersistFavoritesAsync()
+    {
+        try
+        {
+            var json = System.Text.Json.JsonSerializer.Serialize(FavoriteNodePositionIds);
+            await JS.InvokeVoidAsync("localStorage.setItem", FavoriteStorageKey, json);
+        }
+        catch { /* ignore */ }
+    }
+    public void SetFavorite(string id, bool isFavorite)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return;
+        if (isFavorite) FavoriteNodePositionIds.Add(id); else FavoriteNodePositionIds.Remove(id);
+        _ = PersistFavoritesAsync();
+        // sofort auf aktuelle Liste anwenden
+        var spot = AllNodePositionList.FirstOrDefault(e => e.Id == id);
+        if (spot != null) spot.AlertSet = isFavorite;
+    }
+    private void ApplyFavorites()
+    {
+        if (FavoriteNodePositionIds == null || FavoriteNodePositionIds.Count == 0) return;
+        foreach (var pos in AllNodePositionList)
+        {
+            if (FavoriteNodePositionIds.Contains(pos.Id))
+                pos.AlertSet = true;
+        }
+        foreach (var pos in NodePositionList)
+        {
+            if (FavoriteNodePositionIds.Contains(pos.Id))
+                pos.AlertSet = true;
+        }
+    }
+    // Automatisches Deaktivieren von Favoriten nach > 1 Tag überfällig
+    public void AutoDeactivateExpiredFavorites()
+    {
+        if (AllNodePositionList == null || AllNodePositionList.Count == 0) return;
+        const int dayInSeconds = 86400;
+        var expired = AllNodePositionList
+            .Where(p => p.AlertSet && p.TimeLeft <= -dayInSeconds)
+            .Select(p => p.Id)
+            .Distinct()
+            .ToList();
+        if (expired.Count == 0) return;
+
+        foreach (var id in expired)
+        {
+            FavoriteNodePositionIds.Remove(id);
+            var pAll = AllNodePositionList.FirstOrDefault(x => x.Id == id);
+            if (pAll != null) pAll.AlertSet = false;
+            var pAct = NodePositionList.FirstOrDefault(x => x.Id == id);
+            if (pAct != null) pAct.AlertSet = false;
+        }
+        _ = PersistFavoritesAsync();
     }
 
     // List von ResourcePositionen, die die Daten enthalten
@@ -129,10 +202,13 @@
             if (await JsFunctionExists("removeCustomMarkers"))
                 await JS.InvokeVoidAsync("removeCustomMarkers");
 
+            // Favoriten behalten (FavoriteNodePositionIds bereits geladen)
             NodeList = await GetAllNodes();
             AllNodePositionList = await GetNodePositions(includeGhosts: true);
             NodePositionList = AllNodePositionList.Where(e => !e.Ghost).ToList();
 
+            ApplyFavorites();
+            AutoDeactivateExpiredFavorites();
             UpdateFilteredPosList();
             UpdateFilterByTime();
             await UpdateMapMarkers();
@@ -154,12 +230,17 @@
         {
             try { await JS.InvokeVoidAsync("initMap"); } catch { /* log */ }
 
+            try { await JS.InvokeVoidAsync("initMap"); } catch { }
+            await LoadFavoritesAsync();
             NodeList = await GetAllNodes();
             AllNodePositionList = await GetNodePositions(includeGhosts: true);
             NodePositionList = AllNodePositionList.Where(e => !e.Ghost).ToList();
 
             // Standard-Filter (ohne Ghosts)
             timeLeftFilter = new[] { "act", "<-1d" };
+            ApplyFavorites();
+            AutoDeactivateExpiredFavorites();
+            timeLeftFilter = new[] { "act", "<-1d" }; // Standard-Filter (ohne Ghosts)
         }
 
         // Bei Auswahl: nur zur Liste scrollen; keine Karten-Zentrierung hier
@@ -170,6 +251,7 @@
                 await JS.InvokeVoidAsync("scrollToElementId", $"node-row-{SelectedPosition.Id}");
             }
             catch { }
+            try { await JS.InvokeVoidAsync("scrollToElementId", $"node-row-{SelectedPosition.Id}"); } catch { }
         }
     }
     // ✅ Hilfsmethode: Prüft, ob eine JS-Funktion existiert
@@ -341,7 +423,8 @@
                 Image = spot.Image,
                 LastHarvest = spot.LastHarvest,
                 TimerMod = 0,
-                Ghost = spot.Ghost
+                Ghost = spot.Ghost,
+                AlertSet = FavoriteNodePositionIds.Contains(spot.Id)
             };
 
             result.Add(newSpot);
@@ -384,6 +467,7 @@
             inAll.LastHarvest = nodeView.LastHarvest;
             inAll.Ghost = nodeView.Ghost;
             inAll.Node = nodeView.Node;
+            inAll.AlertSet = nodeView.AlertSet;
         }
         else
         {
@@ -408,12 +492,18 @@
                 inActive.LastHarvest = nodeView.LastHarvest;
                 inActive.Ghost = nodeView.Ghost;
                 inActive.Node = nodeView.Node;
+                inActive.AlertSet = nodeView.AlertSet;
             }
             else
             {
                 NodePositionList.Add(nodeView);
             }
         }
+        if (nodeView.AlertSet)
+            FavoriteNodePositionIds.Add(nodeView.Id);
+        else
+            FavoriteNodePositionIds.Remove(nodeView.Id);
+        _ = PersistFavoritesAsync();
 
         UpdateFilteredPosList();
         UpdateFilterByTime();
