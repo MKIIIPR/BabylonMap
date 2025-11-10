@@ -118,6 +118,8 @@ class Program
         var optNoBackup = new Option<bool>("--no-backup", () => false, "Skip backup");
         var optApplyMode = new Option<string?>("--apply-mode", description: "Override apply mode: swap|overlay");
         var optJsonLogs = new Option<bool>("--json-logs", () => false, "Emit JSON logs");
+        var optRelaunch = new Option<string?>("--relaunch", description: "Path to app executable to relaunch after update check/apply");
+        var optCheckOnly = new Option<bool>("--check-only", () => false, "Only check for updates and return code 11 if update available, 0 if up-to-date");
 
         var rootCommand = new RootCommand("Solution Updater");
         rootCommand.AddOption(optConfig);
@@ -126,8 +128,10 @@ class Program
         rootCommand.AddOption(optNoBackup);
         rootCommand.AddOption(optApplyMode);
         rootCommand.AddOption(optJsonLogs);
+        rootCommand.AddOption(optRelaunch);
+        rootCommand.AddOption(optCheckOnly);
 
-        rootCommand.SetHandler(async (FileInfo? configFile, bool force, bool dryRun, bool noBackup, string? applyModeOverride, bool jsonLogs) =>
+        rootCommand.SetHandler(async (FileInfo? configFile, bool force, bool dryRun, bool noBackup, string? applyModeOverride, bool jsonLogs, string? relaunchPath, bool checkOnly) =>
         {
             using var cts = new CancellationTokenSource();
             Console.CancelKeyPress += (s, e) => { e.Cancel = true; cts.Cancel(); };
@@ -139,29 +143,62 @@ class Program
             if (applyModeOverride is { Length: > 0 }) cfg = cfg with { ApplyMode = applyModeOverride };
             if (jsonLogs) cfg = cfg with { JsonLogs = true };
 
+            // Configure logging (was missing)
             ConfigureLogging(cfg);
 
+            int result;
             try
             {
-                var result = await RunAsync(cfg, force, dryRun, noBackup, cts.Token);
-                Log.CloseAndFlush();
-                Environment.ExitCode = result;
+                if (checkOnly)
+                {
+                    result = await CheckOnlyAsync(cfg, cts.Token);
+                }
+                else
+                {
+                    result = await RunAsync(cfg, force, dryRun, noBackup, cts.Token);
+                }
             }
             catch (OperationCanceledException)
             {
                 Log.Warning("Operation canceled by user");
-                Log.CloseAndFlush();
-                Environment.ExitCode = 130;
+                result = 130;
             }
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Fatal error");
-                Log.CloseAndFlush();
-                Environment.ExitCode = 1;
+                result = 1;
             }
-        }, optConfig, optForce, optDryRun, optNoBackup, optApplyMode, optJsonLogs);
+            finally
+            {
+                Log.CloseAndFlush();
+            }
 
-        return await rootCommand.InvokeAsync(args);
+            // Optional relaunch
+            if (!string.IsNullOrWhiteSpace(relaunchPath) && !checkOnly)
+            {
+                try
+                {
+                    var exe = relaunchPath.Trim('"');
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = exe,
+                        WorkingDirectory = Path.GetDirectoryName(exe) ?? AppContext.BaseDirectory,
+                        UseShellExecute = true
+                    };
+                    Process.Start(psi);
+                }
+                catch (Exception ex)
+                {
+                    try { Log.Error(ex, "Failed to relaunch {Path}", relaunchPath); } catch { }
+                }
+            }
+
+            Environment.ExitCode = result;
+        }, optConfig, optForce, optDryRun, optNoBackup, optApplyMode, optJsonLogs, optRelaunch, optCheckOnly);
+
+        // Invoke the command but use the Environment.ExitCode assigned by our handler as the process exit code
+        await rootCommand.InvokeAsync(args);
+        return Environment.ExitCode;
     }
 
     static void LoadDotEnv()
@@ -245,6 +282,43 @@ class Program
         Log.Logger = conf.CreateLogger();
     }
 
+    static async Task<int> CheckOnlyAsync(UpdaterConfig cfg, CancellationToken ct)
+    {
+        Log.Information("Updater check-only start");
+        var manifest = await LoadRemoteManifest(cfg, ct);
+
+        var localManifestPath = Path.Combine(cfg.LocalSolutionPath, cfg.VersionFileName);
+        VersionManifest? local = null;
+        if (File.Exists(localManifestPath))
+        {
+            try { local = JsonSerializer.Deserialize<VersionManifest>(await File.ReadAllTextAsync(localManifestPath, ct), ManifestJsonOptions); }
+            catch (Exception ex) { Log.Warning(ex, "Failed reading local manifest"); }
+        }
+
+        // respect minUpdaterVersion but return distinct code
+        if (manifest.minUpdaterVersion is { Length: > 0 })
+        {
+            var myVersion = typeof(Program).Assembly.GetName().Version?.ToString() ?? "0.0.0";
+            if (NuGetVersion.TryParse(manifest.minUpdaterVersion, out var min) && NuGetVersion.TryParse(myVersion, out var cur))
+            {
+                if (cur < min)
+                {
+                    Log.Error("Updater version {Cur} is below required {Min}", cur, min);
+                    return 5;
+                }
+            }
+        }
+
+        bool needsUpdate = local == null || IsRemoteNewer(local.version, manifest.version);
+        if (needsUpdate)
+        {
+            Log.Information("Update available: remote={Remote} local={Local}", manifest.version, local?.version ?? "<none>");
+            return 11; // 11 => update available
+        }
+        Log.Information("Up-to-date: {Version}", manifest.version);
+        return 0; // 0 => up to date
+    }
+
     static async Task<int> RunAsync(UpdaterConfig cfg, bool force, bool dryRun, bool noBackup, CancellationToken ct)
     {
         Log.Information("Updater start. Force={Force} DryRun={DryRun}", force, dryRun);
@@ -275,7 +349,7 @@ class Program
         if (!needsUpdate)
         {
             Log.Information("Already latest version {Version}", manifest.version);
-            return 0;
+            return 0; // 0 => no update applied
         }
         Log.Information("Update required: local={Local} remote={Remote}", local?.version ?? "<none>", manifest.version);
 
@@ -321,7 +395,7 @@ class Program
             CleanupBackups(backupRoot, cfg.BackupRetention);
             CleanupStaging();
             Log.Information("Update applied successfully to {Version}", manifest.version);
-            return 0;
+            return 10; // 10 => update applied successfully
         }
         catch (Exception ex)
         {

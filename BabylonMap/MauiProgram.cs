@@ -4,6 +4,7 @@ using FrontUI.Helper.MapHelper;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
+using BabylonMap.Updater;
 
 namespace BabylonMap;
 
@@ -11,6 +12,9 @@ public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
+		// Run updater pre-start
+		PreStartUpdater.RunIfAvailable();
+
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()

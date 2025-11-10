@@ -34,8 +34,9 @@
       <_UpdaterDest>$(TargetDir)Updater\</_UpdaterDest>
     </PropertyGroup>
 
-    <!-- Build Updater with same configuration -->
-    <MSBuild Projects="$(_UpdaterProject)" Targets="Build" Properties="Configuration=$(Configuration)" />
+    <!-- Explicit restore and build WITHOUT the top-level RID to avoid NETSDK1047 -->
+    <MSBuild Projects="$(_UpdaterProject)" Targets="Restore" Properties="Configuration=$(Configuration);RuntimeIdentifier=" />
+    <MSBuild Projects="$(_UpdaterProject)" Targets="Build" Properties="Configuration=$(Configuration);RuntimeIdentifier=" />
 
     <MakeDir Directories="$(_UpdaterDest)" />
 
@@ -59,7 +60,10 @@
       <_UpdaterDest>$(PublishDir)Updater\</_UpdaterDest>
     </PropertyGroup>
 
-    <MSBuild Projects="$(_UpdaterProject)" Targets="Build" Properties="Configuration=$(Configuration)" />
+    <!-- Explicit restore and build WITHOUT the top-level RID to avoid NETSDK1047 during publish -->
+    <MSBuild Projects="$(_UpdaterProject)" Targets="Restore" Properties="Configuration=$(Configuration);RuntimeIdentifier=" />
+    <MSBuild Projects="$(_UpdaterProject)" Targets="Build" Properties="Configuration=$(Configuration);RuntimeIdentifier=" />
+
     <MakeDir Directories="$(_UpdaterDest)" />
     <ItemGroup>
       <_UpdaterFiles Include="$(_UpdaterOut)**\*.*" Exclude="**\*.pdb;**\*.xml;**\*.deps.json" />
