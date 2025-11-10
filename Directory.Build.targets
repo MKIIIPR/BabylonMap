@@ -1,0 +1,97 @@
+<Project>
+  <!-- Automatically create ZIP, SHA256 and version.json after Publish -->
+  <PropertyGroup>
+    <!-- Enable for Release by default -->
+    <GenerateReleaseArtifacts Condition="'$(Configuration)' == 'Release' and '$(GenerateReleaseArtifacts)' == ''">true</GenerateReleaseArtifacts>
+
+    <!-- Where to place generated artifacts per project -->
+    <ArtifactsRoot>$(MSBuildProjectDirectory)\artifacts</ArtifactsRoot>
+
+    <!-- Runtime segment for file names; defaults to RID if set, otherwise portable -->
+    <_ArtifactRid Condition="'$(RuntimeIdentifier)' != ''">$(RuntimeIdentifier)</_ArtifactRid>
+    <_ArtifactRid Condition="'$(_ArtifactRid)' == ''">portable</_ArtifactRid>
+
+    <!-- Version for file names; fall back if Version not set -->
+    <_ArtifactVersion Condition="'$(Version)' != ''">$(Version)</_ArtifactVersion>
+    <_ArtifactVersion Condition="'$(_ArtifactVersion)' == ''">$(AssemblyVersion)</_ArtifactVersion>
+    <_ArtifactVersion Condition="'$(_ArtifactVersion)' == ''">1.0.0</_ArtifactVersion>
+
+    <!-- Computed artifact names -->
+    <ArtifactFileName>$(MSBuildProjectName)-$(_ArtifactRid)-V$(_ArtifactVersion).zip</ArtifactFileName>
+    <ArtifactDir>$(ArtifactsRoot)\$(_ArtifactRid)</ArtifactDir>
+    <ArtifactPath>$(ArtifactDir)\$(ArtifactFileName)</ArtifactPath>
+    <ArtifactShaPath>$(ArtifactPath).sha256</ArtifactShaPath>
+    <ArtifactVersionJsonFile>$(ArtifactDir)\$(MSBuildProjectName)-$(_ArtifactRid).version.json</ArtifactVersionJsonFile>
+  </PropertyGroup>
+
+  <!-- Build Updater project and copy its output into BabylonMap's BUILD output folder under Updater/ -->
+  <Target Name="BuildAndCopyUpdaterOnBuild" AfterTargets="Build" Condition="'$(MSBuildProjectName)' == 'BabylonMap' and Exists('$(MSBuildProjectDirectory)\..\Updater\Updater.csproj') and Exists('$(TargetDir)')">
+    <PropertyGroup>
+      <_UpdaterProject>$(MSBuildProjectDirectory)\..\Updater\Updater.csproj</_UpdaterProject>
+      <!-- Keep in sync with Updater's TargetFramework -->
+      <_UpdaterTF>net9.0-windows10.0.19041.0</_UpdaterTF>
+      <_UpdaterOut>$(MSBuildProjectDirectory)\..\Updater\bin\$(Configuration)\$(_UpdaterTF)\</_UpdaterOut>
+      <_UpdaterDest>$(TargetDir)Updater\</_UpdaterDest>
+    </PropertyGroup>
+
+    <!-- Build Updater with same configuration -->
+    <MSBuild Projects="$(_UpdaterProject)" Targets="Build" Properties="Configuration=$(Configuration)" />
+
+    <MakeDir Directories="$(_UpdaterDest)" />
+
+    <ItemGroup>
+      <_UpdaterFiles Include="$(_UpdaterOut)**\*.*" Exclude="**\*.pdb;**\*.xml;**\*.deps.json" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_UpdaterFiles)"
+          DestinationFiles="@(_UpdaterFiles->'$(_UpdaterDest)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <Message Importance="High" Text="Updater copied to build output: $(_UpdaterDest)" />
+  </Target>
+
+  <!-- Build Updater project and copy its output into BabylonMap's publish folder under Updater/ -->
+  <Target Name="BuildAndCopyUpdater" AfterTargets="Publish" BeforeTargets="CreateReleaseArtifacts" Condition="'$(MSBuildProjectName)' == 'BabylonMap' and Exists('$(MSBuildProjectDirectory)\..\Updater\Updater.csproj') and Exists('$(PublishDir)')">
+    <PropertyGroup>
+      <_UpdaterProject>$(MSBuildProjectDirectory)\..\Updater\Updater.csproj</_UpdaterProject>
+      <_UpdaterTF>net9.0-windows10.0.19041.0</_UpdaterTF>
+      <_UpdaterOut>$(MSBuildProjectDirectory)\..\Updater\bin\$(Configuration)\$(_UpdaterTF)\</_UpdaterOut>
+      <_UpdaterDest>$(PublishDir)Updater\</_UpdaterDest>
+    </PropertyGroup>
+
+    <MSBuild Projects="$(_UpdaterProject)" Targets="Build" Properties="Configuration=$(Configuration)" />
+    <MakeDir Directories="$(_UpdaterDest)" />
+    <ItemGroup>
+      <_UpdaterFiles Include="$(_UpdaterOut)**\*.*" Exclude="**\*.pdb;**\*.xml;**\*.deps.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_UpdaterFiles)"
+          DestinationFiles="@(_UpdaterFiles->'$(_UpdaterDest)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+    <Message Importance="High" Text="Updater copied to publish output: $(_UpdaterDest)" />
+  </Target>
+
+  <Target Name="CreateReleaseArtifacts" AfterTargets="Publish" Condition="'$(GenerateReleaseArtifacts)' == 'true' and Exists('$(PublishDir)')">
+    <!-- Ensure artifact directory exists -->
+    <MakeDir Directories="$(ArtifactDir)" />
+
+    <!-- Create ZIP of the publish output (Windows PowerShell) -->
+    <Exec Condition="'$(OS)' == 'Windows_NT'" 
+          Command='powershell -NoProfile -ExecutionPolicy Bypass -Command "Compress-Archive -Force -Path \"$(PublishDir)*\" -DestinationPath \"$(ArtifactPath)\""' />
+
+    <!-- Fallback cross-platform zip via dotnet if PowerShell is unavailable (optional; tries to use System.IO.Compression.ZipFile via PowerShell 7) -->
+    <Exec Condition="'$(OS)' != 'Windows_NT'" 
+          Command='pwsh -NoProfile -Command "[System.IO.Compression.ZipFile]::CreateFromDirectory(\"$(PublishDir)\", \"$(ArtifactPath)\");"' ContinueOnError="true" />
+
+    <!-- Compute SHA256 and save as .sha256 -->
+    <Exec Condition="'$(OS)' == 'Windows_NT'" 
+          Command='powershell -NoProfile -ExecutionPolicy Bypass -Command "$h=(Get-FileHash -Algorithm SHA256 \"$(ArtifactPath)\").Hash; Set-Content -NoNewline -Path \"$(ArtifactShaPath)\" -Value $h"' />
+
+    <!-- Write version.json next to artifact -->
+    <Exec Condition="'$(OS)' == 'Windows_NT'" 
+          Command='powershell -NoProfile -ExecutionPolicy Bypass -Command "$hash=Get-Content -Raw \"$(ArtifactShaPath)\"; $obj=[ordered]@{ version=\"$(_ArtifactVersion)\"; buildTimestamp=[DateTime]::UtcNow.ToString(\"o\"); artifact=\"$(ArtifactFileName)\"; sha256=$hash }; ($obj | ConvertTo-Json) | Set-Content -Path \"$(ArtifactVersionJsonFile)\""' />
+
+    <Message Importance="High" Text="Created: $(ArtifactPath)" />
+    <Message Importance="High" Text="Created: $(ArtifactShaPath)" />
+    <Message Importance="High" Text="Created: $(ArtifactVersionJsonFile)" />
+  </Target>
+</Project>
